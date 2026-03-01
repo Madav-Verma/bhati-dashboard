@@ -5,62 +5,116 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Bhati March 2026 — Sewadar Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Inter',sans-serif;background:#f0f2f5;color:#1a1a2e;font-size:13px}
-header{background:linear-gradient(135deg,#1a3c6e 0%,#2563a8 100%);color:white;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 8px rgba(0,0,0,0.2)}
-.header-title{font-size:18px;font-weight:700}
+
+/* Header */
+header{background:linear-gradient(135deg,#1a3c6e 0%,#2563a8 100%);color:white;padding:12px 24px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 8px rgba(0,0,0,0.2);flex-wrap:wrap;gap:10px}
+.header-title{font-size:17px;font-weight:700}
 .header-sub{font-size:11px;opacity:.75;margin-top:2px}
-.header-right{text-align:right}
+.header-right{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .updated-tag{font-size:11px;opacity:.8}
-.live-pill{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:999px;padding:3px 10px;font-size:10px;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px}
+.live-pill{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:999px;padding:3px 10px;font-size:10px;letter-spacing:1px;text-transform:uppercase}
 .live-dot{width:6px;height:6px;border-radius:50%;background:#4ade80;animation:blink 1.5s ease-in-out infinite}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
-.tab-bar{background:white;border-bottom:2px solid #d1d5db;padding:0 24px;display:flex;position:sticky;top:0;z-index:100;box-shadow:0 1px 4px rgba(0,0,0,.08)}
-.tab{padding:11px 20px;font-size:12px;font-weight:600;color:#6b7280;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .15s;white-space:nowrap}
+.last-scan-tag{font-size:10px;opacity:.7}
+.global-search{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:6px;padding:6px 12px;font-family:'Inter',sans-serif;font-size:12px;color:white;outline:none;width:220px}
+.global-search::placeholder{color:rgba(255,255,255,.6)}
+.global-search:focus{background:rgba(255,255,255,.25)}
+.date-filter-bar{background:white;padding:8px 24px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #e5e7eb;flex-wrap:wrap}
+.date-btn{padding:5px 14px;border-radius:999px;font-size:11px;font-weight:600;cursor:pointer;border:1.5px solid #d1d5db;background:white;color:#6b7280;transition:all .15s}
+.date-btn:hover{border-color:#2563a8;color:#2563a8}
+.date-btn.active{background:#2563a8;color:white;border-color:#2563a8}
+.date-filter-label{font-size:11px;color:#6b7280;font-weight:600}
+
+/* Tabs */
+.tab-bar{background:white;border-bottom:2px solid #d1d5db;padding:0 24px;display:flex;position:sticky;top:0;z-index:100;box-shadow:0 1px 4px rgba(0,0,0,.08);overflow-x:auto}
+.tab{padding:10px 18px;font-size:12px;font-weight:600;color:#6b7280;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .15s;white-space:nowrap}
 .tab:hover{color:#2563a8;background:#f8faff}
 .tab.active{color:#2563a8;border-bottom-color:#2563a8;background:#f0f6ff}
-main{padding:20px 24px}
+.tab .badge{display:inline-block;background:#fee2e2;color:#dc2626;border-radius:999px;padding:1px 6px;font-size:9px;margin-left:4px;font-weight:700}
+.tab .badge.blue{background:#dbeafe;color:#1d4ed8}
+
+main{padding:18px 24px}
 .tab-content{display:none}
 .tab-content.active{display:block;animation:fadeIn .2s ease}
 @keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
-.kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:20px}
-.kpi{background:white;border-radius:8px;padding:16px 18px;border:1px solid #e5e7eb;border-left:4px solid;box-shadow:0 1px 3px rgba(0,0,0,.06)}
-.kpi.blue{border-left-color:#2563a8}.kpi.green{border-left-color:#16a34a}.kpi.orange{border-left-color:#ea580c}.kpi.purple{border-left-color:#7c3aed}
-.kpi-label{font-size:10px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
-.kpi-value{font-size:28px;font-weight:700;line-height:1}
-.kpi.blue .kpi-value{color:#2563a8}.kpi.green .kpi-value{color:#16a34a}.kpi.orange .kpi-value{color:#ea580c}.kpi.purple .kpi-value{color:#7c3aed}
-.kpi-sub{font-size:10px;color:#9ca3af;margin-top:4px}
+
+/* KPI */
+.kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:18px}
+.kpi{background:white;border-radius:8px;padding:14px 16px;border:1px solid #e5e7eb;border-left:4px solid;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.kpi.blue{border-left-color:#2563a8}.kpi.green{border-left-color:#16a34a}.kpi.orange{border-left-color:#ea580c}.kpi.purple{border-left-color:#7c3aed}.kpi.red{border-left-color:#dc2626}.kpi.teal{border-left-color:#0891b2}
+.kpi-label{font-size:10px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:1px;margin-bottom:5px}
+.kpi-value{font-size:26px;font-weight:700;line-height:1}
+.kpi.blue .kpi-value{color:#2563a8}.kpi.green .kpi-value{color:#16a34a}.kpi.orange .kpi-value{color:#ea580c}.kpi.purple .kpi-value{color:#7c3aed}.kpi.red .kpi-value{color:#dc2626}.kpi.teal .kpi-value{color:#0891b2}
+.kpi-sub{font-size:10px;color:#9ca3af;margin-top:3px}
+
+/* Section */
 .sec-head{font-size:13px;font-weight:700;color:#1a3c6e;margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid #dbeafe;display:flex;align-items:center;justify-content:space-between}
 .sec-head span{font-size:11px;font-weight:400;color:#6b7280}
-.chart-box{background:white;border:1px solid #e5e7eb;border-radius:8px;padding:18px;margin-bottom:20px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
-.bars{display:flex;align-items:flex-end;gap:12px;height:140px;padding-top:10px}
+
+/* Chart */
+.chart-box{background:white;border:1px solid #e5e7eb;border-radius:8px;padding:16px;margin-bottom:18px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.bars{display:flex;align-items:flex-end;gap:10px;height:130px;padding-top:8px}
 .bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;justify-content:flex-end}
 .bar-val{font-size:11px;font-weight:700;color:#1a3c6e}
 .bar-fill{width:100%;border-radius:4px 4px 0 0;background:linear-gradient(180deg,#3b82f6,#1a3c6e);min-height:4px;cursor:pointer}
 .bar-fill:hover{filter:brightness(1.15)}
 .bar-lbl{font-size:10px;color:#6b7280;text-align:center;white-space:nowrap}
-.dept-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-bottom:20px}
-.dept-card{background:white;border:1px solid #e5e7eb;border-radius:8px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+
+/* Gender bar */
+.gender-row{display:flex;gap:12px;margin-bottom:18px;flex-wrap:wrap}
+.gender-card{background:white;border:1px solid #e5e7eb;border-radius:8px;padding:14px 18px;flex:1;min-width:160px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.gender-label{font-size:10px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.gender-split{display:flex;align-items:center;gap:10px}
+.gender-m{font-size:20px;font-weight:700;color:#2563a8}
+.gender-f{font-size:20px;font-weight:700;color:#db2777}
+.gender-divider{color:#d1d5db;font-size:16px}
+.gender-sub{font-size:10px;color:#9ca3af}
+.gender-bar-wrap{height:6px;background:#f3f4f6;border-radius:3px;margin-top:8px;overflow:hidden}
+.gender-bar-m{height:100%;background:#2563a8;border-radius:3px;display:inline-block}
+
+/* Dept */
+.dept-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px;margin-bottom:18px}
+.dept-card{background:white;border:1px solid #e5e7eb;border-radius:8px;padding:11px 14px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 1px 3px rgba(0,0,0,.04)}
 .dept-name{font-size:11px;font-weight:600;color:#374151}
-.dept-count{font-size:18px;font-weight:700;color:white;background:#2563a8;border-radius:6px;padding:2px 10px}
-.toolbar{display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap;align-items:center}
-.search-box{flex:1;min-width:200px;border:1px solid #d1d5db;border-radius:6px;padding:7px 12px;font-family:'Inter',sans-serif;font-size:12px;outline:none;background:white;transition:border-color .15s}
+.dept-count{font-size:17px;font-weight:700;color:white;background:#2563a8;border-radius:6px;padding:2px 10px}
+
+/* Alert cards */
+.alert-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;margin-bottom:18px}
+.alert-card{background:white;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.alert-head{padding:10px 14px;display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:700}
+.alert-head.red{background:#fee2e2;color:#dc2626;border-bottom:1px solid #fecaca}
+.alert-head.amber{background:#fef3c7;color:#d97706;border-bottom:1px solid #fde68a}
+.alert-body{padding:8px 14px;font-size:11px;color:#374151;max-height:160px;overflow-y:auto}
+.alert-row{padding:5px 0;border-bottom:1px solid #f3f4f6;display:flex;gap:8px;align-items:center}
+.alert-row:last-child{border-bottom:none}
+
+/* Toolbar */
+.toolbar{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center}
+.search-box{flex:1;min-width:180px;border:1px solid #d1d5db;border-radius:6px;padding:7px 12px;font-family:'Inter',sans-serif;font-size:12px;outline:none;background:white;transition:border-color .15s}
 .search-box:focus{border-color:#2563a8;box-shadow:0 0 0 2px rgba(37,99,168,.1)}
 .filter-select{border:1px solid #d1d5db;border-radius:6px;padding:7px 10px;font-family:'Inter',sans-serif;font-size:12px;background:white;outline:none;cursor:pointer;color:#374151}
 .count-badge{background:#dbeafe;color:#1d4ed8;border-radius:999px;padding:4px 10px;font-size:11px;font-weight:600;white-space:nowrap}
-.tbl-wrap{background:white;border:1px solid #d1d5db;border-radius:8px;overflow:auto;box-shadow:0 1px 3px rgba(0,0,0,.05);max-height:65vh}
-table{width:100%;border-collapse:collapse;min-width:900px}
+.dl-btn{display:inline-flex;align-items:center;gap:6px;background:#16a34a;color:white;border:none;border-radius:6px;padding:7px 13px;font-family:'Inter',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:background .15s;white-space:nowrap}
+.dl-btn:hover{background:#15803d}
+.dl-btn svg{width:13px;height:13px;flex-shrink:0}
+
+/* Table */
+.tbl-wrap{background:white;border:1px solid #d1d5db;border-radius:8px;overflow:auto;box-shadow:0 1px 3px rgba(0,0,0,.05);max-height:60vh}
+table{width:100%;border-collapse:collapse;min-width:800px}
 thead{position:sticky;top:0;z-index:5}
-thead tr th{background:#1a3c6e;color:white;padding:10px 12px;text-align:left;font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;white-space:nowrap;border-right:1px solid rgba(255,255,255,.1)}
+thead tr th{background:#1a3c6e;color:white;padding:9px 12px;text-align:left;font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;white-space:nowrap;border-right:1px solid rgba(255,255,255,.1)}
 thead tr th:last-child{border-right:none}
-.sub-header th{background:#2563a8 !important;color:rgba(255,255,255,.85) !important;font-size:9px !important;padding:5px 12px !important;letter-spacing:.5px}
+.sub-header th{background:#2563a8 !important;color:rgba(255,255,255,.85) !important;font-size:9px !important;padding:5px 12px !important}
 tbody tr:nth-child(even){background:#f8faff}
 tbody tr:hover{background:#dbeafe !important}
-td{padding:8px 12px;border-bottom:1px solid #e5e7eb;border-right:1px solid #f3f4f6;white-space:nowrap;vertical-align:middle}
+td{padding:7px 12px;border-bottom:1px solid #e5e7eb;border-right:1px solid #f3f4f6;white-space:nowrap;vertical-align:middle}
 td:last-child{border-right:none}
-.sno{color:#9ca3af;font-size:11px;text-align:center;min-width:40px}
-.badge-tag{font-family:'Courier New',monospace;font-size:11px;font-weight:600;background:#f0f6ff;border:1px solid #bfdbfe;border-radius:4px;padding:2px 7px;color:#1d4ed8;white-space:nowrap}
+.sno{color:#9ca3af;font-size:11px;text-align:center;min-width:36px}
+.badge-tag{font-family:'Courier New',monospace;font-size:11px;font-weight:600;background:#f0f6ff;border:1px solid #bfdbfe;border-radius:4px;padding:2px 7px;color:#1d4ed8}
 .name-primary{font-weight:600;color:#111827;font-size:12px}
 .name-sub{font-size:10px;color:#6b7280;margin-top:1px}
 .centre-tag{display:inline-block;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:4px;padding:2px 8px;font-size:10px;font-weight:600;color:#15803d}
@@ -68,68 +122,118 @@ td:last-child{border-right:none}
 .type-in{background:#dcfce7;color:#15803d;border:1px solid #bbf7d0;border-radius:4px;padding:2px 8px;font-size:10px;font-weight:700}
 .type-out{background:#fee2e2;color:#dc2626;border:1px solid #fecaca;border-radius:4px;padding:2px 8px;font-size:10px;font-weight:700}
 .present-cell{background:#dcfce7;color:#15803d;border-radius:4px;padding:3px 6px;font-size:10px;line-height:1.5;white-space:nowrap;display:inline-block;min-width:80px;text-align:center}
-.absent-cell{background:#fee2e2;color:#dc2626;border-radius:4px;padding:3px 6px;font-size:10px;display:inline-block;min-width:60px;text-align:center}
-.centre-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px}
+.absent-cell{background:#fee2e2;color:#dc2626;border-radius:4px;padding:3px 6px;font-size:10px;display:inline-block;min-width:55px;text-align:center}
+
+/* Centre cards */
+.centre-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
 .centre-card{background:white;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.05)}
-.centre-card-head{background:linear-gradient(135deg,#1a3c6e,#2563a8);color:white;padding:10px 14px;display:flex;align-items:center;justify-content:space-between}
+.centre-card-head{background:linear-gradient(135deg,#1a3c6e,#2563a8);color:white;padding:10px 14px}
 .centre-card-title{font-size:13px;font-weight:700}
-.centre-total{font-size:11px;opacity:.8}
-.centre-date-row{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;border-bottom:1px solid #f3f4f6;font-size:12px}
+.centre-card-meta{font-size:10px;opacity:.8;margin-top:3px}
+.expected-bar{height:4px;background:rgba(255,255,255,.2);border-radius:2px;margin-top:8px;overflow:hidden}
+.expected-fill{height:100%;background:#4ade80;border-radius:2px}
+.centre-date-row{display:flex;align-items:center;justify-content:space-between;padding:7px 14px;border-bottom:1px solid #f3f4f6;font-size:12px}
 .centre-date-row:last-child{border-bottom:none}
 .cdr-date{font-weight:600;color:#374151;min-width:80px}
-.cdr-present{color:#15803d;font-weight:700;min-width:100px;text-align:right}
+.cdr-present{color:#15803d;font-weight:700;min-width:90px;text-align:right}
 .cdr-bar-wrap{flex:1;margin:0 10px;height:6px;background:#f3f4f6;border-radius:3px}
 .cdr-bar{height:100%;background:#2563a8;border-radius:3px}
+
+/* Absent tab */
+.absent-date-section{margin-bottom:20px}
+.absent-date-head{background:#fee2e2;border:1px solid #fecaca;border-radius:8px 8px 0 0;padding:10px 14px;display:flex;align-items:center;justify-content:space-between}
+.absent-date-title{font-size:13px;font-weight:700;color:#dc2626}
+.absent-date-count{font-size:11px;color:#dc2626;font-weight:600}
+
+/* Loading */
 #loading{display:flex;flex-direction:column;align-items:center;justify-content:center;height:60vh;gap:12px}
 .spinner{width:36px;height:36px;border:3px solid #dbeafe;border-top-color:#2563a8;border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 #loading p{color:#6b7280;font-size:13px}
 #error-msg{display:none;text-align:center;padding:4rem;color:#dc2626;line-height:2}
 #dashboard{display:none}
-@media(max-width:768px){header{flex-direction:column;align-items:flex-start;gap:8px;padding:12px 16px}main{padding:16px}.tab{padding:10px 14px;font-size:11px}}
+
+/* Global search results */
+.gsearch-results{position:absolute;top:100%;right:0;background:white;border:1px solid #d1d5db;border-radius:8px;box-shadow:0 4px 20px rgba(0,0,0,.15);width:360px;max-height:400px;overflow-y:auto;z-index:200;display:none}
+.gsearch-item{padding:10px 14px;border-bottom:1px solid #f3f4f6;cursor:pointer;transition:background .1s}
+.gsearch-item:hover{background:#f0f6ff}
+.gsearch-item:last-child{border-bottom:none}
+.gsearch-name{font-weight:600;font-size:12px;color:#111827}
+.gsearch-meta{font-size:10px;color:#6b7280;margin-top:2px}
+.gsearch-wrap{position:relative}
+
+@media(max-width:768px){header{padding:12px 16px}main{padding:14px 12px}.tab{padding:9px 12px;font-size:11px}}
 </style>
 </head>
 <body>
+
 <div id="loading"><div class="spinner"></div><p>Loading Bhati attendance data...</p></div>
-<div id="error-msg">⚠️ Could not load data.json<br><small style="color:#6b7280">Make sure GitHub Actions has run at least once.</small></div>
+<div id="error-msg">⚠️ Could not load data<br><small style="color:#6b7280">Check your Railway URL is set correctly.</small></div>
 
 <div id="dashboard">
   <header>
     <div>
       <div class="header-title">🙏 Bhati March 2026 — Sewadar Dashboard</div>
-      <div class="header-sub">Real-time attendance tracking • Auto-updates every 10 minutes</div>
+      <div class="header-sub">Live attendance tracking • Updates every 60 seconds</div>
     </div>
     <div class="header-right">
-      <div class="live-pill"><span class="live-dot"></span> Live</div>
-      <div class="updated-tag" id="last-updated">—</div>
+      <div>
+        <div class="live-pill"><span class="live-dot"></span> Live</div>
+        <div class="updated-tag" id="last-updated">—</div>
+        <div class="last-scan-tag" id="last-scan-tag"></div>
+      </div>
+      <div class="gsearch-wrap">
+        <input class="global-search" id="global-search" placeholder="🔍 Search any sewadar..." oninput="globalSearch()" onblur="setTimeout(()=>document.getElementById('gsearch-results').style.display='none',200)"/>
+        <div class="gsearch-results" id="gsearch-results"></div>
+      </div>
     </div>
   </header>
+
+  <!-- Date filter bar -->
+  <div class="date-filter-bar">
+    <span class="date-filter-label">Filter by date:</span>
+    <button class="date-btn active" onclick="setDateFilter('all',this)">All Dates</button>
+    <div id="date-btns"></div>
+  </div>
 
   <div class="tab-bar">
     <div class="tab active" onclick="switchTab('overview')">📊 Overview</div>
     <div class="tab" onclick="switchTab('scans')">🔍 Scan Details</div>
-    <div class="tab" onclick="switchTab('attendance')">📅 Attendance Matrix</div>
-    <div class="tab" onclick="switchTab('centres')">🏢 Centre-wise</div>
+    <div class="tab" onclick="switchTab('attendance')">📅 Attendance</div>
+    <div class="tab" onclick="switchTab('centres')">🏢 Centres</div>
+    <div class="tab" onclick="switchTab('absent')">❌ Absent <span class="badge" id="absent-badge">0</span></div>
+    <div class="tab" onclick="switchTab('alerts')">⚠️ Alerts <span class="badge" id="alerts-badge">0</span></div>
   </div>
 
   <main>
+
     <!-- OVERVIEW -->
     <div class="tab-content active" id="tab-overview">
       <div class="kpi-row" id="kpi-row"></div>
+      <div id="gender-row" class="gender-row"></div>
       <div class="sec-head">Daily Headcount <span id="date-range-label"></span></div>
       <div class="chart-box"><div class="bars" id="bar-chart"></div></div>
-      <div class="sec-head">Department Breakdown <span>Unique sewadars scanned per department</span></div>
+      <div class="sec-head">Department Breakdown <span>Unique sewadars per department</span></div>
       <div class="dept-grid" id="dept-grid"></div>
+      <div style="margin-top:14px">
+        <button class="dl-btn" onclick="downloadOverviewExcel()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+          Download Overview Excel
+        </button>
+      </div>
     </div>
 
     <!-- SCAN DETAILS -->
     <div class="tab-content" id="tab-scans">
       <div class="toolbar">
-        <input class="search-box" id="scan-search" placeholder="Search by name, badge, centre, department..." oninput="filterScans()"/>
+        <input class="search-box" id="scan-search" placeholder="Search name, badge, centre..." oninput="filterScans()"/>
         <select class="filter-select" id="scan-type-filter" onchange="filterScans()"><option value="">All Types</option><option value="IN">IN only</option><option value="OUT">OUT only</option></select>
-        <select class="filter-select" id="scan-date-filter" onchange="filterScans()"><option value="">All Dates</option></select>
         <select class="filter-select" id="scan-dept-filter" onchange="filterScans()"><option value="">All Departments</option></select>
         <div class="count-badge" id="scan-count">0 records</div>
+        <button class="dl-btn" onclick="downloadScansExcel()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+          Download (filtered)
+        </button>
       </div>
       <div class="tbl-wrap">
         <table>
@@ -142,7 +246,7 @@ td:last-child{border-right:none}
             </tr>
             <tr class="sub-header">
               <th>Badge No.</th><th>Name</th><th>Centre</th><th style="border-right:2px solid rgba(255,255,255,.3)">Department</th>
-              <th>Type</th><th>Date</th><th style="border-right:2px solid rgba(255,255,255,.3)">Time</th>
+              <th>Type</th><th>Date</th><th style="border-right:2px solid rgba(255,255,255,.3)">Time (IST)</th>
               <th>Badge No.</th><th>Name</th><th>Centre</th>
             </tr>
           </thead>
@@ -154,35 +258,125 @@ td:last-child{border-right:none}
     <!-- ATTENDANCE MATRIX -->
     <div class="tab-content" id="tab-attendance">
       <div class="toolbar">
-        <input class="search-box" id="att-search" placeholder="Search sewadar name or badge..." oninput="filterAttendance()"/>
+        <input class="search-box" id="att-search" placeholder="Search sewadar..." oninput="filterAttendance()"/>
         <select class="filter-select" id="att-centre-filter" onchange="filterAttendance()"><option value="">All Centres</option></select>
         <select class="filter-select" id="att-dept-filter" onchange="filterAttendance()"><option value="">All Departments</option></select>
+        <select class="filter-select" id="att-gender-filter" onchange="filterAttendance()"><option value="">All Genders</option><option value="m">Male</option><option value="f">Female</option></select>
         <div class="count-badge" id="att-count">0 sewadars</div>
+        <button class="dl-btn" onclick="downloadAttendanceExcel()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+          Download (filtered)
+        </button>
       </div>
       <div class="tbl-wrap">
         <table><thead id="att-head"></thead><tbody id="att-body"></tbody></table>
       </div>
     </div>
 
-    <!-- CENTRE-WISE -->
+    <!-- CENTRES -->
     <div class="tab-content" id="tab-centres">
       <div class="toolbar">
-        <input class="search-box" id="centre-search" placeholder="Search centre..." oninput="filterCentres()" style="max-width:300px"/>
+        <input class="search-box" id="centre-search" placeholder="Search centre..." oninput="filterCentres()" style="max-width:280px"/>
         <div class="count-badge" id="centre-count">0 centres</div>
+        <button class="dl-btn" onclick="downloadCentreExcel()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+          Download Centre Summary
+        </button>
       </div>
       <div class="centre-cards" id="centre-cards"></div>
     </div>
+
+    <!-- ABSENT -->
+    <div class="tab-content" id="tab-absent">
+      <div class="toolbar">
+        <input class="search-box" id="absent-search" placeholder="Search absent sewadar..." oninput="filterAbsent()"/>
+        <select class="filter-select" id="absent-centre-filter" onchange="filterAbsent()"><option value="">All Centres</option></select>
+        <select class="filter-select" id="absent-dept-filter" onchange="filterAbsent()"><option value="">All Departments</option></select>
+        <div class="count-badge" id="absent-count">0 absent</div>
+        <button class="dl-btn" onclick="downloadAbsentExcel()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+          Download Absent List
+        </button>
+      </div>
+      <div id="absent-content"></div>
+    </div>
+
+    <!-- ALERTS -->
+    <div class="tab-content" id="tab-alerts">
+      <div class="sec-head">Duplicate IN Scans <span>Same sewadar scanned IN more than once in a day</span></div>
+      <div class="alert-grid" id="dup-grid"></div>
+      <div class="sec-head" style="margin-top:16px">Missing OUT Scans <span>Sewadars who have IN but no OUT recorded</span></div>
+      <div class="toolbar" style="margin-bottom:10px">
+        <input class="search-box" id="missing-search" placeholder="Search..." oninput="filterMissingOut()" style="max-width:280px"/>
+        <select class="filter-select" id="missing-dept-filter" onchange="filterMissingOut()"><option value="">All Departments</option></select>
+        <div class="count-badge" id="missing-count">0 records</div>
+        <button class="dl-btn" onclick="downloadAlertsExcel()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+          Download Alerts
+        </button>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>#</th><th>Badge No.</th><th>Sewadar Name</th><th>Centre</th><th>Department</th><th>Date</th><th>IN Time</th></tr></thead>
+          <tbody id="missing-body"></tbody>
+        </table>
+      </div>
+    </div>
+
   </main>
 </div>
 
 <script>
-let DATA=null;
+// ── Config ────────────────────────────────────────────────────────────────────
+// IMPORTANT: Replace with your Railway URL after deployment
+const DATA_URL = window.location.hostname === 'localhost'
+  ? 'data.json'
+  : 'https://bhati-server-production.up.railway.app/data.json';
 
+let DATA = null;
+let ACTIVE_DATE = 'all';
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+function fmtDate(d){ if(!d)return'—'; return new Date(d).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'2-digit'}); }
+function nowStamp(){ return new Date().toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}).replace(/ /g,'-'); }
+function dlIcon(){ return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>`; }
+
+function switchTab(name){
+  ['overview','scans','attendance','centres','absent','alerts'].forEach((n,i)=>{
+    document.querySelectorAll('.tab')[i].classList.toggle('active',n===name);
+    document.getElementById('tab-'+n).classList.toggle('active',n===name);
+  });
+}
+
+function setDateFilter(date, btn){
+  ACTIVE_DATE = date;
+  document.querySelectorAll('.date-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  if(DATA) applyDateFilter();
+}
+
+function applyDateFilter(){
+  const d = DATA;
+  const dates = ACTIVE_DATE==='all' ? d.dates : [ACTIVE_DATE];
+  renderOverview(d, dates);
+  renderScanTable(getFilteredScans(d.raw_log||[], dates));
+  renderAttendanceTable(d.sewadar_attendance||[], dates);
+  renderCentreCards(d.centre_summary||[], dates);
+  renderAbsent(d.absent_per_day||[], dates);
+}
+
+function getFilteredScans(scans, dates){
+  if(ACTIVE_DATE==='all') return scans;
+  return scans.filter(s=>dates.includes(s.date));
+}
+
+// ── Load ──────────────────────────────────────────────────────────────────────
 async function loadData(){
   try{
-    const res=await fetch('data.json?t='+Date.now());
-    if(!res.ok)throw new Error();
-    DATA=await res.json();
+    const url = DATA_URL==='REPLACE_WITH_RAILWAY_URL/data.json' ? 'data.json' : DATA_URL;
+    const res = await fetch(url+'?t='+Date.now());
+    if(!res.ok) throw new Error();
+    DATA = await res.json();
     render(DATA);
     document.getElementById('loading').style.display='none';
     document.getElementById('dashboard').style.display='block';
@@ -192,38 +386,74 @@ async function loadData(){
   }
 }
 
-function switchTab(name){
-  ['overview','scans','attendance','centres'].forEach((n,i)=>{
-    document.querySelectorAll('.tab')[i].classList.toggle('active',n===name);
-    document.getElementById('tab-'+n).classList.toggle('active',n===name);
-  });
-}
-
-function fmtDate(d){
-  if(!d)return'—';
-  return new Date(d).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'2-digit'});
-}
-
+// ── Render all ────────────────────────────────────────────────────────────────
 function render(d){
   document.getElementById('last-updated').textContent='Updated: '+d.last_updated;
+  if(d.last_scan_at) document.getElementById('last-scan-tag').textContent='Last scan: '+d.last_scan_at.slice(11,16)+' IST';
 
-  // KPIs
-  const peak=(d.headcount_per_day||[]).reduce((a,b)=>a.total_present>b.total_present?a:b,{total_present:0,date:''});
+  // Date filter buttons
+  const btnContainer = document.getElementById('date-btns');
+  btnContainer.innerHTML = (d.dates||[]).map(dt=>
+    `<button class="date-btn" onclick="setDateFilter('${dt}',this)">${fmtDate(dt)}</button>`
+  ).join('');
+
+  // Alert badges
+  const alertCount = (d.duplicate_flags||[]).length + (d.missing_out||[]).length;
+  document.getElementById('alerts-badge').textContent = alertCount;
+  const absentTotal = (d.absent_per_day||[]).reduce((a,b)=>a+b.absent_count,0);
+  document.getElementById('absent-badge').textContent = absentTotal > 999 ? '999+' : absentTotal;
+
+  // Populate filters
+  populateFilters(d);
+
+  applyDateFilter();
+
+  // Alerts tab (not date-filtered)
+  renderAlerts(d);
+
+  // Global search index
+  buildSearchIndex(d);
+}
+
+function renderOverview(d, dates){
+  const hpd = (d.headcount_per_day||[]).filter(h=>dates.includes(h.date));
+  const totalPresent = hpd.reduce((a,b)=>a+b.total_present,0);
+  const peak = hpd.reduce((a,b)=>a.total_present>b.total_present?a:b,{total_present:0,date:''});
+
   document.getElementById('kpi-row').innerHTML=[
-    {cls:'blue',  label:'Total Sewadars', val:d.total_sewadars,           sub:'scanned at least once'},
-    {cls:'green', label:'Total Scans',    val:d.total_scans,              sub:'IN + OUT combined'},
-    {cls:'orange',label:'Days Tracked',   val:(d.dates||[]).length,       sub:'unique dates'},
-    {cls:'purple',label:'Peak Attendance',val:peak.total_present,         sub:fmtDate(peak.date)},
+    {cls:'blue',  label:'Total Sewadars',   val:d.total_sewadars,    sub:'scanned at least once'},
+    {cls:'green', label:'Registered',       val:d.total_registered||0, sub:'in Sewadar_Details.xlsx'},
+    {cls:'orange',label:'Total Scans',      val:hpd.reduce((a,b)=>a+b.total_in+b.total_out,0), sub:'IN + OUT'},
+    {cls:'purple',label:'Peak Day',         val:peak.total_present,  sub:fmtDate(peak.date)},
+    {cls:'red',   label:'Absent Today',     val:(d.absent_per_day||[]).find(a=>a.date===dates[dates.length-1])?.absent_count||0, sub:'not scanned yet'},
+    {cls:'teal',  label:'Missing OUT',      val:(d.missing_out||[]).filter(m=>dates.includes(m.date)).length, sub:'IN but no OUT'},
   ].map(k=>`<div class="kpi ${k.cls}"><div class="kpi-label">${k.label}</div><div class="kpi-value">${k.val}</div><div class="kpi-sub">${k.sub}</div></div>`).join('');
 
   if(d.dates&&d.dates.length)
     document.getElementById('date-range-label').textContent=
       fmtDate(d.dates[0])+(d.dates.length>1?' – '+fmtDate(d.dates[d.dates.length-1]):'');
 
+  // Gender
+  const gs = (d.gender_summary||[]).filter(g=>dates.includes(g.date));
+  const totalM = gs.reduce((a,b)=>a+b.male,0);
+  const totalF = gs.reduce((a,b)=>a+b.female,0);
+  const totalG = totalM+totalF||1;
+  document.getElementById('gender-row').innerHTML = gs.map(g=>{
+    const tot=g.male+g.female||1;
+    return`<div class="gender-card">
+      <div class="gender-label">${fmtDate(g.date)}</div>
+      <div class="gender-split">
+        <div><div class="gender-m">${g.male}</div><div class="gender-sub">Male</div></div>
+        <div class="gender-divider">|</div>
+        <div><div class="gender-f">${g.female}</div><div class="gender-sub">Female</div></div>
+      </div>
+      <div class="gender-bar-wrap"><div class="gender-bar-m" style="width:${Math.round(g.male/tot*100)}%"></div></div>
+    </div>`;
+  }).join('');
+
   // Bar chart
-  const hpd=d.headcount_per_day||[];
-  const maxH=Math.max(...hpd.map(h=>h.total_present),1);
-  document.getElementById('bar-chart').innerHTML=hpd.map(h=>`
+  const maxH = Math.max(...hpd.map(h=>h.total_present),1);
+  document.getElementById('bar-chart').innerHTML = hpd.map(h=>`
     <div class="bar-col">
       <div class="bar-val">${h.total_present}</div>
       <div class="bar-fill" style="height:${Math.max((h.total_present/maxH)*100,3)}%"
@@ -231,45 +461,21 @@ function render(d){
       <div class="bar-lbl">${fmtDate(h.date)}</div>
     </div>`).join('');
 
-  // Dept breakdown
+  // Dept
+  const scans = ACTIVE_DATE==='all' ? d.scans||[] : (d.scans||[]).filter(s=>dates.includes(s.date));
   const deptMap={};
-  (d.scans||[]).forEach(s=>{
-    if(s.department){if(!deptMap[s.department])deptMap[s.department]=new Set();deptMap[s.department].add(s.badge_no);}
-  });
+  scans.forEach(s=>{ if(s.department){if(!deptMap[s.department])deptMap[s.department]=new Set(); deptMap[s.department].add(s.badge_no);} });
   document.getElementById('dept-grid').innerHTML=Object.entries(deptMap)
     .sort((a,b)=>b[1].size-a[1].size)
     .map(([dept,badges])=>`<div class="dept-card"><div class="dept-name">${dept}</div><div class="dept-count">${badges.size}</div></div>`)
     .join('');
-
-  // Scan filters
-  const scanDates=[...new Set((d.raw_log||[]).map(s=>s.date))].sort();
-  const scanDepts=[...new Set((d.raw_log||[]).map(s=>s.department).filter(Boolean))].sort();
-  const sdf=document.getElementById('scan-date-filter');
-  scanDates.forEach(dt=>{const o=document.createElement('option');o.value=dt;o.textContent=fmtDate(dt);sdf.appendChild(o);});
-  const sdp=document.getElementById('scan-dept-filter');
-  scanDepts.forEach(dep=>{const o=document.createElement('option');o.value=dep;o.textContent=dep;sdp.appendChild(o);});
-  renderScanTable(d.raw_log||[]);
-
-  // Attendance filters
-  const attCentres=[...new Set((d.sewadar_attendance||[]).map(s=>s.sewadar_centre).filter(Boolean))].sort();
-  const attDepts  =[...new Set((d.sewadar_attendance||[]).map(s=>s.department).filter(Boolean))].sort();
-  const acf=document.getElementById('att-centre-filter');
-  attCentres.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;acf.appendChild(o);});
-  const adf=document.getElementById('att-dept-filter');
-  attDepts.forEach(dep=>{const o=document.createElement('option');o.value=dep;o.textContent=dep;adf.appendChild(o);});
-
-  document.getElementById('att-head').innerHTML=`<tr>
-    <th>#</th><th>Badge No.</th><th>Sewadar Name</th><th>Centre</th><th>Department</th>
-    ${(d.dates||[]).map(dt=>`<th style="text-align:center;min-width:90px">${fmtDate(dt)}</th>`).join('')}
-  </tr>`;
-  renderAttendanceTable(d.sewadar_attendance||[],d.dates||[]);
-  renderCentreCards(d.centre_summary||[],d.dates||[]);
 }
 
+// ── Scan Table ────────────────────────────────────────────────────────────────
 function renderScanTable(rows){
   document.getElementById('scan-body').innerHTML=rows.map((s,i)=>`
-    <tr data-search="${[s.badge_no,s.sewadar_name,s.sewadar_centre,s.department,s.scanned_by_badge,s.scanned_by_name].join(' ').toLowerCase()}"
-        data-type="${s.type||''}" data-date="${s.date||''}" data-dept="${s.department||''}">
+    <tr data-search="${[s.badge_no,s.sewadar_name,s.sewadar_centre,s.department,s.scanned_by_name].join(' ').toLowerCase()}"
+        data-type="${s.type||''}" data-dept="${s.department||''}">
       <td class="sno">${i+1}</td>
       <td><span class="badge-tag">${s.badge_no||'—'}</span></td>
       <td><div class="name-primary">${s.sewadar_name||'Unknown'}</div><div class="name-sub">${s.satsang_point||''}</div></td>
@@ -288,30 +494,36 @@ function renderScanTable(rows){
 function filterScans(){
   const q=document.getElementById('scan-search').value.toLowerCase();
   const type=document.getElementById('scan-type-filter').value;
-  const date=document.getElementById('scan-date-filter').value;
   const dept=document.getElementById('scan-dept-filter').value;
   let vis=0;
   document.querySelectorAll('#scan-body tr').forEach(row=>{
-    const ok=(!q||row.dataset.search.includes(q))&&(!type||row.dataset.type===type)&&(!date||row.dataset.date===date)&&(!dept||row.dataset.dept===dept);
+    const ok=(!q||row.dataset.search.includes(q))&&(!type||row.dataset.type===type)&&(!dept||row.dataset.dept===dept);
     row.style.display=ok?'':'none';
     if(ok)vis++;
   });
   document.getElementById('scan-count').textContent=vis+' records';
 }
 
-function renderAttendanceTable(rows,dates){
+// ── Attendance ────────────────────────────────────────────────────────────────
+function renderAttendanceTable(rows, dates){
+  document.getElementById('att-head').innerHTML=`<tr>
+    <th>#</th><th>Badge No.</th><th>Name</th><th>Centre</th><th>Dept</th><th>Gender</th>
+    ${dates.map(dt=>`<th style="text-align:center;min-width:88px">${fmtDate(dt)}</th>`).join('')}
+  </tr>`;
   document.getElementById('att-body').innerHTML=rows.map((s,i)=>`
     <tr data-name="${(s.sewadar_name||'').toLowerCase()}" data-badge="${(s.badge_no||'').toLowerCase()}"
-        data-centre="${(s.sewadar_centre||'').toLowerCase()}" data-dept="${(s.department||'').toLowerCase()}">
+        data-centre="${(s.sewadar_centre||'').toLowerCase()}" data-dept="${(s.department||'').toLowerCase()}"
+        data-gender="${(s.gender||'').toLowerCase()}">
       <td class="sno">${i+1}</td>
       <td><span class="badge-tag">${s.badge_no||'—'}</span></td>
       <td><div class="name-primary">${s.sewadar_name||'Unknown'}</div><div class="name-sub">${s.satsang_point||''}</div></td>
       <td>${s.sewadar_centre?`<span class="centre-tag">${s.sewadar_centre}</span>`:'—'}</td>
       <td>${s.department?`<span class="dept-tag">${s.department}</span>`:'—'}</td>
+      <td style="text-align:center;font-weight:600;color:${s.gender==='M'?'#2563a8':'#db2777'}">${s.gender||'—'}</td>
       ${dates.map(dt=>{
         const info=s[dt];
         if(!info||info.status==='ABSENT')return`<td style="text-align:center"><span class="absent-cell">ABSENT</span></td>`;
-        return`<td style="text-align:center"><span class="present-cell">↓ ${info.first_in||'—'}<br>↑ ${info.last_out||'—'}</span></td>`;
+        return`<td style="text-align:center"><span class="present-cell">↓${info.first_in||'—'}<br>↑${info.last_out||'—'}</span></td>`;
       }).join('')}
     </tr>`).join('');
   document.getElementById('att-count').textContent=rows.length+' sewadars';
@@ -321,23 +533,31 @@ function filterAttendance(){
   const q=document.getElementById('att-search').value.toLowerCase();
   const centre=document.getElementById('att-centre-filter').value.toLowerCase();
   const dept=document.getElementById('att-dept-filter').value.toLowerCase();
+  const gender=document.getElementById('att-gender-filter').value.toLowerCase();
   let vis=0;
   document.querySelectorAll('#att-body tr').forEach(row=>{
-    const ok=(!q||(row.dataset.name+row.dataset.badge).includes(q))&&(!centre||row.dataset.centre===centre)&&(!dept||row.dataset.dept===dept);
+    const ok=(!q||(row.dataset.name+row.dataset.badge).includes(q))
+          &&(!centre||row.dataset.centre===centre)
+          &&(!dept||row.dataset.dept===dept)
+          &&(!gender||row.dataset.gender===gender);
     row.style.display=ok?'':'none';
     if(ok)vis++;
   });
   document.getElementById('att-count').textContent=vis+' sewadars';
 }
 
-function renderCentreCards(centres,dates){
+// ── Centre Cards ──────────────────────────────────────────────────────────────
+function renderCentreCards(centres, dates){
   const maxP=Math.max(...centres.map(c=>Math.max(...dates.map(d=>c.dates[d]?.present||0))),1);
   document.getElementById('centre-count').textContent=centres.length+' centres';
-  document.getElementById('centre-cards').innerHTML=centres.map(c=>`
-    <div class="centre-card" data-name="${c.centre.toLowerCase()}">
+  document.getElementById('centre-cards').innerHTML=centres.map(c=>{
+    const totalPresent = dates.reduce((a,dt)=>a+(c.dates[dt]?.present||0),0);
+    const pct = c.expected ? Math.round((c.total_sewadars/c.expected)*100) : 0;
+    return`<div class="centre-card" data-name="${c.centre.toLowerCase()}">
       <div class="centre-card-head">
         <div class="centre-card-title">${c.centre}</div>
-        <div class="centre-total">${c.total_sewadars} sewadars</div>
+        <div class="centre-card-meta">${c.total_sewadars} scanned ${c.expected?`/ ${c.expected} expected (${pct}%)`:''}}</div>
+        ${c.expected?`<div class="expected-bar"><div class="expected-fill" style="width:${Math.min(pct,100)}%"></div></div>`:''}
       </div>
       ${dates.map(dt=>{
         const info=c.dates[dt]||{present:0,in:0,out:0};
@@ -345,10 +565,11 @@ function renderCentreCards(centres,dates){
         return`<div class="centre-date-row">
           <div class="cdr-date">${fmtDate(dt)}</div>
           <div class="cdr-bar-wrap"><div class="cdr-bar" style="width:${barW}%"></div></div>
-          <div class="cdr-present">${info.present} <span style="font-size:10px;color:#6b7280;font-weight:400">(IN:${info.in} OUT:${info.out})</span></div>
+          <div class="cdr-present">${info.present} <span style="font-size:10px;color:#6b7280;font-weight:400">(↓${info.in} ↑${info.out})</span></div>
         </div>`;
       }).join('')}
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
 function filterCentres(){
@@ -362,8 +583,287 @@ function filterCentres(){
   document.getElementById('centre-count').textContent=vis+' centres';
 }
 
+// ── Absent ────────────────────────────────────────────────────────────────────
+function renderAbsent(absentPerDay, dates){
+  const filtered = absentPerDay.filter(a=>dates.includes(a.date));
+  const content  = document.getElementById('absent-content');
+  if(!filtered.length){ content.innerHTML='<p style="color:#6b7280;padding:20px">No data yet.</p>'; return; }
+
+  // Populate absent filters
+  const allAbsent = filtered.flatMap(a=>a.absent||[]);
+  const centres = [...new Set(allAbsent.map(a=>a.centre).filter(Boolean))].sort();
+  const depts   = [...new Set(allAbsent.map(a=>a.department).filter(Boolean))].sort();
+  const acf=document.getElementById('absent-centre-filter');
+  while(acf.options.length>1)acf.remove(1);
+  centres.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;acf.appendChild(o);});
+  const adf=document.getElementById('absent-dept-filter');
+  while(adf.options.length>1)adf.remove(1);
+  depts.forEach(d=>{const o=document.createElement('option');o.value=d;o.textContent=d;adf.appendChild(o);});
+
+  content.innerHTML = filtered.map(day=>`
+    <div class="absent-date-section">
+      <div class="absent-date-head">
+        <div class="absent-date-title">❌ ${fmtDate(day.date)}</div>
+        <div class="absent-date-count">${day.absent_count} absent out of ${(DATA.total_registered||0)}</div>
+      </div>
+      <div class="tbl-wrap" style="border-radius:0 0 8px 8px;max-height:300px">
+        <table>
+          <thead><tr><th>#</th><th>Badge No.</th><th>Name</th><th>Centre</th><th>Department</th><th>Gender</th></tr></thead>
+          <tbody>${(day.absent||[]).map((s,i)=>`
+            <tr class="absent-row" data-name="${(s.name||'').toLowerCase()}" data-centre="${(s.centre||'').toLowerCase()}" data-dept="${(s.department||'').toLowerCase()}">
+              <td class="sno">${i+1}</td>
+              <td><span class="badge-tag">${s.badge_no||'—'}</span></td>
+              <td><div class="name-primary">${s.name||'Unknown'}</div></td>
+              <td>${s.centre?`<span class="centre-tag">${s.centre}</span>`:'—'}</td>
+              <td>${s.department?`<span class="dept-tag">${s.department}</span>`:'—'}</td>
+              <td style="font-weight:600;color:${s.gender==='M'?'#2563a8':'#db2777'}">${s.gender||'—'}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>`).join('');
+
+  const total = filtered.reduce((a,b)=>a+b.absent_count,0);
+  document.getElementById('absent-count').textContent=total+' absent';
+}
+
+function filterAbsent(){
+  const q=document.getElementById('absent-search').value.toLowerCase();
+  const centre=document.getElementById('absent-centre-filter').value.toLowerCase();
+  const dept=document.getElementById('absent-dept-filter').value.toLowerCase();
+  let vis=0;
+  document.querySelectorAll('.absent-row').forEach(row=>{
+    const ok=(!q||row.dataset.name.includes(q))&&(!centre||row.dataset.centre===centre)&&(!dept||row.dataset.dept===dept);
+    row.style.display=ok?'':'none';
+    if(ok)vis++;
+  });
+  document.getElementById('absent-count').textContent=vis+' absent';
+}
+
+// ── Alerts ────────────────────────────────────────────────────────────────────
+function renderAlerts(d){
+  const dups = d.duplicate_flags||[];
+  const missing = d.missing_out||[];
+  document.getElementById('alerts-badge').textContent = dups.length+missing.length;
+
+  document.getElementById('dup-grid').innerHTML = dups.length ? dups.map(f=>`
+    <div class="alert-card">
+      <div class="alert-head red">
+        <span>⚠️ ${f.sewadar_name} — ${fmtDate(f.date)}</span>
+        <span>${f.in_count}x IN</span>
+      </div>
+      <div class="alert-body">
+        <span class="badge-tag">${f.badge_no}</span>
+        <div style="margin-top:6px;color:#6b7280">Times: ${f.times.join(', ')}</div>
+      </div>
+    </div>`).join('')
+  : '<p style="color:#6b7280;font-size:12px;padding:8px">No duplicate scans detected ✅</p>';
+
+  const missingDepts=[...new Set(missing.map(m=>m.department).filter(Boolean))].sort();
+  const mdf=document.getElementById('missing-dept-filter');
+  while(mdf.options.length>1)mdf.remove(1);
+  missingDepts.forEach(d=>{const o=document.createElement('option');o.value=d;o.textContent=d;mdf.appendChild(o);});
+
+  document.getElementById('missing-body').innerHTML=missing.map((m,i)=>`
+    <tr class="missing-row" data-name="${(m.sewadar_name||'').toLowerCase()}" data-dept="${(m.department||'').toLowerCase()}">
+      <td class="sno">${i+1}</td>
+      <td><span class="badge-tag">${m.badge_no||'—'}</span></td>
+      <td><div class="name-primary">${m.sewadar_name||'Unknown'}</div></td>
+      <td>${m.centre?`<span class="centre-tag">${m.centre}</span>`:'—'}</td>
+      <td>${m.department?`<span class="dept-tag">${m.department}</span>`:'—'}</td>
+      <td>${m.date||'—'}</td>
+      <td style="font-weight:600;color:#15803d">${m.in_time||'—'}</td>
+    </tr>`).join('');
+  document.getElementById('missing-count').textContent=missing.length+' records';
+}
+
+function filterMissingOut(){
+  const q=document.getElementById('missing-search').value.toLowerCase();
+  const dept=document.getElementById('missing-dept-filter').value.toLowerCase();
+  let vis=0;
+  document.querySelectorAll('.missing-row').forEach(row=>{
+    const ok=(!q||row.dataset.name.includes(q))&&(!dept||row.dataset.dept===dept);
+    row.style.display=ok?'':'none';
+    if(ok)vis++;
+  });
+  document.getElementById('missing-count').textContent=vis+' records';
+}
+
+// ── Populate filters ──────────────────────────────────────────────────────────
+function populateFilters(d){
+  const scanDepts=[...new Set((d.raw_log||[]).map(s=>s.department).filter(Boolean))].sort();
+  const sdp=document.getElementById('scan-dept-filter');
+  while(sdp.options.length>1)sdp.remove(1);
+  scanDepts.forEach(dep=>{const o=document.createElement('option');o.value=dep;o.textContent=dep;sdp.appendChild(o);});
+
+  const attCentres=[...new Set((d.sewadar_attendance||[]).map(s=>s.sewadar_centre).filter(Boolean))].sort();
+  const attDepts=[...new Set((d.sewadar_attendance||[]).map(s=>s.department).filter(Boolean))].sort();
+  const acf=document.getElementById('att-centre-filter'); while(acf.options.length>1)acf.remove(1);
+  attCentres.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;acf.appendChild(o);});
+  const adf=document.getElementById('att-dept-filter'); while(adf.options.length>1)adf.remove(1);
+  attDepts.forEach(d=>{const o=document.createElement('option');o.value=d;o.textContent=d;adf.appendChild(o);});
+}
+
+// ── Global Search ─────────────────────────────────────────────────────────────
+let searchIndex = [];
+function buildSearchIndex(d){
+  searchIndex = (d.sewadar_attendance||[]).map(s=>({
+    badge: s.badge_no, name: s.sewadar_name,
+    centre: s.sewadar_centre, dept: s.department,
+    key: (s.badge_no+' '+s.sewadar_name+' '+s.sewadar_centre).toLowerCase()
+  }));
+}
+
+function globalSearch(){
+  const q = document.getElementById('global-search').value.toLowerCase().trim();
+  const box = document.getElementById('gsearch-results');
+  if(q.length < 2){ box.style.display='none'; return; }
+  const results = searchIndex.filter(s=>s.key.includes(q)).slice(0,8);
+  if(!results.length){ box.style.display='none'; return; }
+  box.innerHTML = results.map(r=>`
+    <div class="gsearch-item" onclick="jumpToSewadar('${r.badge}')">
+      <div class="gsearch-name">${r.name} <span class="badge-tag" style="font-size:10px">${r.badge}</span></div>
+      <div class="gsearch-meta">${r.centre} • ${r.dept}</div>
+    </div>`).join('');
+  box.style.display='block';
+}
+
+function jumpToSewadar(badge){
+  document.getElementById('gsearch-results').style.display='none';
+  document.getElementById('global-search').value='';
+  switchTab('attendance');
+  document.getElementById('att-search').value=badge;
+  filterAttendance();
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+//   EXCEL DOWNLOADS
+// ══════════════════════════════════════════════════════════════════════════════
+function styleWS(ws){
+  const range=XLSX.utils.decode_range(ws['!ref']);
+  const cols=[];
+  for(let C=range.s.c;C<=range.e.c;C++){
+    let w=10;
+    for(let R=range.s.r;R<=range.e.r;R++){
+      const cell=ws[XLSX.utils.encode_cell({r:R,c:C})];
+      if(cell&&cell.v) w=Math.min(Math.max(w,String(cell.v).length+2),40);
+    }
+    cols.push({wch:w});
+  }
+  ws['!cols']=cols;
+  return ws;
+}
+
+function saveXL(wb, name){ XLSX.writeFile(wb, name); }
+
+function downloadOverviewExcel(){
+  if(!DATA)return;
+  const wb=XLSX.utils.book_new();
+  const dates = ACTIVE_DATE==='all'?DATA.dates:[ACTIVE_DATE];
+  const hpd=(DATA.headcount_per_day||[]).filter(h=>dates.includes(h.date));
+  const ws1=XLSX.utils.aoa_to_sheet([
+    ['Bhati March 2026 — Overview'],['Generated',new Date().toLocaleString('en-IN')],[''],
+    ['DATE','PRESENT','IN','OUT'],
+    ...hpd.map(h=>[h.date,h.total_present,h.total_in,h.total_out])
+  ]);
+  styleWS(ws1); XLSX.utils.book_append_sheet(wb,ws1,'Headcount');
+  const gs=(DATA.gender_summary||[]).filter(g=>dates.includes(g.date));
+  const ws2=XLSX.utils.aoa_to_sheet([['DATE','MALE','FEMALE'],...gs.map(g=>[g.date,g.male,g.female])]);
+  styleWS(ws2); XLSX.utils.book_append_sheet(wb,ws2,'Gender');
+  saveXL(wb,`Bhati-Overview-${nowStamp()}.xlsx`);
+}
+
+function downloadScansExcel(){
+  if(!DATA)return;
+  const vis=[...document.querySelectorAll('#scan-body tr')].filter(r=>r.style.display!=='none');
+  const wb=XLSX.utils.book_new();
+  const ws=XLSX.utils.aoa_to_sheet([
+    [`Bhati Scan Details (${vis.length} records)`],['Generated',new Date().toLocaleString('en-IN')],[''],
+    ['#','Badge No.','Name','Satsang Point','Centre','Department','Type','Date','Time (IST)','Scanned By Badge','Scanned By Name','Scanned By Centre'],
+    ...vis.map((row,i)=>{
+      const t=row.querySelectorAll('td');
+      return[i+1,t[1]?.textContent?.trim(),t[2]?.querySelector('.name-primary')?.textContent?.trim(),
+        t[2]?.querySelector('.name-sub')?.textContent?.trim(),t[3]?.textContent?.trim(),
+        t[4]?.textContent?.trim(),t[5]?.textContent?.trim(),t[6]?.textContent?.trim(),
+        t[7]?.textContent?.trim(),t[8]?.textContent?.trim(),
+        t[9]?.querySelector('.name-primary')?.textContent?.trim(),t[10]?.textContent?.trim()];
+    })
+  ]);
+  styleWS(ws); XLSX.utils.book_append_sheet(wb,ws,'Scans');
+  saveXL(wb,`Bhati-Scans-${nowStamp()}.xlsx`);
+}
+
+function downloadAttendanceExcel(){
+  if(!DATA)return;
+  const dates=ACTIVE_DATE==='all'?DATA.dates:[ACTIVE_DATE];
+  const vis=[...document.querySelectorAll('#att-body tr')].filter(r=>r.style.display!=='none');
+  const wb=XLSX.utils.book_new();
+  const ws=XLSX.utils.aoa_to_sheet([
+    [`Bhati Attendance Matrix (${vis.length} sewadars)`],['Generated',new Date().toLocaleString('en-IN')],[''],
+    ['#','Badge No.','Name','Satsang Point','Centre','Department','Gender',...dates.map(fmtDate)],
+    ...vis.map((row,i)=>{
+      const t=row.querySelectorAll('td');
+      const base=[i+1,t[1]?.textContent?.trim(),t[2]?.querySelector('.name-primary')?.textContent?.trim(),
+        t[2]?.querySelector('.name-sub')?.textContent?.trim(),t[3]?.textContent?.trim(),
+        t[4]?.textContent?.trim(),t[5]?.textContent?.trim()];
+      const dc=dates.map((_,di)=>t[7+di]?.textContent?.trim().replace(/\s+/g,' ')||'ABSENT');
+      return[...base,...dc];
+    })
+  ]);
+  styleWS(ws); XLSX.utils.book_append_sheet(wb,ws,'Attendance');
+  saveXL(wb,`Bhati-Attendance-${nowStamp()}.xlsx`);
+}
+
+function downloadCentreExcel(){
+  if(!DATA)return;
+  const dates=ACTIVE_DATE==='all'?DATA.dates:[ACTIVE_DATE];
+  const vis=[...document.querySelectorAll('.centre-card')].filter(c=>c.style.display!=='none').map(c=>c.dataset.name.toUpperCase());
+  const centres=(DATA.centre_summary||[]).filter(c=>vis.includes(c.centre));
+  const wb=XLSX.utils.book_new();
+  const ws=XLSX.utils.aoa_to_sheet([
+    ['Bhati Centre Summary'],['Generated',new Date().toLocaleString('en-IN')],[''],
+    ['Centre','Total Scanned','Expected',...dates.flatMap(dt=>[`${fmtDate(dt)} Present`,`${fmtDate(dt)} IN`,`${fmtDate(dt)} OUT`])],
+    ...centres.map(c=>[c.centre,c.total_sewadars,c.expected||0,...dates.flatMap(dt=>{const i=c.dates[dt]||{present:0,in:0,out:0};return[i.present,i.in,i.out];})])
+  ]);
+  styleWS(ws); XLSX.utils.book_append_sheet(wb,ws,'Centres');
+  saveXL(wb,`Bhati-Centres-${nowStamp()}.xlsx`);
+}
+
+function downloadAbsentExcel(){
+  if(!DATA)return;
+  const dates=ACTIVE_DATE==='all'?DATA.dates:[ACTIVE_DATE];
+  const rows=[];
+  (DATA.absent_per_day||[]).filter(a=>dates.includes(a.date)).forEach(day=>{
+    (day.absent||[]).forEach(s=>rows.push([day.date,s.badge_no,s.name,s.centre,s.department,s.gender]));
+  });
+  const wb=XLSX.utils.book_new();
+  const ws=XLSX.utils.aoa_to_sheet([
+    ['Bhati Absent Sewadar List'],['Generated',new Date().toLocaleString('en-IN')],[''],
+    ['Date','Badge No.','Name','Centre','Department','Gender'],...rows
+  ]);
+  styleWS(ws); XLSX.utils.book_append_sheet(wb,ws,'Absent');
+  saveXL(wb,`Bhati-Absent-${nowStamp()}.xlsx`);
+}
+
+function downloadAlertsExcel(){
+  if(!DATA)return;
+  const wb=XLSX.utils.book_new();
+  const ws1=XLSX.utils.aoa_to_sheet([
+    ['Duplicate IN Scans'],[''],['Badge','Name','Date','IN Count','Times'],
+    ...(DATA.duplicate_flags||[]).map(f=>[f.badge_no,f.sewadar_name,f.date,f.in_count,f.times.join(', ')])
+  ]);
+  styleWS(ws1); XLSX.utils.book_append_sheet(wb,ws1,'Duplicates');
+  const ws2=XLSX.utils.aoa_to_sheet([
+    ['Missing OUT Scans'],[''],['Badge','Name','Centre','Department','Date','IN Time'],
+    ...(DATA.missing_out||[]).map(m=>[m.badge_no,m.sewadar_name,m.centre,m.department,m.date,m.in_time])
+  ]);
+  styleWS(ws2); XLSX.utils.book_append_sheet(wb,ws2,'Missing OUT');
+  saveXL(wb,`Bhati-Alerts-${nowStamp()}.xlsx`);
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
 loadData();
-setInterval(loadData,10*60*1000);
+setInterval(loadData, 60*1000);
 </script>
 </body>
 </html>
