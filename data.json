@@ -1,0 +1,61 @@
+{
+  "last_updated": "01-03-2026 02:52 AM UTC",
+  "total_scans": 1,
+  "total_sewadars": 1,
+  "dates": [
+    "2026-03-01"
+  ],
+  "scans": [
+    {
+      "scan_id": "fKa4EUFm6sg3evxFmdrr",
+      "userId": "yBvX6gxUzbhiKh9yy5L9F5SBcgZ2",
+      "displayName": "Unknown",
+      "badgeNumber": "FB5978GA0001",
+      "center": "",
+      "role": "",
+      "scannedAt": "Bhati-March-2026",
+      "scannedBy": "FB5978GA0001",
+      "type": "IN",
+      "timestamp": "2026-03-01T02:37:56.416000",
+      "date": "2026-03-01",
+      "time": "02:37:56"
+    }
+  ],
+  "sewadar_attendance": [
+    {
+      "userId": "yBvX6gxUzbhiKh9yy5L9F5SBcgZ2",
+      "displayName": "Unknown",
+      "badgeNumber": "FB5978GA0001",
+      "center": "",
+      "2026-03-01": {
+        "status": "PRESENT",
+        "first_in": "02:37:56",
+        "last_out": "-"
+      }
+    }
+  ],
+  "headcount_per_day": [
+    {
+      "date": "2026-03-01",
+      "total_present": 1,
+      "total_in": 1,
+      "total_out": 0
+    }
+  ],
+  "raw_log": [
+    {
+      "scan_id": "fKa4EUFm6sg3evxFmdrr",
+      "userId": "yBvX6gxUzbhiKh9yy5L9F5SBcgZ2",
+      "displayName": "Unknown",
+      "badgeNumber": "FB5978GA0001",
+      "center": "",
+      "role": "",
+      "scannedAt": "Bhati-March-2026",
+      "scannedBy": "FB5978GA0001",
+      "type": "IN",
+      "timestamp": "2026-03-01 02:37:56.416000",
+      "date": "2026-03-01",
+      "time": "02:37:56"
+    }
+  ]
+}
