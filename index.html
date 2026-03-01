@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Bhati March 2026 — Sewadar Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Tiro+Devanagari+Hindi&family=IBM+Plex+Mono:wght@400;600&family=Syne:wght@700;800&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --saffron:  #FF6B00;
+    --gold:     #FFB800;
+    --deep:     #0D0D0D;
+    --panel:    #141414;
+    --border:   #2A2A2A;
+    --text:     #E8E8E8;
+    --muted:    #666;
+    --present:  #00C48C;
+    --absent:   #FF4757;
+    --accent:   #FFB800;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--deep);
+    color: var(--text);
+    font-family: 'IBM Plex Mono', monospace;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── Noise texture overlay ── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none; z-index: 0; opacity: 0.4;
+  }
+
+  /* ── Header ── */
+  header {
+    position: relative;
+    border-bottom: 1px solid var(--border);
+    padding: 2rem 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(135deg, #1a0a00 0%, #0D0D0D 60%);
+    overflow: hidden;
+  }
+
+  header::after {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 240px; height: 240px;
+    background: radial-gradient(circle, rgba(255,107,0,0.15) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .header-left h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(1.4rem, 3vw, 2.2rem);
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    background: linear-gradient(90deg, var(--saffron), var(--gold));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .header-left .subtitle {
+    font-size: 0.7rem;
+    color: var(--muted);
+    margin-top: 4px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .header-right {
+    text-align: right;
+  }
+
+  .live-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(0, 196, 140, 0.1);
+    border: 1px solid rgba(0, 196, 140, 0.3);
+    border-radius: 999px;
+    padding: 4px 12px;
+    font-size: 0.65rem;
+    color: var(--present);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .live-badge .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--present);
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%       { opacity: 0.4; transform: scale(0.8); }
+  }
+
+  .last-updated {
+    font-size: 0.65rem;
+    color: var(--muted);
+    letter-spacing: 0.5px;
+  }
+
+  /* ── Tabs ── */
+  .tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid var(--border);
+    padding: 0 3rem;
+    background: var(--panel);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  .tab {
+    padding: 1rem 1.5rem;
+    font-size: 0.7rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .tab:hover { color: var(--text); }
+  .tab.active { color: var(--saffron); border-bottom-color: var(--saffron); }
+
+  /* ── Main ── */
+  main { padding: 2rem 3rem; position: relative; z-index: 1; }
+
+  .tab-content { display: none; }
+  .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* ── Stat Cards ── */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .stat-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+
+  .stat-card:hover { border-color: var(--saffron); }
+
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--saffron), var(--gold));
+  }
+
+  .stat-label {
+    font-size: 0.6rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.5rem;
+  }
+
+  .stat-value {
+    font-family: 'Syne', sans-serif;
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--gold);
+    line-height: 1;
+  }
+
+  .stat-sub {
+    font-size: 0.6rem;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  /* ── Section title ── */
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* ── Headcount Chart ── */
+  .chart-container {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .bar-chart {
+    display: flex;
+    align-items: flex-end;
+    gap: 1rem;
+    height: 160px;
+    padding-top: 1rem;
+  }
+
+  .bar-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    height: 100%;
+    justify-content: flex-end;
+  }
+
+  .bar-count {
+    font-size: 0.65rem;
+    color: var(--gold);
+    font-weight: 600;
+  }
+
+  .bar {
+    width: 100%;
+    background: linear-gradient(180deg, var(--saffron), #8B3A00);
+    border-radius: 6px 6px 0 0;
+    min-height: 4px;
+    transition: height 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative;
+    cursor: pointer;
+  }
+
+  .bar:hover { filter: brightness(1.2); }
+
+  .bar-label {
+    font-size: 0.6rem;
+    color: var(--muted);
+    letter-spacing: 1px;
+    text-align: center;
+  }
+
+  /* ── Search ── */
+  .search-bar {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    align-items: center;
+  }
+
+  .search-input {
+    flex: 1;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.6rem 1rem;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .search-input:focus { border-color: var(--saffron); }
+  .search-input::placeholder { color: var(--muted); }
+
+  /* ── Attendance Table ── */
+  .table-wrapper {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: auto;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.7rem;
+    min-width: 600px;
+  }
+
+  thead tr {
+    background: #1A1A1A;
+    border-bottom: 1px solid var(--border);
+  }
+
+  th {
+    padding: 0.8rem 1rem;
+    text-align: left;
+    font-size: 0.6rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  th.date-col { text-align: center; }
+
+  td {
+    padding: 0.7rem 1rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+
+  tr:last-child td { border-bottom: none; }
+  tbody tr:hover { background: rgba(255, 107, 0, 0.04); }
+
+  .name-cell strong {
+    display: block;
+    color: var(--text);
+    margin-bottom: 2px;
+  }
+
+  .name-cell span {
+    font-size: 0.6rem;
+    color: var(--muted);
+  }
+
+  .badge-pill {
+    display: inline-block;
+    background: rgba(255,184,0,0.1);
+    border: 1px solid rgba(255,184,0,0.2);
+    border-radius: 4px;
+    padding: 1px 6px;
+    font-size: 0.6rem;
+    color: var(--gold);
+    letter-spacing: 0.5px;
+  }
+
+  .attendance-cell {
+    text-align: center;
+  }
+
+  .present-badge {
+    display: inline-block;
+    background: rgba(0, 196, 140, 0.1);
+    border: 1px solid rgba(0, 196, 140, 0.25);
+    border-radius: 6px;
+    padding: 4px 8px;
+    font-size: 0.58rem;
+    color: var(--present);
+    line-height: 1.6;
+    white-space: nowrap;
+  }
+
+  .absent-badge {
+    display: inline-block;
+    background: rgba(255, 71, 87, 0.07);
+    border: 1px solid rgba(255, 71, 87, 0.2);
+    border-radius: 6px;
+    padding: 4px 8px;
+    font-size: 0.58rem;
+    color: var(--absent);
+  }
+
+  /* ── Raw Log ── */
+  .log-table td { font-size: 0.68rem; }
+
+  .type-in  { color: var(--present); font-weight: 600; }
+  .type-out { color: var(--absent);  font-weight: 600; }
+
+  /* ── Loading ── */
+  #loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 60vh;
+    gap: 1rem;
+  }
+
+  .spinner {
+    width: 40px; height: 40px;
+    border: 3px solid var(--border);
+    border-top-color: var(--saffron);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  #loading p { color: var(--muted); font-size: 0.75rem; letter-spacing: 1px; }
+
+  #error-msg {
+    display: none;
+    text-align: center;
+    padding: 4rem;
+    color: var(--absent);
+    font-size: 0.8rem;
+    line-height: 2;
+  }
+
+  #dashboard { display: none; }
+
+  /* ── Responsive ── */
+  @media (max-width: 768px) {
+    header { padding: 1.5rem; flex-direction: column; align-items: flex-start; gap: 1rem; }
+    .tabs  { padding: 0 1rem; }
+    main   { padding: 1.5rem 1rem; }
+  }
+</style>
+</head>
+<body>
+
+<div id="loading">
+  <div class="spinner"></div>
+  <p>Loading attendance data...</p>
+</div>
+
+<div id="error-msg">
+  ⚠️ Could not load data.json<br>
+  <span style="color:var(--muted); font-size:0.65rem;">Make sure the file exists and GitHub Pages is enabled.</span>
+</div>
+
+<div id="dashboard">
+
+  <header>
+    <div class="header-left">
+      <h1>Bhati March 2026</h1>
+      <div class="subtitle">Sewadar Attendance Dashboard</div>
+    </div>
+    <div class="header-right">
+      <div class="live-badge"><span class="dot"></span> Auto-updating</div>
+      <div class="last-updated" id="last-updated">—</div>
+    </div>
+  </header>
+
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('overview')">Overview</div>
+    <div class="tab" onclick="switchTab('attendance')">Attendance</div>
+    <div class="tab" onclick="switchTab('log')">Scan Log</div>
+  </div>
+
+  <main>
+
+    <!-- ── OVERVIEW ── -->
+    <div class="tab-content active" id="tab-overview">
+
+      <div class="stats-grid" id="stats-grid"></div>
+
+      <div class="section-title">Daily Headcount</div>
+      <div class="chart-container">
+        <div class="bar-chart" id="bar-chart"></div>
+      </div>
+
+    </div>
+
+    <!-- ── ATTENDANCE ── -->
+    <div class="tab-content" id="tab-attendance">
+      <div class="search-bar">
+        <input class="search-input" id="search-input" type="text" placeholder="Search by name, badge, or center..." oninput="filterTable()"/>
+      </div>
+      <div class="table-wrapper">
+        <table id="attendance-table">
+          <thead id="attendance-head"></thead>
+          <tbody id="attendance-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── SCAN LOG ── -->
+    <div class="tab-content" id="tab-log">
+      <div class="search-bar">
+        <input class="search-input" id="log-search" type="text" placeholder="Search log..." oninput="filterLog()"/>
+      </div>
+      <div class="table-wrapper">
+        <table class="log-table">
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Name</th>
+              <th>Badge</th>
+              <th>Type</th>
+              <th>Location</th>
+            </tr>
+          </thead>
+          <tbody id="log-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+let DATA = null;
+
+async function loadData() {
+  try {
+    const res = await fetch(`data.json?t=${Date.now()}`);
+    if (!res.ok) throw new Error("Not found");
+    DATA = await res.json();
+    renderDashboard(DATA);
+    document.getElementById("loading").style.display   = "none";
+    document.getElementById("dashboard").style.display = "block";
+  } catch (e) {
+    document.getElementById("loading").style.display   = "none";
+    document.getElementById("error-msg").style.display = "block";
+  }
+}
+
+function switchTab(name) {
+  document.querySelectorAll(".tab").forEach((t, i) => {
+    const ids = ["overview", "attendance", "log"];
+    t.classList.toggle("active", ids[i] === name);
+  });
+  document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
+  document.getElementById("tab-" + name).classList.add("active");
+}
+
+function renderDashboard(d) {
+  // Last updated
+  document.getElementById("last-updated").textContent = "Updated: " + d.last_updated;
+
+  // Stats
+  const maxDay = d.headcount_per_day.reduce((a, b) => a.total_present > b.total_present ? a : b, {total_present: 0});
+  const statsGrid = document.getElementById("stats-grid");
+  const stats = [
+    { label: "Total Sewadars",  value: d.total_sewadars,                   sub: "registered & scanned" },
+    { label: "Total Scans",     value: d.total_scans,                      sub: "IN + OUT combined"    },
+    { label: "Days Tracked",    value: d.dates.length,                      sub: "unique dates"         },
+    { label: "Peak Day",        value: maxDay.total_present || 0,           sub: formatDate(maxDay.date) },
+  ];
+  statsGrid.innerHTML = stats.map(s => `
+    <div class="stat-card">
+      <div class="stat-label">${s.label}</div>
+      <div class="stat-value">${s.value}</div>
+      <div class="stat-sub">${s.sub}</div>
+    </div>
+  `).join("");
+
+  // Bar chart
+  const chart = document.getElementById("bar-chart");
+  const max = Math.max(...d.headcount_per_day.map(h => h.total_present), 1);
+  chart.innerHTML = d.headcount_per_day.map(h => {
+    const pct = Math.max((h.total_present / max) * 100, 3);
+    return `
+      <div class="bar-group">
+        <div class="bar-count">${h.total_present}</div>
+        <div class="bar" style="height:${pct}%" title="${h.date}: ${h.total_present} present"></div>
+        <div class="bar-label">${formatDate(h.date)}</div>
+      </div>
+    `;
+  }).join("");
+
+  // Attendance table
+  const head = document.getElementById("attendance-head");
+  const body = document.getElementById("attendance-body");
+
+  head.innerHTML = `<tr>
+    <th>Sewadar</th>
+    <th>Badge</th>
+    <th>Center</th>
+    ${d.dates.map(date => `<th class="date-col">${formatDate(date)}</th>`).join("")}
+  </tr>`;
+
+  body.innerHTML = d.sewadar_attendance.map(s => `
+    <tr data-name="${s.displayName.toLowerCase()}" data-badge="${s.badgeNumber.toLowerCase()}" data-center="${s.center.toLowerCase()}">
+      <td class="name-cell"><strong>${s.displayName}</strong></td>
+      <td><span class="badge-pill">${s.badgeNumber || "—"}</span></td>
+      <td style="color:var(--muted); font-size:0.65rem;">${s.center || "—"}</td>
+      ${d.dates.map(date => {
+        const info = s[date];
+        if (!info || info.status === "ABSENT") {
+          return `<td class="attendance-cell"><span class="absent-badge">ABSENT</span></td>`;
+        }
+        return `<td class="attendance-cell">
+          <span class="present-badge">
+            ↓ ${info.first_in || "—"}<br>↑ ${info.last_out || "—"}
+          </span>
+        </td>`;
+      }).join("")}
+    </tr>
+  `).join("");
+
+  // Raw log
+  const logBody = document.getElementById("log-body");
+  logBody.innerHTML = (d.raw_log || []).slice(0, 500).map(s => `
+    <tr data-log="${(s.displayName + s.badgeNumber + s.scannedAt).toLowerCase()}">
+      <td style="color:var(--muted)">${s.date || ""} ${s.time || ""}</td>
+      <td>${s.displayName}</td>
+      <td><span class="badge-pill">${s.badgeNumber || "—"}</span></td>
+      <td><span class="${s.type === "IN" ? "type-in" : "type-out"}">${s.type}</span></td>
+      <td style="color:var(--muted)">${s.scannedAt || "—"}</td>
+    </tr>
+  `).join("");
+}
+
+function formatDate(dateStr) {
+  if (!dateStr) return "—";
+  const d = new Date(dateStr);
+  return d.toLocaleDateString("en-IN", { day: "numeric", month: "short" });
+}
+
+function filterTable() {
+  const q = document.getElementById("search-input").value.toLowerCase();
+  document.querySelectorAll("#attendance-body tr").forEach(row => {
+    const match = (row.dataset.name + row.dataset.badge + row.dataset.center).includes(q);
+    row.style.display = match ? "" : "none";
+  });
+}
+
+function filterLog() {
+  const q = document.getElementById("log-search").value.toLowerCase();
+  document.querySelectorAll("#log-body tr").forEach(row => {
+    row.style.display = (row.dataset.log || "").includes(q) ? "" : "none";
+  });
+}
+
+// Auto-refresh every 10 minutes
+loadData();
+setInterval(loadData, 10 * 60 * 1000);
+</script>
+</body>
+</html>
