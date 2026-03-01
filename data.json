@@ -1,11 +1,119 @@
 {
-  "last_updated": "01-03-2026 07:26 AM UTC",
-  "total_scans": 0,
-  "total_sewadars": 0,
-  "dates": [],
-  "scans": [],
-  "sewadar_attendance": [],
-  "headcount_per_day": [],
-  "centre_summary": [],
-  "raw_log": []
+  "last_updated": "01-03-2026 07:30 AM UTC",
+  "total_scans": 2,
+  "total_sewadars": 1,
+  "dates": [
+    "2026-03-01"
+  ],
+  "scans": [
+    {
+      "scan_id": "jGkyne3R4v67sT0lHucU",
+      "userId": "JYeVaY7gVFRONdaK3zyqs3aZI5S2",
+      "badge_no": "FB5978GA0001",
+      "sewadar_name": "Daksh Verma",
+      "sewadar_centre": "SECTOR-15-A",
+      "satsang_point": "Sector-15-a",
+      "department": "TRAFFIC OUTSIDE BHATI",
+      "gender": "M",
+      "type": "IN",
+      "scanned_at_loc": "Bhati-March-2026",
+      "timestamp": "2026-03-01T09:13:46.844000",
+      "date": "2026-03-01",
+      "time": "09:13:46",
+      "scanned_by_badge": "FB5978GA0176",
+      "scanned_by_name": "Rishabh Thukral",
+      "scanned_by_centre": "SECTOR-15-A"
+    },
+    {
+      "scan_id": "tvubjsOPw7lz5CxSmtgh",
+      "userId": "JYeVaY7gVFRONdaK3zyqs3aZI5S2",
+      "badge_no": "FB5978GA0001",
+      "sewadar_name": "Daksh Verma",
+      "sewadar_centre": "SECTOR-15-A",
+      "satsang_point": "Sector-15-a",
+      "department": "TRAFFIC OUTSIDE BHATI",
+      "gender": "M",
+      "type": "OUT",
+      "scanned_at_loc": "Bhati-March-2026",
+      "timestamp": "2026-03-01T09:14:12.788000",
+      "date": "2026-03-01",
+      "time": "09:14:12",
+      "scanned_by_badge": "FB5978GA0176",
+      "scanned_by_name": "Rishabh Thukral",
+      "scanned_by_centre": "SECTOR-15-A"
+    }
+  ],
+  "sewadar_attendance": [
+    {
+      "badge_no": "FB5978GA0001",
+      "sewadar_name": "Daksh Verma",
+      "sewadar_centre": "SECTOR-15-A",
+      "satsang_point": "Sector-15-a",
+      "department": "TRAFFIC OUTSIDE BHATI",
+      "2026-03-01": {
+        "status": "PRESENT",
+        "first_in": "09:13:46",
+        "last_out": "09:14:12"
+      }
+    }
+  ],
+  "headcount_per_day": [
+    {
+      "date": "2026-03-01",
+      "total_present": 1,
+      "total_in": 1,
+      "total_out": 1
+    }
+  ],
+  "centre_summary": [
+    {
+      "centre": "SECTOR-15-A",
+      "total_sewadars": 1,
+      "dates": {
+        "2026-03-01": {
+          "present": 1,
+          "in": 1,
+          "out": 1
+        }
+      }
+    }
+  ],
+  "raw_log": [
+    {
+      "scan_id": "tvubjsOPw7lz5CxSmtgh",
+      "userId": "JYeVaY7gVFRONdaK3zyqs3aZI5S2",
+      "badge_no": "FB5978GA0001",
+      "sewadar_name": "Daksh Verma",
+      "sewadar_centre": "SECTOR-15-A",
+      "satsang_point": "Sector-15-a",
+      "department": "TRAFFIC OUTSIDE BHATI",
+      "gender": "M",
+      "type": "OUT",
+      "scanned_at_loc": "Bhati-March-2026",
+      "timestamp": "2026-03-01 09:14:12.788000",
+      "date": "2026-03-01",
+      "time": "09:14:12",
+      "scanned_by_badge": "FB5978GA0176",
+      "scanned_by_name": "Rishabh Thukral",
+      "scanned_by_centre": "SECTOR-15-A"
+    },
+    {
+      "scan_id": "jGkyne3R4v67sT0lHucU",
+      "userId": "JYeVaY7gVFRONdaK3zyqs3aZI5S2",
+      "badge_no": "FB5978GA0001",
+      "sewadar_name": "Daksh Verma",
+      "sewadar_centre": "SECTOR-15-A",
+      "satsang_point": "Sector-15-a",
+      "department": "TRAFFIC OUTSIDE BHATI",
+      "gender": "M",
+      "type": "IN",
+      "scanned_at_loc": "Bhati-March-2026",
+      "timestamp": "2026-03-01 09:13:46.844000",
+      "date": "2026-03-01",
+      "time": "09:13:46",
+      "scanned_by_badge": "FB5978GA0176",
+      "scanned_by_name": "Rishabh Thukral",
+      "scanned_by_centre": "SECTOR-15-A"
+    }
+  ]
 }
