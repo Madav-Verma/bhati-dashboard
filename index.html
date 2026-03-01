@@ -1,645 +1,369 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
+<meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Bhati March 2026 — Sewadar Dashboard</title>
-<link href="https://fonts.googleapis.com/css2?family=Tiro+Devanagari+Hindi&family=IBM+Plex+Mono:wght@400;600&family=Syne:wght@700;800&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <style>
-  :root {
-    --saffron:  #FF6B00;
-    --gold:     #FFB800;
-    --deep:     #0D0D0D;
-    --panel:    #141414;
-    --border:   #2A2A2A;
-    --text:     #E8E8E8;
-    --muted:    #666;
-    --present:  #00C48C;
-    --absent:   #FF4757;
-    --accent:   #FFB800;
-  }
-
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    background: var(--deep);
-    color: var(--text);
-    font-family: 'IBM Plex Mono', monospace;
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
-
-  /* ── Noise texture overlay ── */
-  body::before {
-    content: '';
-    position: fixed; inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
-    pointer-events: none; z-index: 0; opacity: 0.4;
-  }
-
-  /* ── Header ── */
-  header {
-    position: relative;
-    border-bottom: 1px solid var(--border);
-    padding: 2rem 3rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: linear-gradient(135deg, #1a0a00 0%, #0D0D0D 60%);
-    overflow: hidden;
-  }
-
-  header::after {
-    content: '';
-    position: absolute;
-    top: -60px; right: -60px;
-    width: 240px; height: 240px;
-    background: radial-gradient(circle, rgba(255,107,0,0.15) 0%, transparent 70%);
-    pointer-events: none;
-  }
-
-  .header-left h1 {
-    font-family: 'Syne', sans-serif;
-    font-size: clamp(1.4rem, 3vw, 2.2rem);
-    font-weight: 800;
-    letter-spacing: -0.5px;
-    background: linear-gradient(90deg, var(--saffron), var(--gold));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  .header-left .subtitle {
-    font-size: 0.7rem;
-    color: var(--muted);
-    margin-top: 4px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-  }
-
-  .header-right {
-    text-align: right;
-  }
-
-  .live-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: rgba(0, 196, 140, 0.1);
-    border: 1px solid rgba(0, 196, 140, 0.3);
-    border-radius: 999px;
-    padding: 4px 12px;
-    font-size: 0.65rem;
-    color: var(--present);
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    margin-bottom: 6px;
-  }
-
-  .live-badge .dot {
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: var(--present);
-    animation: pulse 2s ease-in-out infinite;
-  }
-
-  @keyframes pulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50%       { opacity: 0.4; transform: scale(0.8); }
-  }
-
-  .last-updated {
-    font-size: 0.65rem;
-    color: var(--muted);
-    letter-spacing: 0.5px;
-  }
-
-  /* ── Tabs ── */
-  .tabs {
-    display: flex;
-    gap: 0;
-    border-bottom: 1px solid var(--border);
-    padding: 0 3rem;
-    background: var(--panel);
-    position: sticky;
-    top: 0;
-    z-index: 10;
-  }
-
-  .tab {
-    padding: 1rem 1.5rem;
-    font-size: 0.7rem;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    color: var(--muted);
-    cursor: pointer;
-    border-bottom: 2px solid transparent;
-    transition: all 0.2s;
-    white-space: nowrap;
-  }
-
-  .tab:hover { color: var(--text); }
-  .tab.active { color: var(--saffron); border-bottom-color: var(--saffron); }
-
-  /* ── Main ── */
-  main { padding: 2rem 3rem; position: relative; z-index: 1; }
-
-  .tab-content { display: none; }
-  .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
-
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-
-  /* ── Stat Cards ── */
-  .stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 1rem;
-    margin-bottom: 2rem;
-  }
-
-  .stat-card {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 1.5rem;
-    position: relative;
-    overflow: hidden;
-    transition: border-color 0.2s;
-  }
-
-  .stat-card:hover { border-color: var(--saffron); }
-
-  .stat-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, var(--saffron), var(--gold));
-  }
-
-  .stat-label {
-    font-size: 0.6rem;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 0.5rem;
-  }
-
-  .stat-value {
-    font-family: 'Syne', sans-serif;
-    font-size: 2.5rem;
-    font-weight: 800;
-    color: var(--gold);
-    line-height: 1;
-  }
-
-  .stat-sub {
-    font-size: 0.6rem;
-    color: var(--muted);
-    margin-top: 4px;
-  }
-
-  /* ── Section title ── */
-  .section-title {
-    font-family: 'Syne', sans-serif;
-    font-size: 1rem;
-    font-weight: 700;
-    color: var(--text);
-    margin-bottom: 1rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  .section-title::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: var(--border);
-  }
-
-  /* ── Headcount Chart ── */
-  .chart-container {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 1.5rem;
-    margin-bottom: 2rem;
-  }
-
-  .bar-chart {
-    display: flex;
-    align-items: flex-end;
-    gap: 1rem;
-    height: 160px;
-    padding-top: 1rem;
-  }
-
-  .bar-group {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
-    height: 100%;
-    justify-content: flex-end;
-  }
-
-  .bar-count {
-    font-size: 0.65rem;
-    color: var(--gold);
-    font-weight: 600;
-  }
-
-  .bar {
-    width: 100%;
-    background: linear-gradient(180deg, var(--saffron), #8B3A00);
-    border-radius: 6px 6px 0 0;
-    min-height: 4px;
-    transition: height 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
-    position: relative;
-    cursor: pointer;
-  }
-
-  .bar:hover { filter: brightness(1.2); }
-
-  .bar-label {
-    font-size: 0.6rem;
-    color: var(--muted);
-    letter-spacing: 1px;
-    text-align: center;
-  }
-
-  /* ── Search ── */
-  .search-bar {
-    display: flex;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-    align-items: center;
-  }
-
-  .search-input {
-    flex: 1;
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 0.6rem 1rem;
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 0.75rem;
-    color: var(--text);
-    outline: none;
-    transition: border-color 0.2s;
-  }
-
-  .search-input:focus { border-color: var(--saffron); }
-  .search-input::placeholder { color: var(--muted); }
-
-  /* ── Attendance Table ── */
-  .table-wrapper {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    overflow: auto;
-  }
-
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.7rem;
-    min-width: 600px;
-  }
-
-  thead tr {
-    background: #1A1A1A;
-    border-bottom: 1px solid var(--border);
-  }
-
-  th {
-    padding: 0.8rem 1rem;
-    text-align: left;
-    font-size: 0.6rem;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    color: var(--muted);
-    white-space: nowrap;
-  }
-
-  th.date-col { text-align: center; }
-
-  td {
-    padding: 0.7rem 1rem;
-    border-bottom: 1px solid var(--border);
-    vertical-align: middle;
-  }
-
-  tr:last-child td { border-bottom: none; }
-  tbody tr:hover { background: rgba(255, 107, 0, 0.04); }
-
-  .name-cell strong {
-    display: block;
-    color: var(--text);
-    margin-bottom: 2px;
-  }
-
-  .name-cell span {
-    font-size: 0.6rem;
-    color: var(--muted);
-  }
-
-  .badge-pill {
-    display: inline-block;
-    background: rgba(255,184,0,0.1);
-    border: 1px solid rgba(255,184,0,0.2);
-    border-radius: 4px;
-    padding: 1px 6px;
-    font-size: 0.6rem;
-    color: var(--gold);
-    letter-spacing: 0.5px;
-  }
-
-  .attendance-cell {
-    text-align: center;
-  }
-
-  .present-badge {
-    display: inline-block;
-    background: rgba(0, 196, 140, 0.1);
-    border: 1px solid rgba(0, 196, 140, 0.25);
-    border-radius: 6px;
-    padding: 4px 8px;
-    font-size: 0.58rem;
-    color: var(--present);
-    line-height: 1.6;
-    white-space: nowrap;
-  }
-
-  .absent-badge {
-    display: inline-block;
-    background: rgba(255, 71, 87, 0.07);
-    border: 1px solid rgba(255, 71, 87, 0.2);
-    border-radius: 6px;
-    padding: 4px 8px;
-    font-size: 0.58rem;
-    color: var(--absent);
-  }
-
-  /* ── Raw Log ── */
-  .log-table td { font-size: 0.68rem; }
-
-  .type-in  { color: var(--present); font-weight: 600; }
-  .type-out { color: var(--absent);  font-weight: 600; }
-
-  /* ── Loading ── */
-  #loading {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 60vh;
-    gap: 1rem;
-  }
-
-  .spinner {
-    width: 40px; height: 40px;
-    border: 3px solid var(--border);
-    border-top-color: var(--saffron);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-  }
-
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  #loading p { color: var(--muted); font-size: 0.75rem; letter-spacing: 1px; }
-
-  #error-msg {
-    display: none;
-    text-align: center;
-    padding: 4rem;
-    color: var(--absent);
-    font-size: 0.8rem;
-    line-height: 2;
-  }
-
-  #dashboard { display: none; }
-
-  /* ── Responsive ── */
-  @media (max-width: 768px) {
-    header { padding: 1.5rem; flex-direction: column; align-items: flex-start; gap: 1rem; }
-    .tabs  { padding: 0 1rem; }
-    main   { padding: 1.5rem 1rem; }
-  }
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:#f0f2f5;color:#1a1a2e;font-size:13px}
+header{background:linear-gradient(135deg,#1a3c6e 0%,#2563a8 100%);color:white;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 8px rgba(0,0,0,0.2)}
+.header-title{font-size:18px;font-weight:700}
+.header-sub{font-size:11px;opacity:.75;margin-top:2px}
+.header-right{text-align:right}
+.updated-tag{font-size:11px;opacity:.8}
+.live-pill{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:999px;padding:3px 10px;font-size:10px;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px}
+.live-dot{width:6px;height:6px;border-radius:50%;background:#4ade80;animation:blink 1.5s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.tab-bar{background:white;border-bottom:2px solid #d1d5db;padding:0 24px;display:flex;position:sticky;top:0;z-index:100;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.tab{padding:11px 20px;font-size:12px;font-weight:600;color:#6b7280;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .15s;white-space:nowrap}
+.tab:hover{color:#2563a8;background:#f8faff}
+.tab.active{color:#2563a8;border-bottom-color:#2563a8;background:#f0f6ff}
+main{padding:20px 24px}
+.tab-content{display:none}
+.tab-content.active{display:block;animation:fadeIn .2s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+.kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:20px}
+.kpi{background:white;border-radius:8px;padding:16px 18px;border:1px solid #e5e7eb;border-left:4px solid;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.kpi.blue{border-left-color:#2563a8}.kpi.green{border-left-color:#16a34a}.kpi.orange{border-left-color:#ea580c}.kpi.purple{border-left-color:#7c3aed}
+.kpi-label{font-size:10px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.kpi-value{font-size:28px;font-weight:700;line-height:1}
+.kpi.blue .kpi-value{color:#2563a8}.kpi.green .kpi-value{color:#16a34a}.kpi.orange .kpi-value{color:#ea580c}.kpi.purple .kpi-value{color:#7c3aed}
+.kpi-sub{font-size:10px;color:#9ca3af;margin-top:4px}
+.sec-head{font-size:13px;font-weight:700;color:#1a3c6e;margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid #dbeafe;display:flex;align-items:center;justify-content:space-between}
+.sec-head span{font-size:11px;font-weight:400;color:#6b7280}
+.chart-box{background:white;border:1px solid #e5e7eb;border-radius:8px;padding:18px;margin-bottom:20px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.bars{display:flex;align-items:flex-end;gap:12px;height:140px;padding-top:10px}
+.bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;justify-content:flex-end}
+.bar-val{font-size:11px;font-weight:700;color:#1a3c6e}
+.bar-fill{width:100%;border-radius:4px 4px 0 0;background:linear-gradient(180deg,#3b82f6,#1a3c6e);min-height:4px;cursor:pointer}
+.bar-fill:hover{filter:brightness(1.15)}
+.bar-lbl{font-size:10px;color:#6b7280;text-align:center;white-space:nowrap}
+.dept-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-bottom:20px}
+.dept-card{background:white;border:1px solid #e5e7eb;border-radius:8px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.dept-name{font-size:11px;font-weight:600;color:#374151}
+.dept-count{font-size:18px;font-weight:700;color:white;background:#2563a8;border-radius:6px;padding:2px 10px}
+.toolbar{display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap;align-items:center}
+.search-box{flex:1;min-width:200px;border:1px solid #d1d5db;border-radius:6px;padding:7px 12px;font-family:'Inter',sans-serif;font-size:12px;outline:none;background:white;transition:border-color .15s}
+.search-box:focus{border-color:#2563a8;box-shadow:0 0 0 2px rgba(37,99,168,.1)}
+.filter-select{border:1px solid #d1d5db;border-radius:6px;padding:7px 10px;font-family:'Inter',sans-serif;font-size:12px;background:white;outline:none;cursor:pointer;color:#374151}
+.count-badge{background:#dbeafe;color:#1d4ed8;border-radius:999px;padding:4px 10px;font-size:11px;font-weight:600;white-space:nowrap}
+.tbl-wrap{background:white;border:1px solid #d1d5db;border-radius:8px;overflow:auto;box-shadow:0 1px 3px rgba(0,0,0,.05);max-height:65vh}
+table{width:100%;border-collapse:collapse;min-width:900px}
+thead{position:sticky;top:0;z-index:5}
+thead tr th{background:#1a3c6e;color:white;padding:10px 12px;text-align:left;font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;white-space:nowrap;border-right:1px solid rgba(255,255,255,.1)}
+thead tr th:last-child{border-right:none}
+.sub-header th{background:#2563a8 !important;color:rgba(255,255,255,.85) !important;font-size:9px !important;padding:5px 12px !important;letter-spacing:.5px}
+tbody tr:nth-child(even){background:#f8faff}
+tbody tr:hover{background:#dbeafe !important}
+td{padding:8px 12px;border-bottom:1px solid #e5e7eb;border-right:1px solid #f3f4f6;white-space:nowrap;vertical-align:middle}
+td:last-child{border-right:none}
+.sno{color:#9ca3af;font-size:11px;text-align:center;min-width:40px}
+.badge-tag{font-family:'Courier New',monospace;font-size:11px;font-weight:600;background:#f0f6ff;border:1px solid #bfdbfe;border-radius:4px;padding:2px 7px;color:#1d4ed8;white-space:nowrap}
+.name-primary{font-weight:600;color:#111827;font-size:12px}
+.name-sub{font-size:10px;color:#6b7280;margin-top:1px}
+.centre-tag{display:inline-block;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:4px;padding:2px 8px;font-size:10px;font-weight:600;color:#15803d}
+.dept-tag{display:inline-block;background:#fff7ed;border:1px solid #fed7aa;border-radius:4px;padding:2px 8px;font-size:10px;font-weight:600;color:#c2410c}
+.type-in{background:#dcfce7;color:#15803d;border:1px solid #bbf7d0;border-radius:4px;padding:2px 8px;font-size:10px;font-weight:700}
+.type-out{background:#fee2e2;color:#dc2626;border:1px solid #fecaca;border-radius:4px;padding:2px 8px;font-size:10px;font-weight:700}
+.present-cell{background:#dcfce7;color:#15803d;border-radius:4px;padding:3px 6px;font-size:10px;line-height:1.5;white-space:nowrap;display:inline-block;min-width:80px;text-align:center}
+.absent-cell{background:#fee2e2;color:#dc2626;border-radius:4px;padding:3px 6px;font-size:10px;display:inline-block;min-width:60px;text-align:center}
+.centre-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px}
+.centre-card{background:white;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.centre-card-head{background:linear-gradient(135deg,#1a3c6e,#2563a8);color:white;padding:10px 14px;display:flex;align-items:center;justify-content:space-between}
+.centre-card-title{font-size:13px;font-weight:700}
+.centre-total{font-size:11px;opacity:.8}
+.centre-date-row{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;border-bottom:1px solid #f3f4f6;font-size:12px}
+.centre-date-row:last-child{border-bottom:none}
+.cdr-date{font-weight:600;color:#374151;min-width:80px}
+.cdr-present{color:#15803d;font-weight:700;min-width:100px;text-align:right}
+.cdr-bar-wrap{flex:1;margin:0 10px;height:6px;background:#f3f4f6;border-radius:3px}
+.cdr-bar{height:100%;background:#2563a8;border-radius:3px}
+#loading{display:flex;flex-direction:column;align-items:center;justify-content:center;height:60vh;gap:12px}
+.spinner{width:36px;height:36px;border:3px solid #dbeafe;border-top-color:#2563a8;border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+#loading p{color:#6b7280;font-size:13px}
+#error-msg{display:none;text-align:center;padding:4rem;color:#dc2626;line-height:2}
+#dashboard{display:none}
+@media(max-width:768px){header{flex-direction:column;align-items:flex-start;gap:8px;padding:12px 16px}main{padding:16px}.tab{padding:10px 14px;font-size:11px}}
 </style>
 </head>
 <body>
-
-<div id="loading">
-  <div class="spinner"></div>
-  <p>Loading attendance data...</p>
-</div>
-
-<div id="error-msg">
-  ⚠️ Could not load data.json<br>
-  <span style="color:var(--muted); font-size:0.65rem;">Make sure the file exists and GitHub Pages is enabled.</span>
-</div>
+<div id="loading"><div class="spinner"></div><p>Loading Bhati attendance data...</p></div>
+<div id="error-msg">⚠️ Could not load data.json<br><small style="color:#6b7280">Make sure GitHub Actions has run at least once.</small></div>
 
 <div id="dashboard">
-
   <header>
-    <div class="header-left">
-      <h1>Bhati March 2026</h1>
-      <div class="subtitle">Sewadar Attendance Dashboard</div>
+    <div>
+      <div class="header-title">🙏 Bhati March 2026 — Sewadar Dashboard</div>
+      <div class="header-sub">Real-time attendance tracking • Auto-updates every 10 minutes</div>
     </div>
     <div class="header-right">
-      <div class="live-badge"><span class="dot"></span> Auto-updating</div>
-      <div class="last-updated" id="last-updated">—</div>
+      <div class="live-pill"><span class="live-dot"></span> Live</div>
+      <div class="updated-tag" id="last-updated">—</div>
     </div>
   </header>
 
-  <div class="tabs">
-    <div class="tab active" onclick="switchTab('overview')">Overview</div>
-    <div class="tab" onclick="switchTab('attendance')">Attendance</div>
-    <div class="tab" onclick="switchTab('log')">Scan Log</div>
+  <div class="tab-bar">
+    <div class="tab active" onclick="switchTab('overview')">📊 Overview</div>
+    <div class="tab" onclick="switchTab('scans')">🔍 Scan Details</div>
+    <div class="tab" onclick="switchTab('attendance')">📅 Attendance Matrix</div>
+    <div class="tab" onclick="switchTab('centres')">🏢 Centre-wise</div>
   </div>
 
   <main>
-
-    <!-- ── OVERVIEW ── -->
+    <!-- OVERVIEW -->
     <div class="tab-content active" id="tab-overview">
-
-      <div class="stats-grid" id="stats-grid"></div>
-
-      <div class="section-title">Daily Headcount</div>
-      <div class="chart-container">
-        <div class="bar-chart" id="bar-chart"></div>
-      </div>
-
+      <div class="kpi-row" id="kpi-row"></div>
+      <div class="sec-head">Daily Headcount <span id="date-range-label"></span></div>
+      <div class="chart-box"><div class="bars" id="bar-chart"></div></div>
+      <div class="sec-head">Department Breakdown <span>Unique sewadars scanned per department</span></div>
+      <div class="dept-grid" id="dept-grid"></div>
     </div>
 
-    <!-- ── ATTENDANCE ── -->
-    <div class="tab-content" id="tab-attendance">
-      <div class="search-bar">
-        <input class="search-input" id="search-input" type="text" placeholder="Search by name, badge, or center..." oninput="filterTable()"/>
+    <!-- SCAN DETAILS -->
+    <div class="tab-content" id="tab-scans">
+      <div class="toolbar">
+        <input class="search-box" id="scan-search" placeholder="Search by name, badge, centre, department..." oninput="filterScans()"/>
+        <select class="filter-select" id="scan-type-filter" onchange="filterScans()"><option value="">All Types</option><option value="IN">IN only</option><option value="OUT">OUT only</option></select>
+        <select class="filter-select" id="scan-date-filter" onchange="filterScans()"><option value="">All Dates</option></select>
+        <select class="filter-select" id="scan-dept-filter" onchange="filterScans()"><option value="">All Departments</option></select>
+        <div class="count-badge" id="scan-count">0 records</div>
       </div>
-      <div class="table-wrapper">
-        <table id="attendance-table">
-          <thead id="attendance-head"></thead>
-          <tbody id="attendance-body"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- ── SCAN LOG ── -->
-    <div class="tab-content" id="tab-log">
-      <div class="search-bar">
-        <input class="search-input" id="log-search" type="text" placeholder="Search log..." oninput="filterLog()"/>
-      </div>
-      <div class="table-wrapper">
-        <table class="log-table">
+      <div class="tbl-wrap">
+        <table>
           <thead>
             <tr>
-              <th>Time</th>
-              <th>Name</th>
-              <th>Badge</th>
-              <th>Type</th>
-              <th>Location</th>
+              <th rowspan="2">#</th>
+              <th colspan="4" style="text-align:center;border-right:2px solid rgba(255,255,255,.3)">SCANNED SEWADAR</th>
+              <th colspan="3" style="text-align:center;border-right:2px solid rgba(255,255,255,.3)">SCAN DETAILS</th>
+              <th colspan="3" style="text-align:center">SCANNED BY</th>
+            </tr>
+            <tr class="sub-header">
+              <th>Badge No.</th><th>Name</th><th>Centre</th><th style="border-right:2px solid rgba(255,255,255,.3)">Department</th>
+              <th>Type</th><th>Date</th><th style="border-right:2px solid rgba(255,255,255,.3)">Time</th>
+              <th>Badge No.</th><th>Name</th><th>Centre</th>
             </tr>
           </thead>
-          <tbody id="log-body"></tbody>
+          <tbody id="scan-body"></tbody>
         </table>
       </div>
     </div>
 
+    <!-- ATTENDANCE MATRIX -->
+    <div class="tab-content" id="tab-attendance">
+      <div class="toolbar">
+        <input class="search-box" id="att-search" placeholder="Search sewadar name or badge..." oninput="filterAttendance()"/>
+        <select class="filter-select" id="att-centre-filter" onchange="filterAttendance()"><option value="">All Centres</option></select>
+        <select class="filter-select" id="att-dept-filter" onchange="filterAttendance()"><option value="">All Departments</option></select>
+        <div class="count-badge" id="att-count">0 sewadars</div>
+      </div>
+      <div class="tbl-wrap">
+        <table><thead id="att-head"></thead><tbody id="att-body"></tbody></table>
+      </div>
+    </div>
+
+    <!-- CENTRE-WISE -->
+    <div class="tab-content" id="tab-centres">
+      <div class="toolbar">
+        <input class="search-box" id="centre-search" placeholder="Search centre..." oninput="filterCentres()" style="max-width:300px"/>
+        <div class="count-badge" id="centre-count">0 centres</div>
+      </div>
+      <div class="centre-cards" id="centre-cards"></div>
+    </div>
   </main>
 </div>
 
 <script>
-let DATA = null;
+let DATA=null;
 
-async function loadData() {
-  try {
-    const res = await fetch(`data.json?t=${Date.now()}`);
-    if (!res.ok) throw new Error("Not found");
-    DATA = await res.json();
-    renderDashboard(DATA);
-    document.getElementById("loading").style.display   = "none";
-    document.getElementById("dashboard").style.display = "block";
-  } catch (e) {
-    document.getElementById("loading").style.display   = "none";
-    document.getElementById("error-msg").style.display = "block";
+async function loadData(){
+  try{
+    const res=await fetch('data.json?t='+Date.now());
+    if(!res.ok)throw new Error();
+    DATA=await res.json();
+    render(DATA);
+    document.getElementById('loading').style.display='none';
+    document.getElementById('dashboard').style.display='block';
+  }catch(e){
+    document.getElementById('loading').style.display='none';
+    document.getElementById('error-msg').style.display='block';
   }
 }
 
-function switchTab(name) {
-  document.querySelectorAll(".tab").forEach((t, i) => {
-    const ids = ["overview", "attendance", "log"];
-    t.classList.toggle("active", ids[i] === name);
+function switchTab(name){
+  ['overview','scans','attendance','centres'].forEach((n,i)=>{
+    document.querySelectorAll('.tab')[i].classList.toggle('active',n===name);
+    document.getElementById('tab-'+n).classList.toggle('active',n===name);
   });
-  document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
-  document.getElementById("tab-" + name).classList.add("active");
 }
 
-function renderDashboard(d) {
-  // Last updated
-  document.getElementById("last-updated").textContent = "Updated: " + d.last_updated;
+function fmtDate(d){
+  if(!d)return'—';
+  return new Date(d).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'2-digit'});
+}
 
-  // Stats
-  const maxDay = d.headcount_per_day.reduce((a, b) => a.total_present > b.total_present ? a : b, {total_present: 0});
-  const statsGrid = document.getElementById("stats-grid");
-  const stats = [
-    { label: "Total Sewadars",  value: d.total_sewadars,                   sub: "registered & scanned" },
-    { label: "Total Scans",     value: d.total_scans,                      sub: "IN + OUT combined"    },
-    { label: "Days Tracked",    value: d.dates.length,                      sub: "unique dates"         },
-    { label: "Peak Day",        value: maxDay.total_present || 0,           sub: formatDate(maxDay.date) },
-  ];
-  statsGrid.innerHTML = stats.map(s => `
-    <div class="stat-card">
-      <div class="stat-label">${s.label}</div>
-      <div class="stat-value">${s.value}</div>
-      <div class="stat-sub">${s.sub}</div>
-    </div>
-  `).join("");
+function render(d){
+  document.getElementById('last-updated').textContent='Updated: '+d.last_updated;
+
+  // KPIs
+  const peak=(d.headcount_per_day||[]).reduce((a,b)=>a.total_present>b.total_present?a:b,{total_present:0,date:''});
+  document.getElementById('kpi-row').innerHTML=[
+    {cls:'blue',  label:'Total Sewadars', val:d.total_sewadars,           sub:'scanned at least once'},
+    {cls:'green', label:'Total Scans',    val:d.total_scans,              sub:'IN + OUT combined'},
+    {cls:'orange',label:'Days Tracked',   val:(d.dates||[]).length,       sub:'unique dates'},
+    {cls:'purple',label:'Peak Attendance',val:peak.total_present,         sub:fmtDate(peak.date)},
+  ].map(k=>`<div class="kpi ${k.cls}"><div class="kpi-label">${k.label}</div><div class="kpi-value">${k.val}</div><div class="kpi-sub">${k.sub}</div></div>`).join('');
+
+  if(d.dates&&d.dates.length)
+    document.getElementById('date-range-label').textContent=
+      fmtDate(d.dates[0])+(d.dates.length>1?' – '+fmtDate(d.dates[d.dates.length-1]):'');
 
   // Bar chart
-  const chart = document.getElementById("bar-chart");
-  const max = Math.max(...d.headcount_per_day.map(h => h.total_present), 1);
-  chart.innerHTML = d.headcount_per_day.map(h => {
-    const pct = Math.max((h.total_present / max) * 100, 3);
-    return `
-      <div class="bar-group">
-        <div class="bar-count">${h.total_present}</div>
-        <div class="bar" style="height:${pct}%" title="${h.date}: ${h.total_present} present"></div>
-        <div class="bar-label">${formatDate(h.date)}</div>
-      </div>
-    `;
-  }).join("");
+  const hpd=d.headcount_per_day||[];
+  const maxH=Math.max(...hpd.map(h=>h.total_present),1);
+  document.getElementById('bar-chart').innerHTML=hpd.map(h=>`
+    <div class="bar-col">
+      <div class="bar-val">${h.total_present}</div>
+      <div class="bar-fill" style="height:${Math.max((h.total_present/maxH)*100,3)}%"
+           title="${fmtDate(h.date)}: ${h.total_present} present"></div>
+      <div class="bar-lbl">${fmtDate(h.date)}</div>
+    </div>`).join('');
 
-  // Attendance table
-  const head = document.getElementById("attendance-head");
-  const body = document.getElementById("attendance-body");
+  // Dept breakdown
+  const deptMap={};
+  (d.scans||[]).forEach(s=>{
+    if(s.department){if(!deptMap[s.department])deptMap[s.department]=new Set();deptMap[s.department].add(s.badge_no);}
+  });
+  document.getElementById('dept-grid').innerHTML=Object.entries(deptMap)
+    .sort((a,b)=>b[1].size-a[1].size)
+    .map(([dept,badges])=>`<div class="dept-card"><div class="dept-name">${dept}</div><div class="dept-count">${badges.size}</div></div>`)
+    .join('');
 
-  head.innerHTML = `<tr>
-    <th>Sewadar</th>
-    <th>Badge</th>
-    <th>Center</th>
-    ${d.dates.map(date => `<th class="date-col">${formatDate(date)}</th>`).join("")}
+  // Scan filters
+  const scanDates=[...new Set((d.raw_log||[]).map(s=>s.date))].sort();
+  const scanDepts=[...new Set((d.raw_log||[]).map(s=>s.department).filter(Boolean))].sort();
+  const sdf=document.getElementById('scan-date-filter');
+  scanDates.forEach(dt=>{const o=document.createElement('option');o.value=dt;o.textContent=fmtDate(dt);sdf.appendChild(o);});
+  const sdp=document.getElementById('scan-dept-filter');
+  scanDepts.forEach(dep=>{const o=document.createElement('option');o.value=dep;o.textContent=dep;sdp.appendChild(o);});
+  renderScanTable(d.raw_log||[]);
+
+  // Attendance filters
+  const attCentres=[...new Set((d.sewadar_attendance||[]).map(s=>s.sewadar_centre).filter(Boolean))].sort();
+  const attDepts  =[...new Set((d.sewadar_attendance||[]).map(s=>s.department).filter(Boolean))].sort();
+  const acf=document.getElementById('att-centre-filter');
+  attCentres.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;acf.appendChild(o);});
+  const adf=document.getElementById('att-dept-filter');
+  attDepts.forEach(dep=>{const o=document.createElement('option');o.value=dep;o.textContent=dep;adf.appendChild(o);});
+
+  document.getElementById('att-head').innerHTML=`<tr>
+    <th>#</th><th>Badge No.</th><th>Sewadar Name</th><th>Centre</th><th>Department</th>
+    ${(d.dates||[]).map(dt=>`<th style="text-align:center;min-width:90px">${fmtDate(dt)}</th>`).join('')}
   </tr>`;
-
-  body.innerHTML = d.sewadar_attendance.map(s => `
-    <tr data-name="${s.displayName.toLowerCase()}" data-badge="${s.badgeNumber.toLowerCase()}" data-center="${s.center.toLowerCase()}">
-      <td class="name-cell"><strong>${s.displayName}</strong></td>
-      <td><span class="badge-pill">${s.badgeNumber || "—"}</span></td>
-      <td style="color:var(--muted); font-size:0.65rem;">${s.center || "—"}</td>
-      ${d.dates.map(date => {
-        const info = s[date];
-        if (!info || info.status === "ABSENT") {
-          return `<td class="attendance-cell"><span class="absent-badge">ABSENT</span></td>`;
-        }
-        return `<td class="attendance-cell">
-          <span class="present-badge">
-            ↓ ${info.first_in || "—"}<br>↑ ${info.last_out || "—"}
-          </span>
-        </td>`;
-      }).join("")}
-    </tr>
-  `).join("");
-
-  // Raw log
-  const logBody = document.getElementById("log-body");
-  logBody.innerHTML = (d.raw_log || []).slice(0, 500).map(s => `
-    <tr data-log="${(s.displayName + s.badgeNumber + s.scannedAt).toLowerCase()}">
-      <td style="color:var(--muted)">${s.date || ""} ${s.time || ""}</td>
-      <td>${s.displayName}</td>
-      <td><span class="badge-pill">${s.badgeNumber || "—"}</span></td>
-      <td><span class="${s.type === "IN" ? "type-in" : "type-out"}">${s.type}</span></td>
-      <td style="color:var(--muted)">${s.scannedAt || "—"}</td>
-    </tr>
-  `).join("");
+  renderAttendanceTable(d.sewadar_attendance||[],d.dates||[]);
+  renderCentreCards(d.centre_summary||[],d.dates||[]);
 }
 
-function formatDate(dateStr) {
-  if (!dateStr) return "—";
-  const d = new Date(dateStr);
-  return d.toLocaleDateString("en-IN", { day: "numeric", month: "short" });
+function renderScanTable(rows){
+  document.getElementById('scan-body').innerHTML=rows.map((s,i)=>`
+    <tr data-search="${[s.badge_no,s.sewadar_name,s.sewadar_centre,s.department,s.scanned_by_badge,s.scanned_by_name].join(' ').toLowerCase()}"
+        data-type="${s.type||''}" data-date="${s.date||''}" data-dept="${s.department||''}">
+      <td class="sno">${i+1}</td>
+      <td><span class="badge-tag">${s.badge_no||'—'}</span></td>
+      <td><div class="name-primary">${s.sewadar_name||'Unknown'}</div><div class="name-sub">${s.satsang_point||''}</div></td>
+      <td>${s.sewadar_centre?`<span class="centre-tag">${s.sewadar_centre}</span>`:'—'}</td>
+      <td>${s.department?`<span class="dept-tag">${s.department}</span>`:'—'}</td>
+      <td><span class="${s.type==='IN'?'type-in':'type-out'}">${s.type||'—'}</span></td>
+      <td style="color:#374151">${s.date||'—'}</td>
+      <td style="font-weight:600;color:${s.type==='IN'?'#15803d':'#dc2626'}">${s.time||'—'}</td>
+      <td><span class="badge-tag">${s.scanned_by_badge||'—'}</span></td>
+      <td><div class="name-primary">${s.scanned_by_name||'—'}</div></td>
+      <td>${s.scanned_by_centre?`<span class="centre-tag">${s.scanned_by_centre}</span>`:'—'}</td>
+    </tr>`).join('');
+  document.getElementById('scan-count').textContent=rows.length+' records';
 }
 
-function filterTable() {
-  const q = document.getElementById("search-input").value.toLowerCase();
-  document.querySelectorAll("#attendance-body tr").forEach(row => {
-    const match = (row.dataset.name + row.dataset.badge + row.dataset.center).includes(q);
-    row.style.display = match ? "" : "none";
+function filterScans(){
+  const q=document.getElementById('scan-search').value.toLowerCase();
+  const type=document.getElementById('scan-type-filter').value;
+  const date=document.getElementById('scan-date-filter').value;
+  const dept=document.getElementById('scan-dept-filter').value;
+  let vis=0;
+  document.querySelectorAll('#scan-body tr').forEach(row=>{
+    const ok=(!q||row.dataset.search.includes(q))&&(!type||row.dataset.type===type)&&(!date||row.dataset.date===date)&&(!dept||row.dataset.dept===dept);
+    row.style.display=ok?'':'none';
+    if(ok)vis++;
   });
+  document.getElementById('scan-count').textContent=vis+' records';
 }
 
-function filterLog() {
-  const q = document.getElementById("log-search").value.toLowerCase();
-  document.querySelectorAll("#log-body tr").forEach(row => {
-    row.style.display = (row.dataset.log || "").includes(q) ? "" : "none";
+function renderAttendanceTable(rows,dates){
+  document.getElementById('att-body').innerHTML=rows.map((s,i)=>`
+    <tr data-name="${(s.sewadar_name||'').toLowerCase()}" data-badge="${(s.badge_no||'').toLowerCase()}"
+        data-centre="${(s.sewadar_centre||'').toLowerCase()}" data-dept="${(s.department||'').toLowerCase()}">
+      <td class="sno">${i+1}</td>
+      <td><span class="badge-tag">${s.badge_no||'—'}</span></td>
+      <td><div class="name-primary">${s.sewadar_name||'Unknown'}</div><div class="name-sub">${s.satsang_point||''}</div></td>
+      <td>${s.sewadar_centre?`<span class="centre-tag">${s.sewadar_centre}</span>`:'—'}</td>
+      <td>${s.department?`<span class="dept-tag">${s.department}</span>`:'—'}</td>
+      ${dates.map(dt=>{
+        const info=s[dt];
+        if(!info||info.status==='ABSENT')return`<td style="text-align:center"><span class="absent-cell">ABSENT</span></td>`;
+        return`<td style="text-align:center"><span class="present-cell">↓ ${info.first_in||'—'}<br>↑ ${info.last_out||'—'}</span></td>`;
+      }).join('')}
+    </tr>`).join('');
+  document.getElementById('att-count').textContent=rows.length+' sewadars';
+}
+
+function filterAttendance(){
+  const q=document.getElementById('att-search').value.toLowerCase();
+  const centre=document.getElementById('att-centre-filter').value.toLowerCase();
+  const dept=document.getElementById('att-dept-filter').value.toLowerCase();
+  let vis=0;
+  document.querySelectorAll('#att-body tr').forEach(row=>{
+    const ok=(!q||(row.dataset.name+row.dataset.badge).includes(q))&&(!centre||row.dataset.centre===centre)&&(!dept||row.dataset.dept===dept);
+    row.style.display=ok?'':'none';
+    if(ok)vis++;
   });
+  document.getElementById('att-count').textContent=vis+' sewadars';
 }
 
-// Auto-refresh every 10 minutes
+function renderCentreCards(centres,dates){
+  const maxP=Math.max(...centres.map(c=>Math.max(...dates.map(d=>c.dates[d]?.present||0))),1);
+  document.getElementById('centre-count').textContent=centres.length+' centres';
+  document.getElementById('centre-cards').innerHTML=centres.map(c=>`
+    <div class="centre-card" data-name="${c.centre.toLowerCase()}">
+      <div class="centre-card-head">
+        <div class="centre-card-title">${c.centre}</div>
+        <div class="centre-total">${c.total_sewadars} sewadars</div>
+      </div>
+      ${dates.map(dt=>{
+        const info=c.dates[dt]||{present:0,in:0,out:0};
+        const barW=Math.round((info.present/maxP)*100);
+        return`<div class="centre-date-row">
+          <div class="cdr-date">${fmtDate(dt)}</div>
+          <div class="cdr-bar-wrap"><div class="cdr-bar" style="width:${barW}%"></div></div>
+          <div class="cdr-present">${info.present} <span style="font-size:10px;color:#6b7280;font-weight:400">(IN:${info.in} OUT:${info.out})</span></div>
+        </div>`;
+      }).join('')}
+    </div>`).join('');
+}
+
+function filterCentres(){
+  const q=document.getElementById('centre-search').value.toLowerCase();
+  let vis=0;
+  document.querySelectorAll('.centre-card').forEach(c=>{
+    const ok=!q||c.dataset.name.includes(q);
+    c.style.display=ok?'':'none';
+    if(ok)vis++;
+  });
+  document.getElementById('centre-count').textContent=vis+' centres';
+}
+
 loadData();
-setInterval(loadData, 10 * 60 * 1000);
+setInterval(loadData,10*60*1000);
 </script>
 </body>
 </html>
