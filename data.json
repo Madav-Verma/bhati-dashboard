@@ -1,5 +1,5 @@
 {
-  "last_updated": "01-03-2026 02:52 AM UTC",
+  "last_updated": "01-03-2026 03:31 AM UTC",
   "total_scans": 1,
   "total_sewadars": 1,
   "dates": [
@@ -18,15 +18,25 @@
       "type": "IN",
       "timestamp": "2026-03-01T02:37:56.416000",
       "date": "2026-03-01",
-      "time": "02:37:56"
+      "time": "02:37:56",
+      "badge_no": "FB5978GA0001",
+      "sewadar_name": "Unknown",
+      "sewadar_centre": "",
+      "department": "TRAFFIC OUTSIDE BHATI",
+      "satsang_point": "Sector-15-a",
+      "gender": "M",
+      "scanned_by_badge": "FB5978GA0001",
+      "scanned_by_name": "Daksh Verma",
+      "scanned_by_centre": "SECTOR-15-A"
     }
   ],
   "sewadar_attendance": [
     {
-      "userId": "yBvX6gxUzbhiKh9yy5L9F5SBcgZ2",
-      "displayName": "Unknown",
-      "badgeNumber": "FB5978GA0001",
-      "center": "",
+      "badge_no": "FB5978GA0001",
+      "sewadar_name": "Unknown",
+      "sewadar_centre": "",
+      "satsang_point": "Sector-15-a",
+      "department": "TRAFFIC OUTSIDE BHATI",
       "2026-03-01": {
         "status": "PRESENT",
         "first_in": "02:37:56",
@@ -42,6 +52,7 @@
       "total_out": 0
     }
   ],
+  "centre_summary": [],
   "raw_log": [
     {
       "scan_id": "fKa4EUFm6sg3evxFmdrr",
@@ -55,7 +66,16 @@
       "type": "IN",
       "timestamp": "2026-03-01 02:37:56.416000",
       "date": "2026-03-01",
-      "time": "02:37:56"
+      "time": "02:37:56",
+      "badge_no": "FB5978GA0001",
+      "sewadar_name": "Unknown",
+      "sewadar_centre": "",
+      "department": "TRAFFIC OUTSIDE BHATI",
+      "satsang_point": "Sector-15-a",
+      "gender": "M",
+      "scanned_by_badge": "FB5978GA0001",
+      "scanned_by_name": "Daksh Verma",
+      "scanned_by_centre": "SECTOR-15-A"
     }
   ]
 }
