@@ -1,5 +1,5 @@
 {
-  "last_updated": "01-03-2026 07:01 AM UTC",
+  "last_updated": "01-03-2026 07:15 AM UTC",
   "total_scans": 3,
   "total_sewadars": 1,
   "dates": [
@@ -69,8 +69,8 @@
   "sewadar_attendance": [
     {
       "badge_no": "FB5978GA0001",
-      "sewadar_name": "Unknown",
-      "sewadar_centre": "",
+      "sewadar_name": "Daksh Verma",
+      "sewadar_centre": "SECTOR-15-A",
       "satsang_point": "Sector-15-a",
       "department": "TRAFFIC OUTSIDE BHATI",
       "2026-03-01": {
@@ -105,12 +105,12 @@
     {
       "scan_id": "tvubjsOPw7lz5CxSmtgh",
       "userId": "JYeVaY7gVFRONdaK3zyqs3aZI5S2",
-      "displayName": NaN,
-      "badgeNumber": NaN,
-      "center": NaN,
-      "role": NaN,
-      "scannedAt": NaN,
-      "scannedBy": NaN,
+      "displayName": "",
+      "badgeNumber": "",
+      "center": "",
+      "role": "",
+      "scannedAt": "",
+      "scannedBy": "",
       "type": "OUT",
       "timestamp": "2026-03-01 03:44:12.788000",
       "date": "2026-03-01",
@@ -129,12 +129,12 @@
     {
       "scan_id": "jGkyne3R4v67sT0lHucU",
       "userId": "JYeVaY7gVFRONdaK3zyqs3aZI5S2",
-      "displayName": NaN,
-      "badgeNumber": NaN,
-      "center": NaN,
-      "role": NaN,
-      "scannedAt": NaN,
-      "scannedBy": NaN,
+      "displayName": "",
+      "badgeNumber": "",
+      "center": "",
+      "role": "",
+      "scannedAt": "",
+      "scannedBy": "",
       "type": "IN",
       "timestamp": "2026-03-01 03:43:46.844000",
       "date": "2026-03-01",
@@ -172,7 +172,7 @@
       "scanned_by_badge": "FB5978GA0001",
       "scanned_by_name": "Daksh Verma",
       "scanned_by_centre": "SECTOR-15-A",
-      "scanned_at_loc": NaN
+      "scanned_at_loc": ""
     }
   ]
 }
