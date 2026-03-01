@@ -244,12 +244,16 @@ if all_scans:
 
     # ── Per Sewadar per Date ──────────────────────────────────────────────────
     for badge, grp in df.groupby("badge_no"):
+        # Always re-lookup from Excel so old Unknown records get resolved
+        info = lookup_badge(badge)
+        name   = info["name"]   if info["name"] not in ("","Unknown") else grp["sewadar_name"].iloc[0]
+        centre = info["centre"] if info["centre"] else grp["sewadar_centre"].iloc[0]
         row = {
             "badge_no":       badge,
-            "sewadar_name":   grp["sewadar_name"].iloc[0],
-            "sewadar_centre": grp["sewadar_centre"].iloc[0],
-            "satsang_point":  grp["satsang_point"].iloc[0],
-            "department":     grp["department"].iloc[0],
+            "sewadar_name":   name,
+            "sewadar_centre": centre,
+            "satsang_point":  info["satsang_point"] or grp["satsang_point"].iloc[0],
+            "department":     info["department"]    or grp["department"].iloc[0],
         }
         for date in all_dates:
             day = grp[grp["date"] == date]
@@ -315,6 +319,20 @@ output = {
     "centre_summary":     centre_summary,
     "raw_log":            raw_log,
 }
+
+import math
+
+def clean_nans(obj):
+    """Recursively replace NaN/None with empty string for valid JSON."""
+    if isinstance(obj, float) and math.isnan(obj):
+        return ""
+    if isinstance(obj, dict):
+        return {k: clean_nans(v) for k, v in obj.items()}
+    if isinstance(obj, list):
+        return [clean_nans(i) for i in obj]
+    return obj
+
+output = clean_nans(output)
 
 with open(OUTPUT_JSON, "w") as f:
     json.dump(output, f, indent=2, default=str)
