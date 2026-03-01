@@ -125,7 +125,7 @@ fetch_time = datetime.now(timezone.utc)
 
 if last_fetch:
     print(f"Incremental fetch — after: {last_fetch.strftime('%d-%m-%Y %I:%M %p UTC')}")
-    query = db.collection(SCAN_COLLECTION).where(TIMESTAMP_FIELD, ">", last_fetch)
+    query = db.collection(SCAN_COLLECTION).where(filter=firestore.FieldFilter(TIMESTAMP_FIELD, ">", last_fetch))
 else:
     print("First run — fetching ALL scans...")
     query = db.collection(SCAN_COLLECTION)
@@ -193,7 +193,31 @@ if os.path.exists(OUTPUT_JSON):
         existing_data = json.load(f)
         existing_scans = existing_data.get("scans", [])
 
-existing_ids = {s["scan_id"] for s in existing_scans}
+def normalize_scan(s):
+    """Normalize old scan records that used different field names."""
+    # Old script used 'badgeNumber', new uses 'badge_no'
+    if "badge_no" not in s:
+        s["badge_no"] = s.get("badgeNumber", s.get("barcode", ""))
+    if "sewadar_name" not in s:
+        s["sewadar_name"] = s.get("displayName", "Unknown")
+    if "sewadar_centre" not in s:
+        s["sewadar_centre"] = s.get("center", s.get("centre", ""))
+    if "department" not in s:
+        # Try to look up from Excel if we have the badge
+        info = lookup_badge(s.get("badge_no", ""))
+        s["department"]    = info.get("department", "")
+        s["satsang_point"] = info.get("satsang_point", "")
+        s["gender"]        = info.get("gender", "")
+    if "scanned_by_badge" not in s:
+        s["scanned_by_badge"]  = s.get("scannedBy", "")
+        scanner = lookup_badge(s["scanned_by_badge"])
+        s["scanned_by_name"]   = scanner.get("name", "—")
+        s["scanned_by_centre"] = scanner.get("centre", "")
+    return s
+
+# Normalize existing records and merge new ones
+existing_scans = [normalize_scan(s) for s in existing_scans]
+existing_ids   = {s["scan_id"] for s in existing_scans}
 for s in new_scans:
     if s["scan_id"] not in existing_ids:
         existing_scans.append(s)
