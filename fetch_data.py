@@ -142,10 +142,15 @@ for doc in query.stream():
         continue
 
     ts = d[TIMESTAMP_FIELD]
+    # Convert to IST (UTC+5:30)
+    from datetime import timedelta
+    IST_OFFSET = timedelta(hours=5, minutes=30)
     if hasattr(ts, "tzinfo") and ts.tzinfo is not None:
-        ts_naive = ts.replace(tzinfo=None)
+        ts_ist = ts.astimezone(timezone.utc) + IST_OFFSET
+        ts_naive = ts_ist.replace(tzinfo=None)
     else:
-        ts_naive = ts
+        # Assume UTC if no timezone info, add IST offset
+        ts_naive = ts + IST_OFFSET
 
     # Barcode from scan doc
     barcode    = str(d.get("barcode", "")).strip()
