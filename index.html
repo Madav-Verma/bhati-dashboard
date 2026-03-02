@@ -431,8 +431,6 @@ td:last-child{border-right:none}
       </div>
       <div id="absent-content"></div>
     </div>
-      <div id="absent-content"></div>
-    </div>
 
     <!-- SCANNERS -->
     <div class="tab-content" id="tab-scanners">
@@ -1311,7 +1309,7 @@ function renderScannerPerformance(d){
     }
     const isSlow = avgGap>10;
     
-    return {badge,name:s.name,centre:s.centre,totalScans:s.scans.length,uniqueSewadars,avgGap,last:s.last};
+    return {badge,name:s.name,centre:s.centre,totalScans:s.scans.length,uniqueSewadars,avgGap,last:s.last,isSlow};
   }).sort((a,b)=>b.totalScans-a.totalScans);
   
   document.getElementById('scanner-count').textContent = list.length+' scanners';
@@ -1334,7 +1332,7 @@ function renderScannerPerformance(d){
         </div>
       </div>
       <div class="scanner-perf-last">
-        Avg gap: <span class="${isSlow?'scanner-perf-slow':'scanner-perf-active'}">${s.avgGap||0} min</span> • Last: ${s.last?fmtTime(s.last):'—'}
+        Avg gap: <span class="${s.isSlow?'scanner-perf-slow':'scanner-perf-active'}">${s.avgGap||0} min</span> • Last: ${s.last?fmtTime(s.last):'—'}
       </div>
     </div>
   `).join('');
