@@ -488,8 +488,10 @@ td:last-child{border-right:none}
 
 <script>
 // ── Config ────────────────────────────────────────────────────────────────────
-// IMPORTANT: Replace with your Railway URL after deployment
-const RAILWAY_URL = 'https://bhati-server-production.up.railway.app/data.json';
+// IMPORTANT: Replace with your Railway URL or base endpoint after deployment
+// The server may serve the JSON directly at the root, so you can point to the
+// base URL instead of /data.json if that's where the payload lives.
+const RAILWAY_URL = 'https://bhati-server-production.up.railway.app/';
 const DATA_URL = (window.location.hostname === 'localhost' || window.location.protocol === 'file:')
   ? 'data.json'
   : RAILWAY_URL;
