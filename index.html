@@ -278,7 +278,7 @@ td:last-child{border-right:none}
         <div class="last-scan-tag" id="last-scan-tag"></div>
       </div>
       <div class="gsearch-wrap">
-        <input class="global-search" id="global-search" placeholder="🔍 Search any sewadar..." oninput="globalSearch()" onblur="setTimeout(()=>document.getElementById('gsearch-results').style.display='none',200)"/>
+        <input class="global-search" id="global-search" placeholder="🔍 Search any sewadar..." oninput="debouncedGlobalSearch()" onblur="setTimeout(()=>document.getElementById('gsearch-results').style.display='none',200)"/>
         <div class="gsearch-results" id="gsearch-results"></div>
       </div>
     </div>
@@ -357,7 +357,7 @@ td:last-child{border-right:none}
     <!-- SCAN DETAILS -->
     <div class="tab-content" id="tab-scans">
       <div class="toolbar">
-        <input class="search-box" id="scan-search" placeholder="Search name, badge, centre..." oninput="filterScans()"/>
+        <input class="search-box" id="scan-search" placeholder="Search name, badge, centre..." oninput="debouncedFilterScans()"/>
         <select class="filter-select" id="scan-type-filter" onchange="filterScans()"><option value="">All Types</option><option value="IN">IN only</option><option value="OUT">OUT only</option></select>
         <select class="filter-select" id="scan-dept-filter" onchange="filterScans()"><option value="">All Departments</option></select>
         <div class="count-badge" id="scan-count">0 records</div>
@@ -389,7 +389,7 @@ td:last-child{border-right:none}
     <!-- ATTENDANCE MATRIX -->
     <div class="tab-content" id="tab-attendance">
       <div class="toolbar">
-        <input class="search-box" id="att-search" placeholder="Search sewadar..." oninput="filterAttendance()"/>
+        <input class="search-box" id="att-search" placeholder="Search sewadar..." oninput="debouncedFilterAttendance()"/>
         <select class="filter-select" id="att-centre-filter" onchange="filterAttendance()"><option value="">All Centres</option></select>
         <select class="filter-select" id="att-dept-filter" onchange="filterAttendance()"><option value="">All Departments</option></select>
         <select class="filter-select" id="att-gender-filter" onchange="filterAttendance()"><option value="">All Genders</option><option value="m">Male</option><option value="f">Female</option></select>
@@ -407,7 +407,7 @@ td:last-child{border-right:none}
     <!-- CENTRES -->
     <div class="tab-content" id="tab-centres">
       <div class="toolbar">
-        <input class="search-box" id="centre-search" placeholder="Search centre..." oninput="filterCentres()" style="max-width:280px"/>
+        <input class="search-box" id="centre-search" placeholder="Search centre..." oninput="debouncedFilterCentres()" style="max-width:280px"/>
         <div class="count-badge" id="centre-count">0 centres</div>
         <button class="dl-btn" onclick="downloadCentreExcel()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
@@ -420,7 +420,7 @@ td:last-child{border-right:none}
 <!-- ABSENT -->
     <div class="tab-content" id="tab-absent">
       <div class="toolbar">
-        <input class="search-box" id="absent-search" placeholder="Search absent sewadar..." oninput="filterAbsent()"/>
+        <input class="search-box" id="absent-search" placeholder="Search absent sewadar..." oninput="debouncedFilterAbsent()"/>
         <select class="filter-select" id="absent-centre-filter" onchange="filterAbsent()"><option value="">All Centres</option></select>
         <select class="filter-select" id="absent-dept-filter" onchange="filterAbsent()"><option value="">All Departments</option></select>
         <select class="filter-select" id="absent-group-filter" onchange="renderAbsent(DATA.absent_per_day||[], ACTIVE_DATE==='all'?DATA.dates:[ACTIVE_DATE])"><option value="date">Group by Date</option><option value="centre">Group by Centre</option><option value="dept">Group by Department</option></select>
@@ -436,7 +436,7 @@ td:last-child{border-right:none}
     <!-- SCANNERS -->
     <div class="tab-content" id="tab-scanners">
       <div class="toolbar">
-        <input class="search-box" id="scanner-search" placeholder="Search scanner..." oninput="filterScanners()" style="max-width:280px"/>
+        <input class="search-box" id="scanner-search" placeholder="Search scanner..." oninput="debouncedFilterScanners()" style="max-width:280px"/>
         <select class="filter-select" id="scanner-centre-filter" onchange="filterScanners()"><option value="">All Centres</option></select>
         <div class="count-badge" id="scanner-count">0 scanners</div>
       </div>
@@ -449,7 +449,7 @@ td:last-child{border-right:none}
       <div class="alert-grid" id="dup-grid"></div>
       <div class="sec-head" style="margin-top:16px">Missing OUT Scans <span>Sewadars who have IN but no OUT recorded</span></div>
       <div class="toolbar" style="margin-bottom:10px">
-        <input class="search-box" id="missing-search" placeholder="Search..." oninput="filterMissingOut()" style="max-width:280px"/>
+        <input class="search-box" id="missing-search" placeholder="Search..." oninput="debouncedFilterMissingOut()" style="max-width:280px"/>
         <select class="filter-select" id="missing-dept-filter" onchange="filterMissingOut()"><option value="">All Departments</option></select>
         <div class="count-badge" id="missing-count">0 records</div>
         <button class="dl-btn" onclick="downloadAlertsExcel()">
@@ -648,12 +648,20 @@ const DATA_URL = (window.location.hostname === 'localhost' || window.location.pr
 
 let DATA = null;
 let ACTIVE_DATE = 'all';
+let RENDER_PENDING = false;
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 function fmtDate(d){ if(!d)return'—'; return new Date(d).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'2-digit'}); }
 function fmtTime(t){ if(!t)return'—'; const [h,m]=t.split(':'); const hr=parseInt(h); const ampm=hr>=12?'PM':'AM'; const hr12=hr%12||12; return `${hr12}:${m||'00'} ${ampm}`; }
 function nowStamp(){ return new Date().toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}).replace(/ /g,'-'); }
 function dlIcon(){ return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>`; }
+function debounce(fn, ms){
+  let t;
+  return function(...a){
+    clearTimeout(t);
+    t = setTimeout(()=>fn.apply(this,a), ms);
+  };
+}
 
 function switchTab(name){
   ['overview','liveops','scans','attendance','centres','absent','scanners','alerts','reports','print'].forEach((n,i)=>{
@@ -703,20 +711,29 @@ async function loadData(isAutoRefresh = false){
     
     let d = await res.json();
     
+    // Quick check if data actually changed (BEFORE heavy calculations)
+    const scanCount = (d.scans||d.raw_log||[]).length;
+    const dataHash = JSON.stringify({dates: d.dates, last_updated: d.last_updated, scanCount: scanCount});
+    if(isAutoRefresh && dataHash === LAST_DATA_HASH){
+      return; // No new data, skip everything
+    }
+    LAST_DATA_HASH = dataHash;
+    
     // Calculate aggregated data from scans if not provided
     if(!d.headcount_per_day && d.scans){
       d = calculateAggregates(d);
     }
     
-    // Check if data actually changed (for auto-refresh)
-    const dataHash = JSON.stringify({dates: d.dates, last_updated: d.last_updated, scanCount: (d.scans||d.raw_log||[]).length});
-    if(isAutoRefresh && dataHash === LAST_DATA_HASH){
-      return; // No new data, skip re-render
-    }
-    LAST_DATA_HASH = dataHash;
-    
     DATA = d;
-    render(DATA);
+    
+    // Batch render using requestAnimationFrame to avoid lag
+    if(RENDER_PENDING) return;
+    RENDER_PENDING = true;
+    requestAnimationFrame(() => {
+      render(DATA);
+      RENDER_PENDING = false;
+    });
+    
     document.getElementById('loading').style.display='none';
     document.getElementById('dashboard').style.display='block';
     
@@ -1034,14 +1051,18 @@ function renderScanTable(rows, dates){
     return '';
   };
   
-  document.getElementById('scan-body').innerHTML=rows.map((s,i)=>{
+  const fragment = document.createDocumentFragment();
+  rows.forEach((s,i)=>{
+    const tr = document.createElement('tr');
     const hl = getHighlight(s);
     const warning = getWarning(s);
     const isUnknown = !s.sewadar_name || s.sewadar_name==='Unknown';
     const rowClass = hl + (isUnknown?' unknown-row':'');
-    return `<tr class="${rowClass}" data-search="${[s.badge_no,s.sewadar_name,s.sewadar_centre,s.department,s.scanned_by_name].join(' ').toLowerCase()}"
-        data-type="${s.type||''}" data-dept="${s.department||''}">
-      <td class="sno">${i+1}</td>
+    tr.className = rowClass;
+    tr.dataset.search = [s.badge_no,s.sewadar_name,s.sewadar_centre,s.department,s.scanned_by_name].join(' ').toLowerCase();
+    tr.dataset.type = s.type||'';
+    tr.dataset.dept = s.department||'';
+    tr.innerHTML = `<td class="sno">${i+1}</td>
       <td>${s.badge_no?`<span class="badge-tag">${s.badge_no}</span>`:'—'}${isUnknown?'<span class="unknown-tag">UNKNOWN</span>':''}</td>
       <td><div class="name-primary">${s.sewadar_name||'Unknown'}${warning}</div><div class="name-sub">${s.satsang_point||''}</div></td>
       <td>${s.sewadar_centre?`<span class="centre-tag">${s.sewadar_centre}</span>`:'—'}</td>
@@ -1051,9 +1072,12 @@ function renderScanTable(rows, dates){
       <td style="font-weight:600;color:${s.type==='IN'?'#15803d':'#dc2626'}">${fmtTime(s.time)||'—'}</td>
       <td><span class="badge-tag">${s.scanned_by_badge||'—'}</span></td>
       <td><div class="name-primary">${s.scanned_by_name||'—'}</div></td>
-      <td>${s.scanned_by_centre?`<span class="centre-tag">${s.scanned_by_centre}</span>`:'—'}</td>
-    </tr>`;
-  }).join('');
+      <td>${s.scanned_by_centre?`<span class="centre-tag">${s.scanned_by_centre}</span>`:'—'}</td>`;
+    fragment.appendChild(tr);
+  });
+  const scanBody = document.getElementById('scan-body');
+  scanBody.innerHTML = '';
+  scanBody.appendChild(fragment);
   document.getElementById('scan-count').textContent=rows.length+' records';
 }
 
@@ -1069,6 +1093,7 @@ function filterScans(){
   });
   document.getElementById('scan-count').textContent=vis+' records';
 }
+const debouncedFilterScans = debounce(filterScans, 150);
 
 // ── Attendance ────────────────────────────────────────────────────────────────
 function renderAttendanceTable(rows, dates){
@@ -1111,6 +1136,7 @@ function filterAttendance(){
   });
   document.getElementById('att-count').textContent=vis+' sewadars';
 }
+const debouncedFilterAttendance = debounce(filterAttendance, 150);
 
 // ── Centre Cards ──────────────────────────────────────────────────────────────
 function renderCentreCards(centres, dates){
@@ -1148,6 +1174,7 @@ function filterCentres(){
   });
   document.getElementById('centre-count').textContent=vis+' centres';
 }
+const debouncedFilterCentres = debounce(filterCentres, 150);
 
 // ── Absent ────────────────────────────────────────────────────────────────────
 function renderAbsent(absentPerDay, dates){
@@ -1259,6 +1286,7 @@ function filterAbsent(){
   });
   document.getElementById('absent-count').textContent=vis+' absent';
 }
+const debouncedFilterAbsent = debounce(filterAbsent, 150);
 
 // ── Alerts ────────────────────────────────────────────────────────────────────
 function renderAlerts(d){
@@ -1538,6 +1566,7 @@ function filterScanners(){
   });
   document.getElementById('scanner-count').textContent = vis+' scanners';
 }
+const debouncedFilterScanners = debounce(filterScanners, 150);
 
 function filterMissingOut(){
   const q=document.getElementById('missing-search').value.toLowerCase();
@@ -1550,6 +1579,7 @@ function filterMissingOut(){
   });
   document.getElementById('missing-count').textContent=vis+' records';
 }
+const debouncedFilterMissingOut = debounce(filterMissingOut, 150);
 
 // ── Populate filters ──────────────────────────────────────────────────────────
 function populateFilters(d){
@@ -1671,6 +1701,7 @@ function globalSearch(){
     </div>`).join('');
   box.style.display='block';
 }
+const debouncedGlobalSearch = debounce(globalSearch, 150);
 
 function jumpToSewadar(badge){
   document.getElementById('gsearch-results').style.display='none';
