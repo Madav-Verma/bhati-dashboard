@@ -33,7 +33,6 @@
     .tab.active { color: #2563a8; border-bottom-color: #2563a8; }
     .tab-badge { background: #fee2e2; color: #dc2626; border-radius: 10px; padding: 2px 8px; font-size: 11px; margin-left: 6px; }
     .tab-badge.blue { background: #dbeafe; color: #1d4ed8; }
-    .tab-badge.green { background: #dcfce7; color: #15803d; }
 
     main { padding: 20px 24px; }
     .tab-content { display: none; }
@@ -86,7 +85,7 @@
 
     .table-wrap { background: white; border: 1px solid #e5e7eb; border-radius: 10px; overflow: hidden; }
     .table-scroll { max-height: 60vh; overflow-y: auto; }
-    table { width: 100%; border-collapse: collapse; min-width: 700px; }
+    table { width: 100%; border-collapse: collapse; min-width: 900px; }
     thead { position: sticky; top: 0; z-index: 10; }
     thead th { background: #1a3c6e; color: white; padding: 10px 12px; text-align: left; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
     tbody tr:nth-child(even) { background: #f8fafc; }
@@ -122,30 +121,30 @@
     .issue-reentry .issue-tag { background: #6366f1; color: white; }
     .issue-out-no-in .issue-tag { background: #db2777; color: white; }
 
-    /* Compact Alert KPI Cards */
-    .alert-kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 20px; }
-    .alert-kpi { background: white; border-radius: 8px; padding: 12px; border: 1px solid #e5e7eb; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: all 0.15s; }
-    .alert-kpi:hover { border-color: #2563a8; transform: translateY(-1px); }
-    .alert-kpi-icon { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
-    .alert-kpi-icon.red { background: #fee2e2; }
-    .alert-kpi-icon.orange { background: #ffedd5; }
-    .alert-kpi-icon.yellow { background: #fef9c3; }
-    .alert-kpi-icon.pink { background: #fce7f3; }
+    /* Alert KPI Cards - Clean Minimal Style */
+    .alert-kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin-bottom: 16px; }
+    .alert-kpi { background: white; border-radius: 8px; padding: 10px 12px; border: 1px solid #e5e7eb; display: flex; align-items: center; gap: 10px; cursor: pointer; transition: all 0.15s; }
+    .alert-kpi:hover { border-color: #2563a8; }
+    .alert-kpi-strip { width: 4px; height: 32px; border-radius: 2px; flex-shrink: 0; }
+    .alert-kpi-strip.red { background: #dc2626; }
+    .alert-kpi-strip.orange { background: #ea580c; }
+    .alert-kpi-strip.pink { background: #db2777; }
+    .alert-kpi-strip.purple { background: #6366f1; }
     .alert-kpi-content { flex: 1; min-width: 0; }
-    .alert-kpi-label { font-size: 10px; color: #64748b; font-weight: 600; text-transform: uppercase; }
-    .alert-kpi-value { font-size: 22px; font-weight: 700; color: #1a1a2e; line-height: 1.2; }
+    .alert-kpi-label { font-size: 10px; color: #64748b; font-weight: 600; }
+    .alert-kpi-value { font-size: 20px; font-weight: 700; color: #1a1a2e; line-height: 1.2; }
     .alert-kpi.active { border-color: #2563a8; background: #eff6ff; }
 
-    .alert-compact-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; }
-    .alert-compact-card { background: white; border: 1px solid #e5e7eb; border-radius: 6px; padding: 10px; font-size: 11px; cursor: pointer; transition: all 0.1s; }
+    .alert-compact-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 8px; }
+    .alert-compact-card { background: white; border: 1px solid #e5e7eb; border-radius: 6px; padding: 8px 10px; font-size: 11px; cursor: pointer; transition: all 0.1s; }
     .alert-compact-card:hover { border-color: #2563a8; background: #f8fafc; }
-    .alert-compact-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+    .alert-compact-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
     .alert-compact-name { font-weight: 600; color: #1e293b; }
     .alert-compact-badge { font-family: monospace; font-size: 10px; }
     .alert-compact-meta { color: #64748b; font-size: 10px; }
-    .alert-compact-time { color: #374151; font-weight: 600; margin-top: 4px; }
+    .alert-compact-time { color: #374151; font-weight: 600; margin-top: 4px; font-size: 10px; }
 
-    .scanner-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+    .scanner-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
     .scanner-card { background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px; }
     .scanner-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid #f1f5f9; }
     .scanner-name { font-size: 13px; font-weight: 700; color: #1a3c6e; }
@@ -165,7 +164,7 @@
     .scanner-perf-value { font-weight: 700; color: #1a3c6e; }
     .scanner-perf-label { color: #9ca3af; font-size: 8px; }
 
-    .reports-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; }
+    .reports-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }
     .report-card { background: white; border: 1px solid #e5e7eb; border-radius: 10px; padding: 14px; }
     .report-title { font-size: 13px; font-weight: 700; color: #1a3c6e; margin-bottom: 4px; }
     .report-desc { font-size: 11px; color: #64748b; margin-bottom: 12px; }
@@ -173,10 +172,11 @@
     .report-card .btn { width: 100%; justify-content: center; }
 
     .freeze-panel { background: white; border: 1px solid #e5e7eb; border-radius: 10px; padding: 12px; margin-bottom: 16px; }
-    .freeze-header { font-size: 12px; font-weight: 700; color: #1a3c6e; margin-bottom: 10px; }
+    .freeze-header { font-size: 12px; font-weight: 700; color: #1a3c6e; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
     .freeze-info { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
     .freeze-dates { display: flex; gap: 6px; flex-wrap: wrap; }
     .freeze-date-tag { display: inline-flex; align-items: center; gap: 4px; background: #fef3c7; color: #d97706; border: 1px solid #fde68a; border-radius: 4px; padding: 4px 8px; font-size: 10px; font-weight: 600; }
+    .freeze-date-tag .lock-icon { font-size: 10px; }
     .freeze-date-tag button { background: none; border: none; color: #d97706; cursor: pointer; font-size: 12px; padding: 0 2px; }
 
     #loading { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 80vh; gap: 14px; }
@@ -220,7 +220,7 @@
     <!-- Overview -->
     <div class="tab-content active" id="tab-overview">
       <div class="freeze-panel">
-        <div class="freeze-header">Freeze Day (Admin)</div>
+        <div class="freeze-header"><span style="font-size:14px">🔒</span> Freeze Day (Admin)</div>
         <div class="freeze-info">
           <select id="freeze-date-select" style="padding:6px 8px;border:1px solid #e5e7eb;border-radius:6px;font-size:11px;"><option value="">Select date...</option></select>
           <button class="btn gray" onclick="freezeDay()" style="padding:6px 10px;font-size:11px;">Freeze</button>
@@ -266,7 +266,14 @@
       </div>
       <div class="table-wrap">
         <div class="table-scroll">
-          <table><thead><tr><th>Time</th><th>Date</th><th>Name</th><th>Badge</th><th>Centre</th><th>Dept</th><th>Scanner</th><th>Type</th><th>Issue</th></tr></thead><tbody id="raw-body"></tbody></table>
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th><th>Time</th><th>Type</th><th>Badge</th><th>Name</th><th>Centre</th><th>Dept</th><th>Scanner Badge</th><th>Scanner Name</th><th>Issue</th>
+              </tr>
+            </thead>
+            <tbody id="raw-body"></tbody>
+          </table>
         </div>
       </div>
     </div>
@@ -292,8 +299,8 @@
     </div>
 
     <!-- Reports -->
-    <div class="tab-content-reports">
-     " id="tab <div class="reports-grid">
+    <div class="tab-content" id="tab-reports">
+      <div class="reports-grid">
         <div class="report-card"><div class="report-title">Overview</div><div class="report-desc">Daily stats</div><select id="report-date"></select><button class="btn" onclick="downloadReport('overview')">Download</button></div>
         <div class="report-card"><div class="report-title">Attendance</div><div class="report-desc">All sewadars</div><select id="report-att-date"></select><button class="btn blue" onclick="downloadReport('attendance')">Download</button></div>
         <div class="report-card"><div class="report-title">Absent</div><div class="report-desc">Not present</div><select id="report-absent-date"></select><button class="btn red" onclick="downloadReport('absent')">Download</button></div>
@@ -306,15 +313,15 @@
 
 <script>
 const DATA_URL = 'https://bhati-server-production.up.railway.app/data.json';
-const EVENT_START_TIME = '07:00';
 
 let RAW_DATA = null;
+let REGISTERED_SEWADARS = null; // Master data for expected counts
 let PROCESSED_DATA = null;
 let SELECTED_DATE = null;
 let GLOBAL_SEARCH = '';
 let FROZEN_DATA = {};
 let FROZEN_DATES = [];
-let ALL_ISSUES = []; // Store all detected issues for raw scan highlighting
+let ALL_ISSUES = [];
 
 document.addEventListener('DOMContentLoaded', loadData);
 
@@ -327,6 +334,10 @@ async function loadData() {
       if (!res.ok) throw new Error('Failed');
       RAW_DATA = await res.json();
     }
+    
+    // Load registered sewadars for expected counts
+    await loadRegisteredSewadars();
+    
     processData();
     document.getElementById('loading').style.display = 'none';
     document.getElementById('dashboard').style.display = 'block';
@@ -335,6 +346,21 @@ async function loadData() {
     console.error(e);
     document.getElementById('loading').style.display = 'none';
     document.getElementById('error-msg').style.display = 'block';
+  }
+}
+
+async function loadRegisteredSewadars() {
+  try {
+    // Try to get registered sewadars from raw data or fetch separately
+    if (RAW_DATA.registered_sewadars) {
+      REGISTERED_SEWADARS = RAW_DATA.registered_sewadars;
+    } else if (RAW_DATA.sewadar_details) {
+      REGISTERED_SEWADARS = RAW_DATA.sewadar_details;
+    } else {
+      REGISTERED_SEWADARS = [];
+    }
+  } catch (e) {
+    REGISTERED_SEWADARS = [];
   }
 }
 
@@ -352,12 +378,12 @@ function processData() {
   dateSelect.innerHTML = dates.map(d => `<option value="${d}" ${d === SELECTED_DATE ? 'selected' : ''}>${fmtDate(d)}</option>`).join('');
   FROZEN_DATES.forEach(fd => {
     const opt = dateSelect.querySelector(`option[value="${fd}"]`);
-    if (opt) { opt.textContent = fmtDate(fd) + ' (F)'; opt.disabled = true; }
+    if (opt) { opt.textContent = fmtDate(fd) + ' 🔒'; opt.disabled = true; }
   });
-  document.getElementById('header-date').textContent = fmtDate(SELECTED_DATE) + (FROZEN_DATES.includes(SELECTED_DATE) ? ' [FROZEN]' : '');
+  document.getElementById('header-date').textContent = fmtDate(SELECTED_DATE) + (FROZEN_DATES.includes(SELECTED_DATE) ? ' 🔒 FROZEN' : '');
 
   const todayScans = scans.filter(s => s.date === SELECTED_DATE);
-  const sortedScans = [...todayScans].sort((a, b) => b.time.localeCompare(a.time)); // Latest first
+  const sortedScans = [...todayScans].sort((a, b) => b.time.localeCompare(a.time));
 
   // Sewadar attendance map
   const sewadarMap = {};
@@ -381,9 +407,8 @@ function processData() {
 
   // ========== COMPREHENSIVE ISSUE DETECTION ==========
   ALL_ISSUES = [];
-  const issuesByScan = {}; // Map scan index to issue
+  const issuesByScan = {};
 
-  // Group scans by badge
   const badgeScans = {};
   todayScans.forEach((s, idx) => {
     const b = s.badge_no;
@@ -396,59 +421,53 @@ function processData() {
     const inScans = sorted.filter(s => s.type === 'IN');
     const outScans = sorted.filter(s => s.type === 'OUT');
 
-    // Issue: Multiple IN
     if (inScans.length > 1) {
-      inScans.forEach((s, i) => {
-        const issue = { type: 'dup-in', badge, name: s.sewadar_name, centre: s.sewadar_centre, dept: s.department, scanner: s.scanned_by_name, time: s.time, scan: s };
+      inScans.forEach(s => {
+        const issue = { type: 'dup-in', badge, name: s.sewadar_name, centre: s.sewadar_centre, dept: s.department, scanner: s.scanned_by_name, scannerBadge: s.scanned_by_badge, time: s.time, scan: s };
         ALL_ISSUES.push(issue);
         if (!issuesByScan[s._idx]) issuesByScan[s._idx] = [];
         issuesByScan[s._idx].push(issue);
       });
     }
 
-    // Issue: Multiple OUT
     if (outScans.length > 1) {
       outScans.forEach(s => {
-        const issue = { type: 'dup-out', badge, name: s.sewadar_name, centre: s.sewadar_centre, dept: s.department, scanner: s.scanned_by_name, time: s.time, scan: s };
+        const issue = { type: 'dup-out', badge, name: s.sewadar_name, centre: s.sewadar_centre, dept: s.department, scanner: s.scanned_by_name, scannerBadge: s.scanned_by_badge, time: s.time, scan: s };
         ALL_ISSUES.push(issue);
         if (!issuesByScan[s._idx]) issuesByScan[s._idx] = [];
         issuesByScan[s._idx].push(issue);
       });
     }
 
-    // Issue: Missing OUT (has IN, no OUT)
     if (inScans.length > 0 && outScans.length === 0) {
       const s = inScans[0];
-      const issue = { type: 'missing-out', badge, name: s.sewadar_name, centre: s.sewadar_centre, dept: s.department, scanner: s.scanned_by_name, time: s.time, scan: s };
+      const issue = { type: 'missing-out', badge, name: s.sewadar_name, centre: s.sewadar_centre, dept: s.department, scanner: s.scanned_by_name, scannerBadge: s.scanned_by_badge, time: s.time, scan: s };
       ALL_ISSUES.push(issue);
       if (!issuesByScan[s._idx]) issuesByScan[s._idx] = [];
       issuesByScan[s._idx].push(issue);
     }
 
-    // Issue: Missing IN (has OUT, no IN)
     if (outScans.length > 0 && inScans.length === 0) {
       outScans.forEach(s => {
-        const issue = { type: 'missing-in', badge, name: s.sewadar_name, centre: s.sewadar_centre, dept: s.department, scanner: s.scanned_by_name, time: s.time, scan: s };
+        const issue = { type: 'missing-in', badge, name: s.sewadar_name, centre: s.sewadar_centre, dept: s.department, scanner: s.scanned_by_name, scannerBadge: s.scanned_by_badge, time: s.time, scan: s };
         ALL_ISSUES.push(issue);
         if (!issuesByScan[s._idx]) issuesByScan[s._idx] = [];
         issuesByScan[s._idx].push(issue);
       });
     }
 
-    // Issue: OUT without prior IN (first scan is OUT)
     if (sorted.length > 0 && sorted[0].type === 'OUT') {
       const s = sorted[0];
-      const issue = { type: 'out-no-in', badge, name: s.sewadar_name, centre: s.sewadar_centre, dept: s.department, scanner: s.scanned_by_name, time: s.time, scan: s };
+      const issue = { type: 'out-no-in', badge, name: s.sewadar_name, centre: s.sewadar_centre, dept: s.department, scanner: s.scanned_by_name, scannerBadge: s.scanned_by_badge, time: s.time, scan: s };
       ALL_ISSUES.push(issue);
       if (!issuesByScan[s._idx]) issuesByScan[s._idx] = [];
       issuesByScan[s._idx].push(issue);
     }
 
-    // Issue: Re-entry (IN -> OUT -> IN)
     for (let i = 0; i < sorted.length - 2; i++) {
       if (sorted[i].type === 'IN' && sorted[i+1].type === 'OUT' && sorted[i+2].type === 'IN') {
         const s = sorted[i+2];
-        const issue = { type: 'reentry', badge, name: s.sewadar_name, centre: s.sewadar_centre, dept: s.department, scanner: s.scanned_by_name, time: s.time, scan: s };
+        const issue = { type: 'reentry', badge, name: s.sewadar_name, centre: s.sewadar_centre, dept: s.department, scanner: s.scanned_by_name, scannerBadge: s.scanned_by_badge, time: s.time, scan: s };
         ALL_ISSUES.push(issue);
         if (!issuesByScan[s._idx]) issuesByScan[s._idx] = [];
         issuesByScan[s._idx].push(issue);
@@ -457,11 +476,26 @@ function processData() {
     }
   });
 
-  // Add issue info to each scan for raw table
   todayScans.forEach((s, idx) => {
     s._issues = issuesByScan[idx] || [];
     s._issueClass = s._issues.length ? 'issue-' + s._issues[0].type : '';
   });
+
+  // ========== EXPECTED VS PRESENT FROM REGISTERED DATA ==========
+  const deptExpected = {};
+  const centreExpected = {};
+  
+  if (REGISTERED_SEWADARS && REGISTERED_SEWADARS.length > 0) {
+    REGISTERED_SEWADARS.forEach(s => {
+      if (s.department) {
+        deptExpected[s.department] = (deptExpected[s.department] || 0) + 1;
+      }
+      if (s.centre || s.sewadar_centre) {
+        const c = s.centre || s.sewadar_centre;
+        centreExpected[c] = (centreExpected[c] || 0) + 1;
+      }
+    });
+  }
 
   PROCESSED_DATA = {
     scans: todayScans,
@@ -474,7 +508,6 @@ function processData() {
     femaleCount: sewadarList.filter(s => s.gender === 'F').length
   };
 
-  // Counts for each issue type
   PROCESSED_DATA.issues = {
     'dup-in': ALL_ISSUES.filter(i => i.type === 'dup-in'),
     'dup-out': ALL_ISSUES.filter(i => i.type === 'dup-out'),
@@ -484,20 +517,16 @@ function processData() {
     'out-no-in': ALL_ISSUES.filter(i => i.type === 'out-no-in')
   };
 
-  // Dept/Centre counts
   const deptCounts = {}, centreCounts = {};
-  const deptExp = RAW_DATA.department_expected || {};
-  const centreExp = RAW_DATA.centre_expected || {};
   sewadarList.filter(s => s.status !== 'absent').forEach(s => {
     deptCounts[s.department] = (deptCounts[s.department] || 0) + 1;
     centreCounts[s.centre] = (centreCounts[s.centre] || 0) + 1;
   });
   PROCESSED_DATA.deptCounts = Object.entries(deptCounts).sort((a, b) => b[1] - a[1]);
   PROCESSED_DATA.centreCounts = Object.entries(centreCounts).sort((a, b) => b[1] - a[1]);
-  PROCESSED_DATA.deptExpected = deptExp;
-  PROCESSED_DATA.centreExpected = centreExp;
+  PROCESSED_DATA.deptExpected = deptExpected;
+  PROCESSED_DATA.centreExpected = centreExpected;
 
-  // Scanner data
   processScanners(todayScans);
 }
 
@@ -522,7 +551,6 @@ function processScanners(todayScans) {
       if (diff < 15) status = 'active';
       else if (diff < 30) status = 'idle';
     }
-    // Avg interval
     const sorted = [...sc.scanTimes].sort();
     let avgInt = 0;
     if (sorted.length > 1) {
@@ -534,7 +562,6 @@ function processScanners(todayScans) {
       }
       avgInt = Math.round(ints.reduce((a, b) => a + b, 0) / ints.length);
     }
-    // Peak hour
     const hrCounts = {};
     sc.scanTimes.forEach(t => hrCounts[parseInt(t.split(':')[0])] = (hrCounts[parseInt(t.split(':')[0])] || 0) + 1);
     const peak = Object.entries(hrCounts).sort((a, b) => b[1] - a[1])[0];
@@ -562,7 +589,7 @@ function renderKPIs() {
   const p = PROCESSED_DATA;
   const total = p.sewadars.length;
   document.getElementById('kpi-grid').innerHTML = `
-    <div class="kpi-card"><div class="kpi-label">Present</div><div class="kpi-value blue">${p.totalPresent}</div><div class="kpi-sub">of ${total} registered</div></div>
+    <div class="kpi-card"><div class="kpi-label">Present</div><div class="kpi-value blue">${p.totalPresent}</div><div class="kpi-sub">of ${total} scanned</div></div>
     <div class="kpi-card" style="border-left:3px solid #16a34a"><div class="kpi-label">Inside</div><div class="kpi-value green">${p.totalInside}</div><div class="kpi-sub">currently</div></div>
     <div class="kpi-card"><div class="kpi-label">Scans</div><div class="kpi-value purple">${p.totalScans}</div><div class="kpi-sub">IN + OUT</div></div>
     <div class="kpi-card"><div class="kpi-label">Gender</div><div class="kpi-value" style="font-size:16px"><span style="color:#2563a8">M:${p.maleCount}</span> <span style="color:#db2777">F:${p.femaleCount}</span></div></div>
@@ -576,8 +603,10 @@ function renderStats() {
 }
 
 function renderExpectedVsPresent() {
-  const de = PROCESSED_DATA.deptExpected, ce = PROCESSED_DATA.centreExpected;
-  const dp = Object.fromEntries(PROCESSED_DATA.deptCounts), cp = Object.fromEntries(PROCESSED_DATA.centreCounts);
+  const de = PROCESSED_DATA.deptExpected || {};
+  const ce = PROCESSED_DATA.centreExpected || {};
+  const dp = Object.fromEntries(PROCESSED_DATA.deptCounts);
+  const cp = Object.fromEntries(PROCESSED_DATA.centreCounts);
   const allD = [...new Set([...Object.keys(de), ...Object.keys(dp)])];
   const allC = [...new Set([...Object.keys(ce), ...Object.keys(cp)])];
 
@@ -643,14 +672,15 @@ function renderRawScans() {
     const issue = s._issues && s._issues[0];
     const issueLabel = issue ? issue.type.replace('dup-in','Dup IN').replace('dup-out','Dup OUT').replace('missing-in','No IN').replace('missing-out','No OUT').replace('out-no-in','OUT w/o IN').replace('reentry','Re-entry') : '';
     return `<tr class="${s._issueClass}">
-      <td style="font-weight:600">${fmtTime(s.time)}</td>
       <td>${s.date}</td>
-      <td style="font-weight:500">${s.sewadar_name || '?'}</td>
+      <td style="font-weight:600">${fmtTime(s.time)}</td>
+      <td><span class="${s.type === 'IN' ? 'type-in' : 'type-out'}">${s.type}</span></td>
       <td><span class="badge">${s.badge_no || '-'}</span></td>
+      <td style="font-weight:500">${s.sewadar_name || '?'}</td>
       <td>${s.sewadar_centre || '-'}</td>
       <td>${s.department || '-'}</td>
+      <td><span class="badge">${s.scanned_by_badge || '-'}</span></td>
       <td>${s.scanned_by_name || '-'}</td>
-      <td><span class="${s.type === 'IN' ? 'type-in' : 'type-out'}">${s.type}</span></td>
       <td>${issue ? `<span class="issue-tag">${issueLabel}</span>` : '-'}</td>
     </tr>`;
   }).join('');
@@ -664,30 +694,30 @@ function renderAlerts() {
   document.getElementById('alert-badge').textContent = total;
   document.getElementById('alert-count').textContent = total + ' issues';
 
-  // KPI row
+  // Clean minimal KPI row
   document.getElementById('alert-kpi-row').innerHTML = `
     <div class="alert-kpi ${document.getElementById('alert-filter')?.value === 'dup-in' ? 'active' : ''}" onclick="filterAlertType('dup-in')">
-      <div class="alert-kpi-icon red">2+</div>
+      <div class="alert-kpi-strip red"></div>
       <div class="alert-kpi-content"><div class="alert-kpi-label">Duplicate IN</div><div class="alert-kpi-value">${iss['dup-in'].length}</div></div>
     </div>
     <div class="alert-kpi" onclick="filterAlertType('dup-out')">
-      <div class="alert-kpi-icon red">2+</div>
+      <div class="alert-kpi-strip red"></div>
       <div class="alert-kpi-content"><div class="alert-kpi-label">Duplicate OUT</div><div class="alert-kpi-value">${iss['dup-out'].length}</div></div>
     </div>
     <div class="alert-kpi" onclick="filterAlertType('missing-out')">
-      <div class="alert-kpi-icon orange">!</div>
+      <div class="alert-kpi-strip orange"></div>
       <div class="alert-kpi-content"><div class="alert-kpi-label">Missing OUT</div><div class="alert-kpi-value">${iss['missing-out'].length}</div></div>
     </div>
     <div class="alert-kpi" onclick="filterAlertType('missing-in')">
-      <div class="alert-kpi-icon orange">!</div>
+      <div class="alert-kpi-strip orange"></div>
       <div class="alert-kpi-content"><div class="alert-kpi-label">Missing IN</div><div class="alert-kpi-value">${iss['missing-in'].length}</div></div>
     </div>
     <div class="alert-kpi" onclick="filterAlertType('out-no-in')">
-      <div class="alert-kpi-icon pink">!</div>
+      <div class="alert-kpi-strip pink"></div>
       <div class="alert-kpi-content"><div class="alert-kpi-label">OUT w/o IN</div><div class="alert-kpi-value">${iss['out-no-in'].length}</div></div>
     </div>
     <div class="alert-kpi" onclick="filterAlertType('reentry')">
-      <div class="alert-kpi-icon yellow">↻</div>
+      <div class="alert-kpi-strip purple"></div>
       <div class="alert-kpi-content"><div class="alert-kpi-label">Re-Entry</div><div class="alert-kpi-value">${iss['reentry'].length}</div></div>
     </div>
   `;
@@ -730,9 +760,7 @@ function filterAlertType(type) {
   renderAlertGrids();
 }
 
-function filterAlertsDisplay() {
-  renderAlertGrids();
-}
+function filterAlertsDisplay() { renderAlertGrids(); }
 
 function goToRaw(time) {
   document.getElementById('raw-search').value = time;
@@ -783,7 +811,6 @@ function onDateChange(date) {
 
 function onGlobalSearch(q) {
   GLOBAL_SEARCH = q.toLowerCase();
-  if (document.getElementById('tab-overview').classList.contains('active')) filterAttendance();
 }
 
 function filterAttendance() {
@@ -839,7 +866,7 @@ function unfreezeDay(d) {
   loadData();
 }
 function renderFrozenDates() {
-  document.getElementById('frozen-dates').innerHTML = FROZEN_DATES.map(fd => `<span class="freeze-date-tag">${fmtDate(fd)}<button onclick="unfreezeDay('${fd}')">×</button></span>`).join('');
+  document.getElementById('frozen-dates').innerHTML = FROZEN_DATES.map(fd => `<span class="freeze-date-tag"><span class="lock-icon">🔒</span>${fmtDate(fd)}<button onclick="unfreezeDay('${fd}')">×</button></span>`).join('');
   const sel = document.getElementById('freeze-date-select');
   const dates = RAW_DATA.dates || [];
   sel.innerHTML = '<option value="">Select date...</option>' + dates.filter(d => !FROZEN_DATES.includes(d)).map(d => `<option value="${d}">${fmtDate(d)}</option>`).join('');
@@ -856,7 +883,7 @@ function downloadAttendance() {
 }
 
 function downloadAlerts() {
-  const data = ALL_ISSUES.map(i => ({ Type: i.type, Badge: i.badge, Name: i.name, Centre: i.centre, Dept: i.dept, Scanner: i.scanner, Time: i.time }));
+  const data = ALL_ISSUES.map(i => ({ Type: i.type, Badge: i.badge, Name: i.name, Centre: i.centre, Dept: i.dept, Scanner: i.scanner, 'Scanner Badge': i.scannerBadge, Time: i.time }));
   const ws = XLSX.utils.json_to_sheet(data);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Alerts');
@@ -870,15 +897,21 @@ function downloadReport(type) {
   if (type === 'overview') {
     const data = [{ Date: SELECTED_DATE, Present: p.totalPresent, Inside: p.totalInside, Scans: p.totalScans, Male: p.maleCount, Female: p.femaleCount, Issues: ALL_ISSUES.length }];
     const ws = XLSX.utils.json_to_sheet(data);
-    XLSX.writeFile(XLSX.utils.book_new(), `overview_${SELECTED_DATE}.xlsx`);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Overview');
+    XLSX.writeFile(wb, `overview_${SELECTED_DATE}.xlsx`);
   } else if (type === 'absent') {
     const data = p.sewadars.filter(s => s.status === 'absent').map(s => ({ Badge: s.badge_no, Name: s.name, Centre: s.centre, Dept: s.department }));
     const ws = XLSX.utils.json_to_sheet(data);
-    XLSX.writeFile(XLSX.utils.book_new(), `absent_${SELECTED_DATE}.xlsx`);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Absent');
+    XLSX.writeFile(wb, `absent_${SELECTED_DATE}.xlsx`);
   } else if (type === 'scanner') {
     const data = p.scanners.map(s => ({ Name: s.name, Centre: s.centre, Total: s.totalScans, IN: s.inCount, OUT: s.outCount, Status: s.status, 'Avg Interval': s.avgInterval, 'Peak Hour': s.peakHour }));
     const ws = XLSX.utils.json_to_sheet(data);
-    XLSX.writeFile(XLSX.utils.book_new(), `scanners_${SELECTED_DATE}.xlsx`);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Scanners');
+    XLSX.writeFile(wb, `scanners_${SELECTED_DATE}.xlsx`);
   }
 }
 </script>
