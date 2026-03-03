@@ -8,275 +8,72 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { 
-      font-family: 'Inter', sans-serif; 
-      background: #f5f7fa; 
-      color: #1a1a2e; 
-      font-size: 13px;
-      min-height: 100vh;
-    }
+    body { font-family: 'Inter', sans-serif; background: #f5f7fa; color: #1a1a2e; font-size: 13px; min-height: 100vh; }
 
-    /* Header */
-    header {
-      background: linear-gradient(135deg, #1a3c6e 0%, #2563a8 100%);
-      color: white;
-      padding: 14px 24px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-      flex-wrap: wrap;
-      gap: 12px;
-    }
+    header { background: linear-gradient(135deg, #1a3c6e 0%, #2563a8 100%); color: white; padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 8px rgba(0,0,0,0.15); flex-wrap: wrap; gap: 12px; }
     .header-title { font-size: 18px; font-weight: 700; }
     .header-meta { font-size: 11px; opacity: 0.8; margin-top: 2px; }
     .header-right { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
     
-    .live-indicator {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: rgba(255,255,255,0.15);
-      border: 1px solid rgba(255,255,255,0.3);
-      border-radius: 20px;
-      padding: 4px 12px;
-      font-size: 11px;
-    }
-    .live-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: #4ade80;
-      animation: pulse 2s infinite;
-    }
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.5; }
-    }
+    .live-indicator { display: inline-flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); border-radius: 20px; padding: 4px 12px; font-size: 11px; }
+    .live-dot { width: 8px; height: 8px; border-radius: 50%; background: #4ade80; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 
-    .date-select {
-      background: rgba(255,255,255,0.15);
-      border: 1px solid rgba(255,255,255,0.3);
-      border-radius: 6px;
-      padding: 6px 12px;
-      color: white;
-      font-family: 'Inter', sans-serif;
-      font-size: 12px;
-      cursor: pointer;
-      outline: none;
-    }
+    .date-select { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); border-radius: 6px; padding: 6px 12px; color: white; font-family: 'Inter', sans-serif; font-size: 12px; cursor: pointer; outline: none; min-width: 140px; }
     .date-select option { color: #1a1a2e; background: white; }
     .date-select:disabled { opacity: 0.7; cursor: not-allowed; }
 
-    .search-box {
-      background: rgba(255,255,255,0.15);
-      border: 1px solid rgba(255,255,255,0.3);
-      border-radius: 6px;
-      padding: 6px 12px;
-      color: white;
-      font-family: 'Inter', sans-serif;
-      font-size: 12px;
-      width: 200px;
-      outline: none;
-    }
+    .search-box { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); border-radius: 6px; padding: 6px 12px; color: white; font-family: 'Inter', sans-serif; font-size: 12px; width: 200px; outline: none; }
     .search-box::placeholder { color: rgba(255,255,255,0.6); }
     .search-box:focus { background: rgba(255,255,255,0.25); }
 
-    /* Tab Bar */
-    .tab-bar {
-      background: white;
-      border-bottom: 1px solid #e5e7eb;
-      padding: 0 24px;
-      display: flex;
-      gap: 4px;
-      overflow-x: auto;
-    }
-    .tab {
-      padding: 12px 20px;
-      font-size: 13px;
-      font-weight: 600;
-      color: #64748b;
-      cursor: pointer;
-      border-bottom: 2px solid transparent;
-      white-space: nowrap;
-      transition: all 0.15s;
-    }
+    .tab-bar { background: white; border-bottom: 1px solid #e5e7eb; padding: 0 24px; display: flex; gap: 4px; overflow-x: auto; }
+    .tab { padding: 12px 20px; font-size: 13px; font-weight: 600; color: #64748b; cursor: pointer; border-bottom: 2px solid transparent; white-space: nowrap; transition: all 0.15s; }
     .tab:hover { color: #2563a8; background: #f8fafc; }
     .tab.active { color: #2563a8; border-bottom-color: #2563a8; }
-    .tab-badge {
-      background: #fee2e2;
-      color: #dc2626;
-      border-radius: 10px;
-      padding: 2px 8px;
-      font-size: 11px;
-      margin-left: 6px;
-    }
+    .tab-badge { background: #fee2e2; color: #dc2626; border-radius: 10px; padding: 2px 8px; font-size: 11px; margin-left: 6px; }
     .tab-badge.blue { background: #dbeafe; color: #1d4ed8; }
     .tab-badge.green { background: #dcfce7; color: #15803d; }
 
-    /* Main Content */
     main { padding: 20px 24px; }
     .tab-content { display: none; }
     .tab-content.active { display: block; }
 
-    /* KPI Cards */
-    .kpi-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 16px;
-      margin-bottom: 24px;
-    }
-    .kpi-card {
-      background: white;
-      border-radius: 10px;
-      padding: 18px;
-      border: 1px solid #e5e7eb;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
-    }
-    .kpi-label {
-      font-size: 11px;
-      font-weight: 600;
-      color: #64748b;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 8px;
-    }
-    .kpi-value {
-      font-size: 32px;
-      font-weight: 700;
-      line-height: 1;
-    }
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 20px; }
+    .kpi-card { background: white; border-radius: 10px; padding: 14px; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+    .kpi-label { font-size: 10px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+    .kpi-value { font-size: 28px; font-weight: 700; line-height: 1; }
     .kpi-value.blue { color: #2563a8; }
     .kpi-value.green { color: #16a34a; }
     .kpi-value.red { color: #dc2626; }
     .kpi-value.orange { color: #ea580c; }
     .kpi-value.purple { color: #7c3aed; }
-    .kpi-sub { font-size: 11px; color: #9ca3af; margin-top: 4px; }
+    .kpi-sub { font-size: 10px; color: #9ca3af; margin-top: 4px; }
 
-    /* Progress Bar */
-    .progress-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 8px;
-    }
-    .progress-label {
-      font-size: 12px;
-      font-weight: 500;
-      min-width: 120px;
-      color: #374151;
-    }
-    .progress-bar {
-      flex: 1;
-      height: 8px;
-      background: #e5e7eb;
-      border-radius: 4px;
-      overflow: hidden;
-    }
-    .progress-fill {
-      height: 100%;
-      border-radius: 4px;
-      transition: width 0.3s ease;
-    }
+    .progress-row { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+    .progress-label { font-size: 11px; font-weight: 500; min-width: 100px; color: #374151; }
+    .progress-bar { flex: 1; height: 6px; background: #e5e7eb; border-radius: 3px; overflow: hidden; }
+    .progress-fill { height: 100%; border-radius: 3px; transition: width 0.3s ease; }
     .progress-fill.high { background: linear-gradient(90deg, #22c55e, #16a34a); }
     .progress-fill.mid { background: linear-gradient(90deg, #f59e0b, #d97706); }
     .progress-fill.low { background: linear-gradient(90deg, #ef4444, #dc2626); }
-    .progress-pct {
-      font-size: 12px;
-      font-weight: 700;
-      min-width: 45px;
-      text-align: right;
-    }
-    .progress-nums {
-      font-size: 11px;
-      color: #9ca3af;
-      min-width: 50px;
-      text-align: right;
-    }
+    .progress-pct { font-size: 11px; font-weight: 700; min-width: 40px; text-align: right; }
+    .progress-nums { font-size: 10px; color: #9ca3af; min-width: 45px; text-align: right; }
 
-    /* Stats Grid */
-    .stats-row {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 16px;
-      margin-bottom: 24px;
-    }
-    .stat-card {
-      background: white;
-      border-radius: 10px;
-      padding: 16px;
-      border: 1px solid #e5e7eb;
-    }
-    .stat-title {
-      font-size: 12px;
-      font-weight: 600;
-      color: #374151;
-      margin-bottom: 12px;
-      padding-bottom: 8px;
-      border-bottom: 1px solid #f1f5f9;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .stat-title .late-badge {
-      background: #fef3c7;
-      color: #d97706;
-      font-size: 10px;
-      padding: 2px 8px;
-      border-radius: 10px;
-    }
-    .stat-list {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      max-height: 240px;
-      overflow-y: auto;
-    }
-    .stat-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 8px 10px;
-      background: #f8fafc;
-      border-radius: 6px;
-    }
-    .stat-name { font-size: 12px; font-weight: 500; color: #374151; }
-    .stat-count { font-size: 14px; font-weight: 700; color: #2563a8; }
+    .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 20px; }
+    .stat-card { background: white; border-radius: 10px; padding: 14px; border: 1px solid #e5e7eb; }
+    .stat-title { font-size: 11px; font-weight: 600; color: #374151; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center; }
+    .stat-list { display: flex; flex-direction: column; gap: 6px; max-height: 180px; overflow-y: auto; }
+    .stat-item { display: flex; justify-content: space-between; align-items: center; padding: 6px 8px; background: #f8fafc; border-radius: 4px; }
+    .stat-name { font-size: 11px; font-weight: 500; color: #374151; }
+    .stat-count { font-size: 13px; font-weight: 700; color: #2563a8; }
 
-    /* Table Styles */
-    .toolbar {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 12px;
-      flex-wrap: wrap;
-      align-items: center;
-    }
-    .toolbar input, .toolbar select {
-      border: 1px solid #e5e7eb;
-      border-radius: 6px;
-      padding: 8px 12px;
-      font-family: 'Inter', sans-serif;
-      font-size: 12px;
-      outline: none;
-    }
+    .toolbar { display: flex; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; align-items: center; }
+    .toolbar input, .toolbar select { border: 1px solid #e5e7eb; border-radius: 6px; padding: 8px 12px; font-family: 'Inter', sans-serif; font-size: 12px; outline: none; }
     .toolbar input:focus, .toolbar select:focus { border-color: #2563a8; }
-    .toolbar input { flex: 1; min-width: 180px; max-width: 300px; }
+    .toolbar input { flex: 1; min-width: 160px; max-width: 280px; }
     
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: #16a34a;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      padding: 8px 14px;
-      font-family: 'Inter', sans-serif;
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.15s;
-    }
+    .btn { display: inline-flex; align-items: center; gap: 6px; background: #16a34a; color: white; border: none; border-radius: 6px; padding: 8px 14px; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.15s; }
     .btn:hover { background: #15803d; transform: translateY(-1px); }
     .btn.blue { background: #2563a8; }
     .btn.blue:hover { background: #1d4ed8; }
@@ -285,578 +82,254 @@
     .btn.gray { background: #6b7280; }
     .btn.gray:hover { background: #4b5563; }
 
-    .count-badge {
-      background: #1a3c6e;
-      color: white;
-      border-radius: 20px;
-      padding: 6px 12px;
-      font-size: 11px;
-      font-weight: 600;
-    }
+    .count-badge { background: #1a3c6e; color: white; border-radius: 20px; padding: 6px 12px; font-size: 11px; font-weight: 600; }
 
-    .table-wrap {
-      background: white;
-      border: 1px solid #e5e7eb;
-      border-radius: 10px;
-      overflow: hidden;
-    }
-    .table-scroll {
-      max-height: 60vh;
-      overflow-y: auto;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      min-width: 800px;
-    }
-    thead {
-      position: sticky;
-      top: 0;
-      z-index: 10;
-    }
-    thead th {
-      background: #1a3c6e;
-      color: white;
-      padding: 12px 14px;
-      text-align: left;
-      font-size: 11px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
+    .table-wrap { background: white; border: 1px solid #e5e7eb; border-radius: 10px; overflow: hidden; }
+    .table-scroll { max-height: 60vh; overflow-y: auto; }
+    table { width: 100%; border-collapse: collapse; min-width: 700px; }
+    thead { position: sticky; top: 0; z-index: 10; }
+    thead th { background: #1a3c6e; color: white; padding: 10px 12px; text-align: left; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
     tbody tr:nth-child(even) { background: #f8fafc; }
     tbody tr:hover { background: #eff6ff; }
-    td {
-      padding: 10px 14px;
-      border-bottom: 1px solid #f1f5f9;
-      vertical-align: middle;
-    }
-    .sno { color: #94a3b8; font-size: 11px; text-align: center; width: 50px; }
+    td { padding: 8px 12px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; font-size: 12px; }
+    .sno { color: #94a3b8; font-size: 11px; text-align: center; width: 45px; }
     
-    .badge {
-      display: inline-block;
-      background: #eff6ff;
-      color: #1d4ed8;
-      border: 1px solid #bfdbfe;
-      border-radius: 4px;
-      padding: 3px 8px;
-      font-size: 11px;
-      font-weight: 600;
-      font-family: monospace;
-    }
+    .badge { display: inline-block; background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; border-radius: 4px; padding: 2px 6px; font-size: 10px; font-weight: 600; font-family: monospace; }
     .badge.green { background: #dcfce7; color: #15803d; border-color: #bbf7d0; }
     .badge.red { background: #fee2e2; color: #dc2626; border-color: #fecaca; }
     .badge.orange { background: #ffedd5; color: #ea580c; border-color: #fed7aa; }
+    .badge.yellow { background: #fef9c3; color: #a16207; border-color: #fde047; }
 
-    .status-inside {
-      background: #dcfce7;
-      color: #15803d;
-      border-radius: 4px;
-      padding: 4px 10px;
-      font-size: 11px;
-      font-weight: 700;
-    }
-    .status-exited {
-      background: #fee2e2;
-      color: #dc2626;
-      border-radius: 4px;
-      padding: 4px 10px;
-      font-size: 11px;
-      font-weight: 700;
-    }
-    .status-absent {
-      background: #f3f4f6;
-      color: #6b7280;
-      border-radius: 4px;
-      padding: 4px 10px;
-      font-size: 11px;
-      font-weight: 700;
-    }
+    .status-inside { background: #dcfce7; color: #15803d; border-radius: 4px; padding: 3px 8px; font-size: 10px; font-weight: 700; }
+    .status-exited { background: #fee2e2; color: #dc2626; border-radius: 4px; padding: 3px 8px; font-size: 10px; font-weight: 700; }
+    .status-absent { background: #f3f4f6; color: #6b7280; border-radius: 4px; padding: 3px 8px; font-size: 10px; font-weight: 700; }
 
-    /* Alert Cards */
-    .alert-section { margin-bottom: 24px; }
-    .alert-header {
-      font-size: 14px;
-      font-weight: 700;
-      color: #1a1a2e;
-      margin-bottom: 12px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .alert-header .count {
-      background: #fee2e2;
-      color: #dc2626;
-      border-radius: 12px;
-      padding: 2px 10px;
-      font-size: 12px;
-    }
-    .alert-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-      gap: 12px;
-    }
-    .alert-card {
-      background: white;
-      border: 1px solid #e5e7eb;
-      border-radius: 8px;
-      padding: 14px;
-    }
-    .alert-card.dup { border-left: 4px solid #dc2626; }
-    .alert-card.missing { border-left: 4px solid #f97316; }
-    .alert-card.reentry { border-left: 4px solid #eab308; }
-    .alert-name { font-weight: 600; color: #1e293b; margin-bottom: 4px; }
-    .alert-meta { font-size: 11px; color: #64748b; }
-    .alert-times { font-size: 11px; color: #374151; margin-top: 6px; }
+    .type-in { background: #dcfce7; color: #15803d; font-weight: 700; padding: 2px 8px; border-radius: 4px; }
+    .type-out { background: #fee2e2; color: #dc2626; font-weight: 700; padding: 2px 8px; border-radius: 4px; }
 
-    /* Scanner Cards */
-    .scanner-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 16px;
-    }
-    .scanner-card {
-      background: white;
-      border: 1px solid #e5e7eb;
-      border-radius: 10px;
-      padding: 16px;
-    }
-    .scanner-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 12px;
-      padding-bottom: 10px;
-      border-bottom: 1px solid #f1f5f9;
-    }
-    .scanner-name {
-      font-size: 14px;
-      font-weight: 700;
-      color: #1a3c6e;
-    }
-    .scanner-centre {
-      font-size: 11px;
-      color: #64748b;
-      margin-top: 2px;
-    }
-    .scanner-status {
-      font-size: 10px;
-      font-weight: 700;
-      padding: 4px 10px;
-      border-radius: 12px;
-    }
+    /* Issue row highlighting */
+    tr.issue-dup-in { background: #fef3c7 !important; }
+    tr.issue-dup-out { background: #fee2e2 !important; }
+    tr.issue-missing-in { background: #ffedd5 !important; }
+    tr.issue-missing-out { background: #fed7aa !important; }
+    tr.issue-reentry { background: #e0e7ff !important; }
+    tr.issue-out-no-in { background: #fce7f3 !important; }
+    .issue-tag { font-size: 9px; font-weight: 700; padding: 2px 5px; border-radius: 3px; margin-left: 4px; }
+    .issue-dup-in .issue-tag { background: #f59e0b; color: white; }
+    .issue-dup-out .issue-tag { background: #dc2626; color: white; }
+    .issue-missing-in .issue-tag { background: #ea580c; color: white; }
+    .issue-missing-out .issue-tag { background: #f97316; color: white; }
+    .issue-reentry .issue-tag { background: #6366f1; color: white; }
+    .issue-out-no-in .issue-tag { background: #db2777; color: white; }
+
+    /* Compact Alert KPI Cards */
+    .alert-kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 20px; }
+    .alert-kpi { background: white; border-radius: 8px; padding: 12px; border: 1px solid #e5e7eb; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: all 0.15s; }
+    .alert-kpi:hover { border-color: #2563a8; transform: translateY(-1px); }
+    .alert-kpi-icon { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+    .alert-kpi-icon.red { background: #fee2e2; }
+    .alert-kpi-icon.orange { background: #ffedd5; }
+    .alert-kpi-icon.yellow { background: #fef9c3; }
+    .alert-kpi-icon.pink { background: #fce7f3; }
+    .alert-kpi-content { flex: 1; min-width: 0; }
+    .alert-kpi-label { font-size: 10px; color: #64748b; font-weight: 600; text-transform: uppercase; }
+    .alert-kpi-value { font-size: 22px; font-weight: 700; color: #1a1a2e; line-height: 1.2; }
+    .alert-kpi.active { border-color: #2563a8; background: #eff6ff; }
+
+    .alert-compact-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; }
+    .alert-compact-card { background: white; border: 1px solid #e5e7eb; border-radius: 6px; padding: 10px; font-size: 11px; cursor: pointer; transition: all 0.1s; }
+    .alert-compact-card:hover { border-color: #2563a8; background: #f8fafc; }
+    .alert-compact-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+    .alert-compact-name { font-weight: 600; color: #1e293b; }
+    .alert-compact-badge { font-family: monospace; font-size: 10px; }
+    .alert-compact-meta { color: #64748b; font-size: 10px; }
+    .alert-compact-time { color: #374151; font-weight: 600; margin-top: 4px; }
+
+    .scanner-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+    .scanner-card { background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px; }
+    .scanner-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid #f1f5f9; }
+    .scanner-name { font-size: 13px; font-weight: 700; color: #1a3c6e; }
+    .scanner-centre { font-size: 10px; color: #64748b; margin-top: 2px; }
+    .scanner-status { font-size: 9px; font-weight: 700; padding: 3px 8px; border-radius: 10px; }
     .scanner-status.active { background: #dcfce7; color: #15803d; }
     .scanner-status.idle { background: #fef3c7; color: #d97706; }
     .scanner-status.offline { background: #f3f4f6; color: #6b7280; }
-    .scanner-stats {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      margin-bottom: 12px;
-    }
-    .scanner-stat {
-      text-align: center;
-      padding: 8px;
-      background: #f8fafc;
-      border-radius: 6px;
-    }
-    .scanner-stat-value {
-      font-size: 18px;
-      font-weight: 700;
-      color: #1a3c6e;
-    }
-    .scanner-stat-label {
-      font-size: 9px;
-      color: #64748b;
-      text-transform: uppercase;
-      margin-top: 2px;
-    }
-    .scanner-meta {
-      font-size: 11px;
-      color: #64748b;
-    }
+    .scanner-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 10px; }
+    .scanner-stat { text-align: center; padding: 6px; background: #f8fafc; border-radius: 4px; }
+    .scanner-stat-value { font-size: 16px; font-weight: 700; color: #1a3c6e; }
+    .scanner-stat-label { font-size: 8px; color: #64748b; text-transform: uppercase; margin-top: 2px; }
+    .scanner-meta { font-size: 10px; color: #64748b; }
     .scanner-meta strong { color: #374151; }
-    .scanner-perf {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 10px;
-      padding-top: 10px;
-      border-top: 1px solid #f1f5f9;
-      font-size: 11px;
-    }
-    .scanner-perf-item {
-      text-align: center;
-    }
-    .scanner-perf-value {
-      font-weight: 700;
-      color: #1a3c6e;
-    }
-    .scanner-perf-label {
-      color: #9ca3af;
-      font-size: 9px;
-    }
+    .scanner-perf { display: flex; justify-content: space-between; margin-top: 8px; padding-top: 8px; border-top: 1px solid #f1f5f9; font-size: 10px; }
+    .scanner-perf-item { text-align: center; }
+    .scanner-perf-value { font-weight: 700; color: #1a3c6e; }
+    .scanner-perf-label { color: #9ca3af; font-size: 8px; }
 
-    /* Reports */
-    .reports-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 16px;
-    }
-    .report-card {
-      background: white;
-      border: 1px solid #e5e7eb;
-      border-radius: 10px;
-      padding: 18px;
-    }
-    .report-title {
-      font-size: 14px;
-      font-weight: 700;
-      color: #1a3c6e;
-      margin-bottom: 6px;
-    }
-    .report-desc {
-      font-size: 12px;
-      color: #64748b;
-      margin-bottom: 14px;
-    }
-    .report-card select {
-      width: 100%;
-      margin-bottom: 10px;
-      padding: 8px;
-      border: 1px solid #e5e7eb;
-      border-radius: 6px;
-      font-size: 12px;
-    }
+    .reports-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; }
+    .report-card { background: white; border: 1px solid #e5e7eb; border-radius: 10px; padding: 14px; }
+    .report-title { font-size: 13px; font-weight: 700; color: #1a3c6e; margin-bottom: 4px; }
+    .report-desc { font-size: 11px; color: #64748b; margin-bottom: 12px; }
+    .report-card select { width: 100%; margin-bottom: 8px; padding: 6px; border: 1px solid #e5e7eb; border-radius: 6px; font-size: 11px; }
     .report-card .btn { width: 100%; justify-content: center; }
 
-    /* Freeze Day */
-    .freeze-panel {
-      background: white;
-      border: 1px solid #e5e7eb;
-      border-radius: 10px;
-      padding: 16px;
-      margin-bottom: 20px;
-    }
-    .freeze-header {
-      font-size: 13px;
-      font-weight: 700;
-      color: #1a3c6e;
-      margin-bottom: 12px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .freeze-info {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-    .freeze-dates {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-    .freeze-date-tag {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: #fef3c7;
-      color: #d97706;
-      border: 1px solid #fde68a;
-      border-radius: 6px;
-      padding: 6px 10px;
-      font-size: 11px;
-      font-weight: 600;
-    }
-    .freeze-date-tag button {
-      background: none;
-      border: none;
-      color: #d97706;
-      cursor: pointer;
-      font-size: 14px;
-      padding: 0 2px;
-    }
-    .freeze-date-tag button:hover { color: #b45309; }
+    .freeze-panel { background: white; border: 1px solid #e5e7eb; border-radius: 10px; padding: 12px; margin-bottom: 16px; }
+    .freeze-header { font-size: 12px; font-weight: 700; color: #1a3c6e; margin-bottom: 10px; }
+    .freeze-info { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .freeze-dates { display: flex; gap: 6px; flex-wrap: wrap; }
+    .freeze-date-tag { display: inline-flex; align-items: center; gap: 4px; background: #fef3c7; color: #d97706; border: 1px solid #fde68a; border-radius: 4px; padding: 4px 8px; font-size: 10px; font-weight: 600; }
+    .freeze-date-tag button { background: none; border: none; color: #d97706; cursor: pointer; font-size: 12px; padding: 0 2px; }
 
-    /* Loading */
-    #loading {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 80vh;
-      gap: 16px;
-    }
-    .spinner {
-      width: 40px;
-      height: 40px;
-      border: 3px solid #e5e7eb;
-      border-top-color: #2563a8;
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
+    #loading { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 80vh; gap: 14px; }
+    .spinner { width: 36px; height: 36px; border: 3px solid #e5e7eb; border-top-color: #2563a8; border-radius: 50%; animation: spin 0.8s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
-    #loading p { color: #64748b; font-size: 14px; }
+    #loading p { color: #64748b; font-size: 13px; }
     #error-msg { display: none; text-align: center; padding: 4rem; color: #dc2626; }
     #dashboard { display: none; }
 
-    @media (max-width: 768px) {
-      header { padding: 12px 16px; }
-      main { padding: 16px 12px; }
-      .tab { padding: 10px 14px; font-size: 12px; }
-    }
+    @media (max-width: 768px) { header { padding: 12px 16px; } main { padding: 14px 12px; } .tab { padding: 10px 14px; font-size: 12px; } }
   </style>
 </head>
 <body>
 
-<div id="loading">
-  <div class="spinner"></div>
-  <p>Loading attendance data...</p>
-</div>
-<div id="error-msg">
-  <h2>⚠️ Unable to load data</h2>
-  <p style="color: #64748b; margin-top: 8px;">Please check your connection and try again.</p>
-</div>
+<div id="loading"><div class="spinner"></div><p>Loading attendance data...</p></div>
+<div id="error-msg"><h2>Unable to load data</h2><p style="color:#64748b;margin-top:8px">Please check connection</p></div>
 
 <div id="dashboard">
   <header>
     <div>
-      <div class="header-title">🙏 Sewadar Attendance Dashboard</div>
+      <div class="header-title">Sewadar Attendance Dashboard</div>
       <div class="header-meta" id="header-date"></div>
     </div>
     <div class="header-right">
-      <div class="live-indicator">
-        <span class="live-dot"></span>
-        <span>Live</span>
-      </div>
-      <select class="date-select" id="date-select" onchange="onDateChange(this.value)">
-        <!-- Filled by JS -->
-      </select>
-      <input class="search-box" id="global-search" placeholder="🔍 Search sewadar..." oninput="onSearch(this.value)">
+      <div class="live-indicator"><span class="live-dot"></span><span>Live</span></div>
+      <select class="date-select" id="date-select" onchange="onDateChange(this.value)"></select>
+      <input class="search-box" id="global-search" placeholder="Search..." oninput="onGlobalSearch(this.value)">
     </div>
   </header>
 
   <div class="tab-bar">
-    <div class="tab active" onclick="switchTab('overview')">📊 Overview</div>
-    <div class="tab" onclick="switchTab('attendance')">📋 Attendance</div>
-    <div class="tab" onclick="switchTab('alerts')">⚠️ Alerts <span class="tab-badge" id="alert-badge">0</span></div>
-    <div class="tab" onclick="switchTab('scanners')">📱 Scanners <span class="tab-badge blue" id="scanner-badge">0</span></div>
-    <div class="tab" onclick="switchTab('reports')">📥 Reports</div>
+    <div class="tab active" onclick="switchTab('overview')">Overview</div>
+    <div class="tab" onclick="switchTab('attendance')">Attendance</div>
+    <div class="tab" onclick="switchTab('raw')">Raw Scans</div>
+    <div class="tab" onclick="switchTab('alerts')">Alerts <span class="tab-badge" id="alert-badge">0</span></div>
+    <div class="tab" onclick="switchTab('scanners')">Scanners <span class="tab-badge blue" id="scanner-badge">0</span></div>
+    <div class="tab" onclick="switchTab('reports')">Reports</div>
   </div>
 
   <main>
-    <!-- Overview Tab -->
+    <!-- Overview -->
     <div class="tab-content active" id="tab-overview">
-      <!-- Freeze Day Panel -->
-      <div class="freeze-panel" id="freeze-panel">
-        <div class="freeze-header">🔒 Freeze Day (Admin)</div>
+      <div class="freeze-panel">
+        <div class="freeze-header">Freeze Day (Admin)</div>
         <div class="freeze-info">
-          <select id="freeze-date-select" style="padding:6px 10px;border:1px solid #e5e7eb;border-radius:6px;font-size:12px;">
-            <option value="">Select date to freeze...</option>
-          </select>
-          <button class="btn gray" onclick="freezeDay()">Freeze Selected Date</button>
+          <select id="freeze-date-select" style="padding:6px 8px;border:1px solid #e5e7eb;border-radius:6px;font-size:11px;"><option value="">Select date...</option></select>
+          <button class="btn gray" onclick="freezeDay()" style="padding:6px 10px;font-size:11px;">Freeze</button>
           <div class="freeze-dates" id="frozen-dates"></div>
         </div>
       </div>
 
-      <div class="kpi-grid" id="kpi-grid">
-        <!-- KPIs filled by JS -->
-      </div>
-
+      <div class="kpi-grid" id="kpi-grid"></div>
       <div class="stats-row">
-        <div class="stat-card">
-          <div class="stat-title">
-            Department Breakdown
-            <span class="late-badge" id="late-dept-badge" style="display:none">Late: <span id="late-dept-count">0</span></span>
-          </div>
-          <div class="stat-list" id="dept-list"></div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-title">
-            Centre Breakdown
-            <span class="late-badge" id="late-centre-badge" style="display:none">Late: <span id="late-centre-count">0</span></span>
-          </div>
-          <div class="stat-list" id="centre-list"></div>
-        </div>
+        <div class="stat-card"><div class="stat-title">Department</div><div class="stat-list" id="dept-list"></div></div>
+        <div class="stat-card"><div class="stat-title">Centre</div><div class="stat-list" id="centre-list"></div></div>
       </div>
-
-      <!-- Expected vs Present -->
-      <div class="stats-row" id="expected-present-section" style="margin-top:0;padding-top:0">
-        <div class="stat-card">
-          <div class="stat-title">Expected vs Present (Departments)</div>
-          <div class="stat-list" id="dept-expected-list" style="max-height:180px"></div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-title">Expected vs Present (Centres)</div>
-          <div class="stat-list" id="centre-expected-list" style="max-height:180px"></div>
-        </div>
+      <div class="stats-row" style="margin-top:0;padding-top:0">
+        <div class="stat-card"><div class="stat-title">Expected vs Present (Dept)</div><div class="stat-list" id="dept-expected-list"></div></div>
+        <div class="stat-card"><div class="stat-title">Expected vs Present (Centre)</div><div class="stat-list" id="centre-expected-list"></div></div>
       </div>
     </div>
 
-    <!-- Attendance Tab -->
+    <!-- Attendance -->
     <div class="tab-content" id="tab-attendance">
       <div class="toolbar">
-        <input type="text" id="att-search" placeholder="Search by name or badge..." oninput="filterAttendance()">
-        <select id="att-centre" onchange="filterAttendance()">
-          <option value="">All Centres</option>
-        </select>
-        <select id="att-dept" onchange="filterAttendance()">
-          <option value="">All Departments</option>
-        </select>
-        <select id="att-status" onchange="filterAttendance()">
-          <option value="">All Status</option>
-          <option value="inside">Inside</option>
-          <option value="exited">Exited</option>
-          <option value="absent">Not Arrived</option>
-        </select>
+        <input type="text" id="att-search" placeholder="Search name/badge..." oninput="filterAttendance()">
+        <select id="att-centre" onchange="filterAttendance()"><option value="">All Centres</option></select>
+        <select id="att-dept" onchange="filterAttendance()"><option value="">All Depts</option></select>
+        <select id="att-status" onchange="filterAttendance()"><option value="">All Status</option><option value="inside">Inside</option><option value="exited">Exited</option><option value="absent">Not Arrived</option></select>
         <span class="count-badge" id="att-count">0</span>
-        <button class="btn" onclick="downloadAttendance()">
-          📥 Download Excel
-        </button>
+        <button class="btn" onclick="downloadAttendance()">Download</button>
       </div>
       <div class="table-wrap">
         <div class="table-scroll">
-          <table>
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Badge No.</th>
-                <th>Name</th>
-                <th>Centre</th>
-                <th>Department</th>
-                <th>IN Time</th>
-                <th>OUT Time</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody id="att-body"></tbody>
-          </table>
+          <table><thead><tr><th>#</th><th>Badge</th><th>Name</th><th>Centre</th><th>Dept</th><th>IN</th><th>OUT</th><th>Status</th></tr></thead><tbody id="att-body"></tbody></table>
         </div>
       </div>
     </div>
 
-    <!-- Alerts Tab -->
-    <div class="tab-content" id="tab-alerts">
+    <!-- Raw Scans -->
+    <div class="tab-content" id="tab-raw">
       <div class="toolbar">
-        <select id="alert-type" onchange="filterAlerts()">
-          <option value="">All Alerts</option>
-          <option value="duplicate">Duplicate IN</option>
-          <option value="missing">Missing OUT</option>
-          <option value="reentry">Re-Entry</option>
-        </select>
-        <span class="count-badge" id="alert-count">0</span>
-        <button class="btn" onclick="downloadAlerts()">
-          📥 Download Alerts
-        </button>
+        <input type="text" id="raw-search" placeholder="Search..." oninput="filterRaw()">
+        <select id="raw-type" onchange="filterRaw()"><option value="">All Types</option><option value="IN">IN</option><option value="OUT">OUT</option></select>
+        <select id="raw-issue" onchange="filterRaw()"><option value="">All Issues</option><option value="dup-in">Duplicate IN</option><option value="dup-out">Duplicate OUT</option><option value="missing-in">Missing IN</option><option value="missing-out">Missing OUT</option><option value="reentry">Re-entry</option><option value="out-no-in">OUT without IN</option></select>
+        <span class="count-badge" id="raw-count">0</span>
       </div>
-
-      <div class="alert-section" id="dup-section">
-        <div class="alert-header">
-          🔴 Duplicate IN Scans
-          <span class="count" id="dup-count">0</span>
+      <div class="table-wrap">
+        <div class="table-scroll">
+          <table><thead><tr><th>Time</th><th>Date</th><th>Name</th><th>Badge</th><th>Centre</th><th>Dept</th><th>Scanner</th><th>Type</th><th>Issue</th></tr></thead><tbody id="raw-body"></tbody></table>
         </div>
-        <div class="alert-grid" id="dup-grid"></div>
-      </div>
-
-      <div class="alert-section" id="missing-section">
-        <div class="alert-header">
-          🟠 Missing OUT Scans
-          <span class="count" id="missing-count">0</span>
-        </div>
-        <div class="alert-grid" id="missing-grid"></div>
-      </div>
-
-      <div class="alert-section" id="reentry-section">
-        <div class="alert-header">
-          🟡 Re-Entry Cases
-          <span class="count" id="reentry-count">0</span>
-        </div>
-        <div class="alert-grid" id="reentry-grid"></div>
       </div>
     </div>
 
-    <!-- Scanners Tab -->
+    <!-- Alerts -->
+    <div class="tab-content" id="tab-alerts">
+      <div class="alert-kpi-row" id="alert-kpi-row"></div>
+      <div class="toolbar" style="margin-bottom:16px">
+        <select id="alert-filter" onchange="filterAlertsDisplay()"><option value="">Show All</option><option value="dup-in">Duplicate IN</option><option value="dup-out">Duplicate OUT</option><option value="missing-in">Missing IN</option><option value="missing-out">Missing OUT</option><option value="reentry">Re-entry</option><option value="out-no-in">OUT without IN</option></select>
+        <span class="count-badge" id="alert-count">0</span>
+        <button class="btn" onclick="downloadAlerts()">Download</button>
+      </div>
+      <div id="alert-grids"></div>
+    </div>
+
+    <!-- Scanners -->
     <div class="tab-content" id="tab-scanners">
       <div class="toolbar">
-        <select id="scanner-centre-filter" onchange="filterScanners()">
-          <option value="">All Centres</option>
-        </select>
-        <span class="count-badge" id="scanner-count">0 scanners</span>
+        <select id="scanner-centre-filter" onchange="renderScanners()"><option value="">All Centres</option></select>
+        <span class="count-badge" id="scanner-count">0</span>
       </div>
       <div class="scanner-grid" id="scanner-grid"></div>
     </div>
 
-    <!-- Reports Tab -->
-    <div class="tab-content" id="tab-reports">
-      <div class="reports-grid">
-        <div class="report-card">
-          <div class="report-title">📊 Overview Report</div>
-          <div class="report-desc">Daily stats and breakdowns</div>
-          <select id="report-date"></select>
-          <button class="btn" onclick="downloadReport('overview')">Download</button>
-        </div>
-        <div class="report-card">
-          <div class="report-title">📋 Attendance List</div>
-          <div class="report-desc">All sewadars with times</div>
-          <select id="report-attendance-date"></select>
-          <button class="btn blue" onclick="downloadReport('attendance')">Download</button>
-        </div>
-        <div class="report-card">
-          <div class="report-title">❌ Absent List</div>
-          <div class="report-desc">Sewadars not present</div>
-          <select id="report-absent-date"></select>
-          <button class="btn red" onclick="downloadReport('absent')">Download</button>
-        </div>
-        <div class="report-card">
-          <div class="report-title">⚠️ Alerts Report</div>
-          <div class="report-desc">All scan issues</div>
-          <select id="report-alerts-date"></select>
-          <button class="btn" onclick="downloadReport('alerts')">Download</button>
-        </div>
-        <div class="report-card">
-          <div class="report-title">📱 Scanner Summary</div>
-          <div class="report-desc">Scanner performance data</div>
-          <select id="report-scanner-date"></select>
-          <button class="btn blue" onclick="downloadReport('scanner')">Download</button>
-        </div>
+    <!-- Reports -->
+    <div class="tab-content-reports">
+     " id="tab <div class="reports-grid">
+        <div class="report-card"><div class="report-title">Overview</div><div class="report-desc">Daily stats</div><select id="report-date"></select><button class="btn" onclick="downloadReport('overview')">Download</button></div>
+        <div class="report-card"><div class="report-title">Attendance</div><div class="report-desc">All sewadars</div><select id="report-att-date"></select><button class="btn blue" onclick="downloadReport('attendance')">Download</button></div>
+        <div class="report-card"><div class="report-title">Absent</div><div class="report-desc">Not present</div><select id="report-absent-date"></select><button class="btn red" onclick="downloadReport('absent')">Download</button></div>
+        <div class="report-card"><div class="report-title">Alerts</div><div class="report-desc">All issues</div><select id="report-alerts-date"></select><button class="btn" onclick="downloadReport('alerts')">Download</button></div>
+        <div class="report-card"><div class="report-title">Scanners</div><div class="report-desc">Performance</div><select id="report-scanner-date"></select><button class="btn blue" onclick="downloadReport('scanner')">Download</button></div>
       </div>
     </div>
   </main>
 </div>
 
 <script>
-// ============ CONFIG ============
 const DATA_URL = 'https://bhati-server-production.up.railway.app/data.json';
-const EVENT_START_TIME = '07:00'; // Configurable: late arrivals after this time
+const EVENT_START_TIME = '07:00';
 
-// ============ STATE ============
 let RAW_DATA = null;
 let PROCESSED_DATA = null;
 let SELECTED_DATE = null;
-let SEARCH_QUERY = '';
-let FROZEN_DATA = {}; // { date: { scans, sewadars, ... } }
+let GLOBAL_SEARCH = '';
+let FROZEN_DATA = {};
 let FROZEN_DATES = [];
+let ALL_ISSUES = []; // Store all detected issues for raw scan highlighting
 
-// ============ INITIALIZE ============
 document.addEventListener('DOMContentLoaded', loadData);
 
 async function loadData() {
   try {
-    // Check if selected date is frozen
     if (FROZEN_DATES.includes(SELECTED_DATE) && FROZEN_DATA[SELECTED_DATE]) {
       RAW_DATA = FROZEN_DATA[SELECTED_DATE];
     } else {
       const res = await fetch(DATA_URL + '?t=' + Date.now());
-      if (!res.ok) throw new Error('Failed to fetch');
+      if (!res.ok) throw new Error('Failed');
       RAW_DATA = await res.json();
     }
-    
     processData();
-    
     document.getElementById('loading').style.display = 'none';
     document.getElementById('dashboard').style.display = 'block';
-    
     render();
   } catch (e) {
     console.error(e);
@@ -865,598 +338,441 @@ async function loadData() {
   }
 }
 
-// ============ DATA PROCESSING ============
 function processData() {
   const scans = RAW_DATA.scans || RAW_DATA.raw_log || [];
   const dates = RAW_DATA.dates || [];
-  
   if (!dates.length) return;
-  
-  // If date not selected, use last date
+
   if (!SELECTED_DATE || !dates.includes(SELECTED_DATE)) {
     SELECTED_DATE = dates[dates.length - 1];
   }
-  
-  // Build date options
+
+  // Date dropdown
   const dateSelect = document.getElementById('date-select');
-  dateSelect.innerHTML = dates.map(d => 
-    `<option value="${d}" ${d === SELECTED_DATE ? 'selected' : ''}>${formatDate(d)}</option>`
-  ).join('');
-  
-  // Disable frozen dates in dropdown
+  dateSelect.innerHTML = dates.map(d => `<option value="${d}" ${d === SELECTED_DATE ? 'selected' : ''}>${fmtDate(d)}</option>`).join('');
   FROZEN_DATES.forEach(fd => {
     const opt = dateSelect.querySelector(`option[value="${fd}"]`);
-    if (opt) {
-      opt.textContent = formatDate(fd) + ' (Frozen)';
-      opt.disabled = true;
-    }
+    if (opt) { opt.textContent = fmtDate(fd) + ' (F)'; opt.disabled = true; }
   });
-  
-  document.getElementById('header-date').textContent = `Date: ${formatDate(SELECTED_DATE)}` + (FROZEN_DATES.includes(SELECTED_DATE) ? ' [FROZEN]' : '');
-  
-  // Filter scans for selected date
+  document.getElementById('header-date').textContent = fmtDate(SELECTED_DATE) + (FROZEN_DATES.includes(SELECTED_DATE) ? ' [FROZEN]' : '');
+
   const todayScans = scans.filter(s => s.date === SELECTED_DATE);
-  
-  // Compute attendance per sewadar
+  const sortedScans = [...todayScans].sort((a, b) => b.time.localeCompare(a.time)); // Latest first
+
+  // Sewadar attendance map
   const sewadarMap = {};
   todayScans.forEach(s => {
-    const badge = s.badge_no;
-    if (!sewadarMap[badge]) {
-      sewadarMap[badge] = {
-        badge_no: badge,
-        name: s.sewadar_name || 'Unknown',
-        centre: s.sewadar_centre || 'Unknown',
-        department: s.department || 'Unknown',
-        gender: s.gender || 'M',
-        in_time: null,
-        out_time: null
-      };
+    const b = s.badge_no;
+    if (!sewadarMap[b]) {
+      sewadarMap[b] = { badge_no: b, name: s.sewadar_name || '?', centre: s.sewadar_centre || '?', department: s.department || '?', gender: s.gender || 'M', in_time: null, out_time: null, scans: [] };
     }
-    if (s.type === 'IN' && (!sewadarMap[badge].in_time || s.time < sewadarMap[badge].in_time)) {
-      sewadarMap[badge].in_time = s.time;
-    }
-    if (s.type === 'OUT' && (!sewadarMap[badge].out_time || s.time > sewadarMap[badge].out_time)) {
-      sewadarMap[badge].out_time = s.time;
-    }
+    sewadarMap[b].scans.push(s);
+    if (s.type === 'IN' && (!sewadarMap[b].in_time || s.time < sewadarMap[b].in_time)) sewadarMap[b].in_time = s.time;
+    if (s.type === 'OUT' && (!sewadarMap[b].out_time || s.time > sewadarMap[b].out_time)) sewadarMap[b].out_time = s.time;
   });
-  
-  // Determine status dynamically
+
   Object.values(sewadarMap).forEach(s => {
-    if (s.in_time && !s.out_time) {
-      s.status = 'inside';
-    } else if (s.in_time && s.out_time) {
-      s.status = 'exited';
-    } else {
-      s.status = 'absent';
-    }
+    if (s.in_time && !s.out_time) s.status = 'inside';
+    else if (s.in_time && s.out_time) s.status = 'exited';
+    else s.status = 'absent';
   });
-  
-  // Alert detection
-  const duplicateIN = [];
-  const missingOUT = [];
-  const reEntry = [];
-  
-  const badgeDayScans = {};
-  todayScans.forEach(s => {
-    const key = s.badge_no;
-    if (!badgeDayScans[key]) badgeDayScans[key] = [];
-    badgeDayScans[key].push(s);
+
+  const sewadarList = Object.values(sewadarMap);
+
+  // ========== COMPREHENSIVE ISSUE DETECTION ==========
+  ALL_ISSUES = [];
+  const issuesByScan = {}; // Map scan index to issue
+
+  // Group scans by badge
+  const badgeScans = {};
+  todayScans.forEach((s, idx) => {
+    const b = s.badge_no;
+    if (!badgeScans[b]) badgeScans[b] = [];
+    badgeScans[b].push({ ...s, _idx: idx });
   });
-  
-  Object.entries(badgeDayScans).forEach(([badge, dayScans]) => {
-    const inScans = dayScans.filter(s => s.type === 'IN');
-    const outScans = dayScans.filter(s => s.type === 'OUT');
-    
-    // Duplicate IN
+
+  Object.entries(badgeScans).forEach(([badge, scansArr]) => {
+    const sorted = scansArr.sort((a, b) => a.time.localeCompare(b.time));
+    const inScans = sorted.filter(s => s.type === 'IN');
+    const outScans = sorted.filter(s => s.type === 'OUT');
+
+    // Issue: Multiple IN
     if (inScans.length > 1) {
-      const times = inScans.map(s => s.time).sort();
-      duplicateIN.push({
-        badge_no: badge,
-        name: inScans[0]?.sewadar_name || 'Unknown',
-        date: SELECTED_DATE,
-        times: times
+      inScans.forEach((s, i) => {
+        const issue = { type: 'dup-in', badge, name: s.sewadar_name, centre: s.sewadar_centre, dept: s.department, scanner: s.scanned_by_name, time: s.time, scan: s };
+        ALL_ISSUES.push(issue);
+        if (!issuesByScan[s._idx]) issuesByScan[s._idx] = [];
+        issuesByScan[s._idx].push(issue);
       });
     }
-    
-    // Missing OUT (has IN but no OUT)
+
+    // Issue: Multiple OUT
+    if (outScans.length > 1) {
+      outScans.forEach(s => {
+        const issue = { type: 'dup-out', badge, name: s.sewadar_name, centre: s.sewadar_centre, dept: s.department, scanner: s.scanned_by_name, time: s.time, scan: s };
+        ALL_ISSUES.push(issue);
+        if (!issuesByScan[s._idx]) issuesByScan[s._idx] = [];
+        issuesByScan[s._idx].push(issue);
+      });
+    }
+
+    // Issue: Missing OUT (has IN, no OUT)
     if (inScans.length > 0 && outScans.length === 0) {
-      missingOUT.push({
-        badge_no: badge,
-        name: inScans[0]?.sewadar_name || 'Unknown',
-        centre: inScans[0]?.sewadar_centre || 'Unknown',
-        dept: inScans[0]?.department || 'Unknown',
-        date: SELECTED_DATE,
-        in_time: inScans[0]?.time
+      const s = inScans[0];
+      const issue = { type: 'missing-out', badge, name: s.sewadar_name, centre: s.sewadar_centre, dept: s.department, scanner: s.scanned_by_name, time: s.time, scan: s };
+      ALL_ISSUES.push(issue);
+      if (!issuesByScan[s._idx]) issuesByScan[s._idx] = [];
+      issuesByScan[s._idx].push(issue);
+    }
+
+    // Issue: Missing IN (has OUT, no IN)
+    if (outScans.length > 0 && inScans.length === 0) {
+      outScans.forEach(s => {
+        const issue = { type: 'missing-in', badge, name: s.sewadar_name, centre: s.sewadar_centre, dept: s.department, scanner: s.scanned_by_name, time: s.time, scan: s };
+        ALL_ISSUES.push(issue);
+        if (!issuesByScan[s._idx]) issuesByScan[s._idx] = [];
+        issuesByScan[s._idx].push(issue);
       });
     }
-    
-    // Re-entry: IN -> OUT -> IN
-    const sorted = dayScans.sort((a, b) => a.time.localeCompare(b.time));
+
+    // Issue: OUT without prior IN (first scan is OUT)
+    if (sorted.length > 0 && sorted[0].type === 'OUT') {
+      const s = sorted[0];
+      const issue = { type: 'out-no-in', badge, name: s.sewadar_name, centre: s.sewadar_centre, dept: s.department, scanner: s.scanned_by_name, time: s.time, scan: s };
+      ALL_ISSUES.push(issue);
+      if (!issuesByScan[s._idx]) issuesByScan[s._idx] = [];
+      issuesByScan[s._idx].push(issue);
+    }
+
+    // Issue: Re-entry (IN -> OUT -> IN)
     for (let i = 0; i < sorted.length - 2; i++) {
       if (sorted[i].type === 'IN' && sorted[i+1].type === 'OUT' && sorted[i+2].type === 'IN') {
-        reEntry.push({
-          badge_no: badge,
-          name: sorted[i]?.sewadar_name || 'Unknown',
-          date: SELECTED_DATE,
-          first_in: sorted[i].time,
-          out: sorted[i+1].time,
-          second_in: sorted[i+2].time
-        });
+        const s = sorted[i+2];
+        const issue = { type: 'reentry', badge, name: s.sewadar_name, centre: s.sewadar_centre, dept: s.department, scanner: s.scanned_by_name, time: s.time, scan: s };
+        ALL_ISSUES.push(issue);
+        if (!issuesByScan[s._idx]) issuesByScan[s._idx] = [];
+        issuesByScan[s._idx].push(issue);
         break;
       }
     }
   });
-  
-  const sewadarList = Object.values(sewadarMap);
-  
+
+  // Add issue info to each scan for raw table
+  todayScans.forEach((s, idx) => {
+    s._issues = issuesByScan[idx] || [];
+    s._issueClass = s._issues.length ? 'issue-' + s._issues[0].type : '';
+  });
+
   PROCESSED_DATA = {
     scans: todayScans,
+    sortedScans,
     sewadars: sewadarList,
-    duplicateIN,
-    missingOUT,
-    reEntry,
-    totalPresent: sewadarList.filter(s => s.status === 'inside' || s.status === 'exited').length,
+    totalPresent: sewadarList.filter(s => s.status !== 'absent').length,
     totalInside: sewadarList.filter(s => s.status === 'inside').length,
     totalScans: todayScans.length,
     maleCount: sewadarList.filter(s => s.gender === 'M').length,
     femaleCount: sewadarList.filter(s => s.gender === 'F').length
   };
-  
-  // Build dept/centre lists
-  const deptCounts = {};
-  const centreCounts = {};
-  const deptExpected = RAW_DATA.department_expected || {};
-  const centreExpected = RAW_DATA.centre_expected || {};
-  
+
+  // Counts for each issue type
+  PROCESSED_DATA.issues = {
+    'dup-in': ALL_ISSUES.filter(i => i.type === 'dup-in'),
+    'dup-out': ALL_ISSUES.filter(i => i.type === 'dup-out'),
+    'missing-in': ALL_ISSUES.filter(i => i.type === 'missing-in'),
+    'missing-out': ALL_ISSUES.filter(i => i.type === 'missing-out'),
+    'reentry': ALL_ISSUES.filter(i => i.type === 'reentry'),
+    'out-no-in': ALL_ISSUES.filter(i => i.type === 'out-no-in')
+  };
+
+  // Dept/Centre counts
+  const deptCounts = {}, centreCounts = {};
+  const deptExp = RAW_DATA.department_expected || {};
+  const centreExp = RAW_DATA.centre_expected || {};
   sewadarList.filter(s => s.status !== 'absent').forEach(s => {
     deptCounts[s.department] = (deptCounts[s.department] || 0) + 1;
     centreCounts[s.centre] = (centreCounts[s.centre] || 0) + 1;
   });
-  
   PROCESSED_DATA.deptCounts = Object.entries(deptCounts).sort((a, b) => b[1] - a[1]);
   PROCESSED_DATA.centreCounts = Object.entries(centreCounts).sort((a, b) => b[1] - a[1]);
-  PROCESSED_DATA.deptExpected = deptExpected;
-  PROCESSED_DATA.centreExpected = centreExpected;
-  
-  // Late arrivals (IN after EVENT_START_TIME)
-  const lateDept = {};
-  const lateCentre = {};
-  sewadarList.filter(s => s.in_time && s.in_time > EVENT_START_TIME).forEach(s => {
-    lateDept[s.department] = (lateDept[s.department] || 0) + 1;
-    lateCentre[s.centre] = (lateCentre[s.centre] || 0) + 1;
-  });
-  PROCESSED_DATA.lateDept = lateDept;
-  PROCESSED_DATA.lateCentre = lateCentre;
-  
+  PROCESSED_DATA.deptExpected = deptExp;
+  PROCESSED_DATA.centreExpected = centreExp;
+
   // Scanner data
-  processScannerData(todayScans);
+  processScanners(todayScans);
 }
 
-function processScannerData(todayScans) {
+function processScanners(todayScans) {
   const scannerMap = {};
-  
   todayScans.forEach(s => {
-    const badge = s.scanned_by_badge;
-    if (!badge) return;
-    
-    if (!scannerMap[badge]) {
-      scannerMap[badge] = {
-        badge: badge,
-        name: s.scanned_by_name || badge,
-        centre: s.scanned_by_centre || 'Unknown',
-        totalScans: 0,
-        inCount: 0,
-        outCount: 0,
-        lastScan: null,
-        scanTimes: []
-      };
-    }
-    
-    scannerMap[badge].totalScans++;
-    if (s.type === 'IN') scannerMap[badge].inCount++;
-    if (s.type === 'OUT') scannerMap[badge].outCount++;
-    scannerMap[badge].scanTimes.push(s.time);
-    
-    if (!scannerMap[badge].lastScan || s.time > scannerMap[badge].lastScan) {
-      scannerMap[badge].lastScan = s.time;
-    }
+    const b = s.scanned_by_badge;
+    if (!b) return;
+    if (!scannerMap[b]) scannerMap[b] = { badge: b, name: s.scanned_by_name || b, centre: s.scanned_by_centre || '?', totalScans: 0, inCount: 0, outCount: 0, lastScan: null, scanTimes: [] };
+    scannerMap[b].totalScans++;
+    if (s.type === 'IN') scannerMap[b].inCount++;
+    if (s.type === 'OUT') scannerMap[b].outCount++;
+    scannerMap[b].scanTimes.push(s.time);
+    if (!scannerMap[b].lastScan || s.time > scannerMap[b].lastScan) scannerMap[b].lastScan = s.time;
   });
-  
-  // Calculate status and performance
+
   const now = new Date();
-  const scannerList = Object.values(scannerMap).map(sc => {
-    // Status calculation
+  const list = Object.values(scannerMap).map(sc => {
     let status = 'offline';
     if (sc.lastScan) {
-      const lastScanDate = new Date(`${SELECTED_DATE}T${sc.lastScan}`);
-      const diffMins = (now - lastScanDate) / 60000;
-      if (diffMins < 15) status = 'active';
-      else if (diffMins < 30) status = 'idle';
-      else status = 'offline';
+      const diff = (now - new Date(`${SELECTED_DATE}T${sc.lastScan}`)) / 60000;
+      if (diff < 15) status = 'active';
+      else if (diff < 30) status = 'idle';
     }
-    
-    // Average scan interval
-    const sortedTimes = [...sc.scanTimes].sort();
-    let avgInterval = 0;
-    if (sortedTimes.length > 1) {
-      const intervals = [];
-      for (let i = 1; i < sortedTimes.length; i++) {
-        const t1 = parseInt(sortedTimes[i-1].split(':')[0]) * 60 + parseInt(sortedTimes[i-1].split(':')[1]);
-        const t2 = parseInt(sortedTimes[i].split(':')[0]) * 60 + parseInt(sortedTimes[i].split(':')[1]);
-        intervals.push(t2 - t1);
+    // Avg interval
+    const sorted = [...sc.scanTimes].sort();
+    let avgInt = 0;
+    if (sorted.length > 1) {
+      const ints = [];
+      for (let i = 1; i < sorted.length; i++) {
+        const t1 = parseInt(sorted[i-1].split(':')[0])*60 + parseInt(sorted[i-1].split(':')[1]);
+        const t2 = parseInt(sorted[i].split(':')[0])*60 + parseInt(sorted[i].split(':')[1]);
+        ints.push(t2 - t1);
       }
-      avgInterval = Math.round(intervals.reduce((a, b) => a + b, 0) / intervals.length);
+      avgInt = Math.round(ints.reduce((a, b) => a + b, 0) / ints.length);
     }
-    
     // Peak hour
-    const hourCounts = {};
-    sc.scanTimes.forEach(t => {
-      const hour = parseInt(t.split(':')[0]);
-      hourCounts[hour] = (hourCounts[hour] || 0) + 1;
-    });
-    const peakHour = Object.entries(hourCounts).sort((a, b) => b[1] - a[1])[0];
-    
-    return {
-      ...sc,
-      status,
-      avgInterval: avgInterval > 0 ? `${Math.floor(avgInterval / 60)}h ${avgInterval % 60}m` : '-',
-      peakHour: peakHour ? `${peakHour[0]}:00 (${peakHour[1]})` : '-'
-    };
+    const hrCounts = {};
+    sc.scanTimes.forEach(t => hrCounts[parseInt(t.split(':')[0])] = (hrCounts[parseInt(t.split(':')[0])] || 0) + 1);
+    const peak = Object.entries(hrCounts).sort((a, b) => b[1] - a[1])[0];
+    return { ...sc, status, avgInterval: avgInt > 0 ? `${Math.floor(avgInt/60)}h${avgInt%60}m` : '-', peakHour: peak ? `${peak[0]}:00` : '-' };
   });
-  
-  PROCESSED_DATA.scanners = scannerList.sort((a, b) => {
-    const statusOrder = { active: 0, idle: 1, offline: 2 };
-    return statusOrder[a.status] - statusOrder[b.status];
-  });
+
+  PROCESSED_DATA.scanners = list.sort((a, b) => { const o = { active: 0, idle: 1, offline: 2 }; return o[a.status] - o[b.status]; });
 }
 
-// ============ RENDER ============
 function render() {
   if (!PROCESSED_DATA) return;
-  
   renderKPIs();
   renderStats();
   renderExpectedVsPresent();
   renderAttendance();
+  renderRawScans();
   renderAlerts();
   renderScanners();
   populateReportDropdowns();
   renderFrozenDates();
-  
-  // Auto-refresh (only if not frozen)
-  if (!FROZEN_DATES.includes(SELECTED_DATE)) {
-    setTimeout(loadData, 60000);
-  }
+  if (!FROZEN_DATES.includes(SELECTED_DATE)) setTimeout(loadData, 60000);
 }
 
 function renderKPIs() {
   const p = PROCESSED_DATA;
-  const totalSewadars = p.sewadars.length;
-  const inside = p.totalInside;
-  const exited = totalSewadars - inside - p.sewadars.filter(s => s.status === 'absent').length;
-  
+  const total = p.sewadars.length;
   document.getElementById('kpi-grid').innerHTML = `
-    <div class="kpi-card">
-      <div class="kpi-label">Present Today</div>
-      <div class="kpi-value blue">${p.totalPresent}</div>
-      <div class="kpi-sub">of ${totalSewadars} registered</div>
-    </div>
-    <div class="kpi-card" style="border-left:4px solid #16a34a">
-      <div class="kpi-label">Currently Inside</div>
-      <div class="kpi-value green">${inside}</div>
-      <div class="kpi-sub">sewadars inside premises</div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-label">Total Scans</div>
-      <div class="kpi-value purple">${p.totalScans}</div>
-      <div class="kpi-sub">IN + OUT scans today</div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-label">Gender Split</div>
-      <div class="kpi-value" style="font-size:20px">
-        <span style="color:#2563a8">👨 ${p.maleCount}</span>
-        <span style="margin:0 8px">|</span>
-        <span style="color:#db2777">👩 ${p.femaleCount}</span>
-      </div>
-      <div class="kpi-sub">Male | Female</div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-label">Missing OUT</div>
-      <div class="kpi-value orange">${p.missingOUT.length}</div>
-      <div class="kpi-sub">IN but no OUT recorded</div>
-    </div>
+    <div class="kpi-card"><div class="kpi-label">Present</div><div class="kpi-value blue">${p.totalPresent}</div><div class="kpi-sub">of ${total} registered</div></div>
+    <div class="kpi-card" style="border-left:3px solid #16a34a"><div class="kpi-label">Inside</div><div class="kpi-value green">${p.totalInside}</div><div class="kpi-sub">currently</div></div>
+    <div class="kpi-card"><div class="kpi-label">Scans</div><div class="kpi-value purple">${p.totalScans}</div><div class="kpi-sub">IN + OUT</div></div>
+    <div class="kpi-card"><div class="kpi-label">Gender</div><div class="kpi-value" style="font-size:16px"><span style="color:#2563a8">M:${p.maleCount}</span> <span style="color:#db2777">F:${p.femaleCount}</span></div></div>
+    <div class="kpi-card"><div class="kpi-label">Issues</div><div class="kpi-value red">${ALL_ISSUES.length}</div><div class="kpi-sub">need attention</div></div>
   `;
 }
 
 function renderStats() {
-  const deptList = document.getElementById('dept-list');
-  const centreList = document.getElementById('centre-list');
-  
-  deptList.innerHTML = PROCESSED_DATA.deptCounts.slice(0, 10).map(([name, count]) => `
-    <div class="stat-item">
-      <span class="stat-name">${name}</span>
-      <span class="stat-count">${count}</span>
-    </div>
-  `).join('');
-  
-  centreList.innerHTML = PROCESSED_DATA.centreCounts.slice(0, 10).map(([name, count]) => `
-    <div class="stat-item">
-      <span class="stat-name">${name}</span>
-      <span class="stat-count">${count}</span>
-    </div>
-  `).join('');
-  
-  // Late badges
-  const lateDeptCount = Object.values(PROCESSED_DATA.lateDept).reduce((a, b) => a + b, 0);
-  const lateCentreCount = Object.values(PROCESSED_DATA.lateCentre).reduce((a, b) => a + b, 0);
-  
-  if (lateDeptCount > 0) {
-    document.getElementById('late-dept-badge').style.display = 'inline';
-    document.getElementById('late-dept-count').textContent = lateDeptCount;
-  }
-  if (lateCentreCount > 0) {
-    document.getElementById('late-centre-badge').style.display = 'inline';
-    document.getElementById('late-centre-count').textContent = lateCentreCount;
-  }
+  document.getElementById('dept-list').innerHTML = PROCESSED_DATA.deptCounts.slice(0, 10).map(([n, c]) => `<div class="stat-item"><span class="stat-name">${n}</span><span class="stat-count">${c}</span></div>`).join('');
+  document.getElementById('centre-list').innerHTML = PROCESSED_DATA.centreCounts.slice(0, 10).map(([n, c]) => `<div class="stat-item"><span class="stat-name">${n}</span><span class="stat-count">${c}</span></div>`).join('');
 }
 
 function renderExpectedVsPresent() {
-  const deptExp = PROCESSED_DATA.deptExpected || {};
-  const centreExp = PROCESSED_DATA.centreExpected || {};
-  const deptPres = Object.fromEntries(PROCESSED_DATA.deptCounts);
-  const centrePres = Object.fromEntries(PROCESSED_DATA.centreCounts);
-  
-  const allDepts = [...new Set([...Object.keys(deptExp), ...Object.keys(deptPres)])];
-  const allCentres = [...new Set([...Object.keys(centreExp), ...Object.keys(centrePres)])];
-  
-  const deptList = document.getElementById('dept-expected-list');
-  const centreList = document.getElementById('centre-expected-list');
-  
-  deptList.innerHTML = allDepts.slice(0, 8).map(dept => {
-    const expected = deptExp[dept] || 0;
-    const present = deptPres[dept] || 0;
-    const pct = expected > 0 ? Math.round((present / expected) * 100) : (present > 0 ? 100 : 0);
-    const barClass = pct >= 80 ? 'high' : pct >= 50 ? 'mid' : 'low';
-    return `
-      <div class="progress-row">
-        <span class="progress-label">${dept}</span>
-        <div class="progress-bar"><div class="progress-fill ${barClass}" style="width:${Math.min(pct, 100)}%"></div></div>
-        <span class="progress-pct">${pct}%</span>
-        <span class="progress-nums">${present}/${expected || '-'}</span>
-      </div>
-    `;
+  const de = PROCESSED_DATA.deptExpected, ce = PROCESSED_DATA.centreExpected;
+  const dp = Object.fromEntries(PROCESSED_DATA.deptCounts), cp = Object.fromEntries(PROCESSED_DATA.centreCounts);
+  const allD = [...new Set([...Object.keys(de), ...Object.keys(dp)])];
+  const allC = [...new Set([...Object.keys(ce), ...Object.keys(cp)])];
+
+  document.getElementById('dept-expected-list').innerHTML = allD.slice(0, 8).map(d => {
+    const exp = de[d] || 0, pre = dp[d] || 0, pct = exp > 0 ? Math.round(pre/exp*100) : (pre > 0 ? 100 : 0);
+    const cls = pct >= 80 ? 'high' : pct >= 50 ? 'mid' : 'low';
+    return `<div class="progress-row"><span class="progress-label">${d}</span><div class="progress-bar"><div class="progress-fill ${cls}" style="width:${Math.min(pct,100)}%"></div></div><span class="progress-pct">${pct}%</span><span class="progress-nums">${pre}/${exp||'-'}</span></div>`;
   }).join('');
-  
-  centreList.innerHTML = allCentres.slice(0, 8).map(centre => {
-    const expected = centreExp[centre] || 0;
-    const present = centrePres[centre] || 0;
-    const pct = expected > 0 ? Math.round((present / expected) * 100) : (present > 0 ? 100 : 0);
-    const barClass = pct >= 80 ? 'high' : pct >= 50 ? 'mid' : 'low';
-    return `
-      <div class="progress-row">
-        <span class="progress-label">${centre}</span>
-        <div class="progress-bar"><div class="progress-fill ${barClass}" style="width:${Math.min(pct, 100)}%"></div></div>
-        <span class="progress-pct">${pct}%</span>
-        <span class="progress-nums">${present}/${expected || '-'}</span>
-      </div>
-    `;
+
+  document.getElementById('centre-expected-list').innerHTML = allC.slice(0, 8).map(c => {
+    const exp = ce[c] || 0, pre = cp[c] || 0, pct = exp > 0 ? Math.round(pre/exp*100) : (pre > 0 ? 100 : 0);
+    const cls = pct >= 80 ? 'high' : pct >= 50 ? 'mid' : 'low';
+    return `<div class="progress-row"><span class="progress-label">${c}</span><div class="progress-bar"><div class="progress-fill ${cls}" style="width:${Math.min(pct,100)}%"></div></div><span class="progress-pct">${pct}%</span><span class="progress-nums">${pre}/${exp||'-'}</span></div>`;
   }).join('');
 }
 
 function renderAttendance() {
-  const tbody = document.getElementById('att-body');
-  
+  const q = document.getElementById('att-search').value.toLowerCase();
+  const cf = document.getElementById('att-centre').value;
+  const df = document.getElementById('att-dept').value;
+  const sf = document.getElementById('att-status').value;
+
   let filtered = PROCESSED_DATA.sewadars.filter(s => {
-    const search = document.getElementById('att-search').value.toLowerCase();
-    const centreFilter = document.getElementById('att-centre').value;
-    const deptFilter = document.getElementById('att-dept').value;
-    const statusFilter = document.getElementById('att-status').value;
-    
-    const matchSearch = !search || 
-      s.name.toLowerCase().includes(search) || 
-      s.badge_no.toLowerCase().includes(search);
-    const matchCentre = !centreFilter || s.centre === centreFilter;
-    const matchDept = !deptFilter || s.department === deptFilter;
-    const matchStatus = !statusFilter || s.status === statusFilter;
-    return matchSearch && matchCentre && matchDept && matchStatus;
+    const matchQ = !q || s.name.toLowerCase().includes(q) || s.badge_no.toLowerCase().includes(q);
+    const matchC = !cf || s.centre === cf;
+    const matchD = !df || s.department === df;
+    const matchS = !sf || s.status === sf;
+    return matchQ && matchC && matchD && matchS;
   });
-  
-  tbody.innerHTML = filtered.map((s, i) => `
+
+  document.getElementById('att-body').innerHTML = filtered.map((s, i) => `
     <tr data-status="${s.status}" data-centre="${s.centre}" data-dept="${s.department}">
       <td class="sno">${i + 1}</td>
       <td><span class="badge">${s.badge_no}</span></td>
       <td style="font-weight:500">${s.name}</td>
       <td>${s.centre}</td>
       <td>${s.department}</td>
-      <td style="font-weight:600;color:#15803d">${s.in_time ? formatTime(s.in_time) : '-'}</td>
-      <td style="font-weight:600;color:#dc2626">${s.out_time ? formatTime(s.out_time) : '-'}</td>
-      <td>
-        ${s.status === 'inside' ? '<span class="status-inside">INSIDE</span>' : ''}
-        ${s.status === 'exited' ? '<span class="status-exited">EXITED</span>' : ''}
-        ${s.status === 'absent' ? '<span class="status-absent">NOT ARRIVED</span>' : ''}
-      </td>
+      <td style="color:#15803d;font-weight:600">${s.in_time ? fmtTime(s.in_time) : '-'}</td>
+      <td style="color:#dc2626;font-weight:600">${s.out_time ? fmtTime(s.out_time) : '-'}</td>
+      <td>${s.status === 'inside' ? '<span class="status-inside">INSIDE</span>' : s.status === 'exited' ? '<span class="status-exited">EXITED</span>' : '<span class="status-absent">NOT ARRIVED</span>'}</td>
     </tr>
   `).join('');
-  
+
   document.getElementById('att-count').textContent = filtered.length + ' sewadars';
-  
-  // Populate filters
   populateSelect('att-centre', PROCESSED_DATA.centreCounts.map(c => c[0]));
   populateSelect('att-dept', PROCESSED_DATA.deptCounts.map(d => d[0]));
 }
 
+function renderRawScans() {
+  const q = document.getElementById('raw-search').value.toLowerCase();
+  const tf = document.getElementById('raw-type').value;
+  const iff = document.getElementById('raw-issue').value;
+
+  const tbody = document.getElementById('raw-body');
+  let filtered = PROCESSED_DATA.scans.filter(s => {
+    const matchQ = !q || s.sewadar_name?.toLowerCase().includes(q) || s.badge_no?.toLowerCase().includes(q) || s.scanned_by_name?.toLowerCase().includes(q);
+    const matchT = !tf || s.type === tf;
+    const matchI = !iff || (s._issues && s._issues.some(i => i.type === iff));
+    return matchQ && matchT && matchI;
+  });
+
+  tbody.innerHTML = filtered.slice(0, 500).map(s => {
+    const issue = s._issues && s._issues[0];
+    const issueLabel = issue ? issue.type.replace('dup-in','Dup IN').replace('dup-out','Dup OUT').replace('missing-in','No IN').replace('missing-out','No OUT').replace('out-no-in','OUT w/o IN').replace('reentry','Re-entry') : '';
+    return `<tr class="${s._issueClass}">
+      <td style="font-weight:600">${fmtTime(s.time)}</td>
+      <td>${s.date}</td>
+      <td style="font-weight:500">${s.sewadar_name || '?'}</td>
+      <td><span class="badge">${s.badge_no || '-'}</span></td>
+      <td>${s.sewadar_centre || '-'}</td>
+      <td>${s.department || '-'}</td>
+      <td>${s.scanned_by_name || '-'}</td>
+      <td><span class="${s.type === 'IN' ? 'type-in' : 'type-out'}">${s.type}</span></td>
+      <td>${issue ? `<span class="issue-tag">${issueLabel}</span>` : '-'}</td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('raw-count').textContent = filtered.length + ' scans';
+}
+
 function renderAlerts() {
-  const p = PROCESSED_DATA;
-  const typeFilter = document.getElementById('alert-type').value;
-  
-  const showDup = !typeFilter || typeFilter === 'duplicate';
-  const showMissing = !typeFilter || typeFilter === 'missing';
-  const showReentry = !typeFilter || typeFilter === 'reentry';
-  
-  document.getElementById('dup-section').style.display = showDup ? 'block' : 'none';
-  document.getElementById('missing-section').style.display = showMissing ? 'block' : 'none';
-  document.getElementById('reentry-section').style.display = showReentry ? 'block' : 'none';
-  
-  document.getElementById('dup-grid').innerHTML = p.duplicateIN.map(a => `
-    <div class="alert-card dup">
-      <div class="alert-name">${a.name}</div>
-      <div class="alert-meta"><span class="badge">${a.badge_no}</span></div>
-      <div class="alert-times">${a.times.map(t => formatTime(t)).join(', ')}</div>
+  const iss = PROCESSED_DATA.issues;
+  const total = Object.values(iss).reduce((a, b) => a + b.length, 0);
+  document.getElementById('alert-badge').textContent = total;
+  document.getElementById('alert-count').textContent = total + ' issues';
+
+  // KPI row
+  document.getElementById('alert-kpi-row').innerHTML = `
+    <div class="alert-kpi ${document.getElementById('alert-filter')?.value === 'dup-in' ? 'active' : ''}" onclick="filterAlertType('dup-in')">
+      <div class="alert-kpi-icon red">2+</div>
+      <div class="alert-kpi-content"><div class="alert-kpi-label">Duplicate IN</div><div class="alert-kpi-value">${iss['dup-in'].length}</div></div>
     </div>
-  `).join('') || '<p style="color:#16a34a;font-size:12px;padding:8px">✓ No duplicate scans</p>';
-  
-  document.getElementById('missing-grid').innerHTML = p.missingOUT.map(a => `
-    <div class="alert-card missing">
-      <div class="alert-name">${a.name}</div>
-      <div class="alert-meta"><span class="badge">${a.badge_no}</span> • ${a.centre}</div>
-      <div class="alert-times">IN: ${formatTime(a.in_time)}</div>
+    <div class="alert-kpi" onclick="filterAlertType('dup-out')">
+      <div class="alert-kpi-icon red">2+</div>
+      <div class="alert-kpi-content"><div class="alert-kpi-label">Duplicate OUT</div><div class="alert-kpi-value">${iss['dup-out'].length}</div></div>
     </div>
-  `).join('') || '<p style="color:#16a34a;font-size:12px;padding:8px">✓ No missing OUT</p>';
-  
-  document.getElementById('reentry-grid').innerHTML = p.reEntry.map(a => `
-    <div class="alert-card reentry">
-      <div class="alert-name">${a.name}</div>
-      <div class="alert-meta"><span class="badge">${a.badge_no}</span></div>
-      <div class="alert-times">↓${formatTime(a.first_in)} → ↑${formatTime(a.out)} → ↓${formatTime(a.second_in)}</div>
+    <div class="alert-kpi" onclick="filterAlertType('missing-out')">
+      <div class="alert-kpi-icon orange">!</div>
+      <div class="alert-kpi-content"><div class="alert-kpi-label">Missing OUT</div><div class="alert-kpi-value">${iss['missing-out'].length}</div></div>
     </div>
-  `).join('') || '<p style="color:#16a34a;font-size:12px;padding:8px">✓ No re-entry cases</p>';
-  
-  document.getElementById('dup-count').textContent = p.duplicateIN.length;
-  document.getElementById('missing-count').textContent = p.missingOUT.length;
-  document.getElementById('reentry-count').textContent = p.reEntry.length;
-  
-  const totalAlerts = p.duplicateIN.length + p.missingOUT.length + p.reEntry.length;
-  document.getElementById('alert-badge').textContent = totalAlerts;
-  document.getElementById('alert-count').textContent = totalAlerts + ' alerts';
+    <div class="alert-kpi" onclick="filterAlertType('missing-in')">
+      <div class="alert-kpi-icon orange">!</div>
+      <div class="alert-kpi-content"><div class="alert-kpi-label">Missing IN</div><div class="alert-kpi-value">${iss['missing-in'].length}</div></div>
+    </div>
+    <div class="alert-kpi" onclick="filterAlertType('out-no-in')">
+      <div class="alert-kpi-icon pink">!</div>
+      <div class="alert-kpi-content"><div class="alert-kpi-label">OUT w/o IN</div><div class="alert-kpi-value">${iss['out-no-in'].length}</div></div>
+    </div>
+    <div class="alert-kpi" onclick="filterAlertType('reentry')">
+      <div class="alert-kpi-icon yellow">↻</div>
+      <div class="alert-kpi-content"><div class="alert-kpi-label">Re-Entry</div><div class="alert-kpi-value">${iss['reentry'].length}</div></div>
+    </div>
+  `;
+
+  renderAlertGrids();
+}
+
+function renderAlertGrids() {
+  const filter = document.getElementById('alert-filter')?.value || '';
+  const iss = PROCESSED_DATA.issues;
+
+  const renderCards = (items, type, label) => {
+    if (!items.length) return '';
+    return `<div style="margin-bottom:16px"><div style="font-size:12px;font-weight:700;color:#374151;margin-bottom:8px">${label} (${items.length})</div><div class="alert-compact-grid">${items.slice(0, 20).map(i => `
+      <div class="alert-compact-card" onclick="goToRaw('${i.time}')">
+        <div class="alert-compact-header"><span class="alert-compact-name">${i.name || '?'}</span><span class="badge alert-compact-badge">${i.badge}</span></div>
+        <div class="alert-compact-meta">${i.dept} | ${i.centre}</div>
+        <div class="alert-compact-time">${fmtTime(i.time)} | ${i.scanner}</div>
+      </div>
+    `).join('')}</div></div>`;
+  };
+
+  let html = '';
+  if (!filter) {
+    html += renderCards(iss['dup-in'], 'dup-in', 'Duplicate IN');
+    html += renderCards(iss['dup-out'], 'dup-out', 'Duplicate OUT');
+    html += renderCards(iss['missing-out'], 'missing-out', 'Missing OUT');
+    html += renderCards(iss['missing-in'], 'missing-in', 'Missing IN');
+    html += renderCards(iss['out-no-in'], 'out-no-in', 'OUT without IN');
+    html += renderCards(iss['reentry'], 'reentry', 'Re-Entry');
+  } else {
+    html = renderCards(iss[filter], filter, filter.replace('dup-in','Duplicate IN').replace('dup-out','Duplicate OUT').replace('missing-out','Missing OUT').replace('missing-in','Missing IN').replace('out-no-in','OUT without IN').replace('reentry','Re-Entry'));
+  }
+
+  document.getElementById('alert-grids').innerHTML = html || '<p style="color:#16a34a;font-size:12px;padding:12px;background:#dcfce7;border-radius:6px">No issues detected</p>';
+}
+
+function filterAlertType(type) {
+  document.getElementById('alert-filter').value = type;
+  renderAlertGrids();
+}
+
+function filterAlertsDisplay() {
+  renderAlertGrids();
+}
+
+function goToRaw(time) {
+  document.getElementById('raw-search').value = time;
+  switchTab('raw');
+  filterRaw();
 }
 
 function renderScanners() {
-  const p = PROCESSED_DATA;
-  const centreFilter = document.getElementById('scanner-centre-filter').value;
-  
-  const filtered = p.scanners.filter(s => !centreFilter || s.centre === centreFilter);
-  
+  const cf = document.getElementById('scanner-centre-filter').value;
+  const filtered = PROCESSED_DATA.scanners.filter(s => !cf || s.centre === cf);
+
   document.getElementById('scanner-grid').innerHTML = filtered.map(sc => `
     <div class="scanner-card">
       <div class="scanner-header">
-        <div>
-          <div class="scanner-name">${sc.name}</div>
-          <div class="scanner-centre">${sc.centre}</div>
-        </div>
+        <div><div class="scanner-name">${sc.name}</div><div class="scanner-centre">${sc.centre}</div></div>
         <span class="scanner-status ${sc.status}">${sc.status.toUpperCase()}</span>
       </div>
       <div class="scanner-stats">
-        <div class="scanner-stat">
-          <div class="scanner-stat-value">${sc.totalScans}</div>
-          <div class="scanner-stat-label">Total</div>
-        </div>
-        <div class="scanner-stat">
-          <div class="scanner-stat-value">${sc.inCount}</div>
-          <div class="scanner-stat-label">IN</div>
-        </div>
-        <div class="scanner-stat">
-          <div class="scanner-stat-value">${sc.outCount}</div>
-          <div class="scanner-stat-label">OUT</div>
-        </div>
+        <div class="scanner-stat"><div class="scanner-stat-value">${sc.totalScans}</div><div class="scanner-stat-label">Total</div></div>
+        <div class="scanner-stat"><div class="scanner-stat-value">${sc.inCount}</div><div class="scanner-stat-label">IN</div></div>
+        <div class="scanner-stat"><div class="scanner-stat-value">${sc.outCount}</div><div class="scanner-stat-label">OUT</div></div>
       </div>
-      <div class="scanner-meta">
-        Last scan: <strong>${sc.lastScan ? formatTime(sc.lastScan) : 'No scans'}</strong>
-      </div>
+      <div class="scanner-meta">Last: <strong>${sc.lastScan ? fmtTime(sc.lastScan) : '-'}</strong></div>
       <div class="scanner-perf">
-        <div class="scanner-perf-item">
-          <div class="scanner-perf-value">${sc.avgInterval}</div>
-          <div class="scanner-perf-label">Avg Interval</div>
-        </div>
-        <div class="scanner-perf-item">
-          <div class="scanner-perf-value">${sc.peakHour}</div>
-          <div class="scanner-perf-label">Peak Hour</div>
-        </div>
+        <div class="scanner-perf-item"><div class="scanner-perf-value">${sc.avgInterval}</div><div class="scanner-perf-label">Avg</div></div>
+        <div class="scanner-perf-item"><div class="scanner-perf-value">${sc.peakHour}</div><div class="scanner-perf-label">Peak</div></div>
       </div>
     </div>
   `).join('');
-  
-  document.getElementById('scanner-count').textContent = filtered.length + ' scanners';
-  document.getElementById('scanner-badge').textContent = p.scanners.length;
-  
-  // Populate centre filter
-  const centres = [...new Set(p.scanners.map(s => s.centre))];
-  populateSelect('scanner-centre-filter', centres);
-}
 
-function filterScanners() {
-  renderScanners();
+  document.getElementById('scanner-count').textContent = filtered.length;
+  document.getElementById('scanner-badge').textContent = PROCESSED_DATA.scanners.length;
+  populateSelect('scanner-centre-filter', [...new Set(PROCESSED_DATA.scanners.map(s => s.centre))]);
 }
-
-// ============ FREEZE DAY ============
-function freezeDay() {
-  const select = document.getElementById('freeze-date-select');
-  const dateToFreeze = select.value;
-  
-  if (!dateToFreeze || FROZEN_DATES.includes(dateToFreeze)) return;
-  
-  // Store current data for this date
-  FROZEN_DATA[dateToFreeze] = JSON.parse(JSON.stringify(RAW_DATA));
-  FROZEN_DATES.push(dateToFreeze);
-  
-  // Save to localStorage
-  localStorage.setItem('frozen_dates', JSON.stringify(FROZEN_DATES));
-  localStorage.setItem('frozen_data', JSON.stringify(FROZEN_DATA));
-  
-  // Reload to reflect frozen state
-  loadData();
-}
-
-function unfreezeDay(date) {
-  FROZEN_DATES = FROZEN_DATES.filter(d => d !== date);
-  delete FROZEN_DATA[date];
-  
-  localStorage.setItem('frozen_dates', JSON.stringify(FROZEN_DATES));
-  localStorage.setItem('frozen_data', JSON.stringify(FROZEN_DATA));
-  
-  loadData();
-}
-
-function renderFrozenDates() {
-  const container = document.getElementById('frozen-dates');
-  const select = document.getElementById('freeze-date-select');
-  
-  container.innerHTML = FROZEN_DATES.map(fd => `
-    <span class="freeze-date-tag">
-      ${formatDate(fd)}
-      <button onclick="unfreezeDay('${fd}')" title="Unfreeze">×</button>
-    </span>
-  `).join('');
-  
-  // Populate freeze date select
-  const dates = RAW_DATA.dates || [];
-  select.innerHTML = '<option value="">Select date to freeze...</option>' + 
-    dates.filter(d => !FROZEN_DATES.includes(d))
-      .map(d => `<option value="${d}">${formatDate(d)}</option>`).join('');
-}
-
-// Load frozen data from localStorage
-(function loadFrozenData() {
-  try {
-    const stored = localStorage.getItem('frozen_dates');
-    if (stored) {
-      FROZEN_DATES = JSON.parse(stored);
-      const storedData = localStorage.getItem('frozen_data');
-      if (storedData) {
-        FROZEN_DATA = JSON.parse(storedData);
-      }
-    }
-  } catch (e) {}
-})();
 
 // ============ HELPERS ============
-function switchTab(tabName) {
-  const tabs = ['overview', 'attendance', 'alerts', 'scanners', 'reports'];
-  document.querySelectorAll('.tab').forEach((t, i) => {
-    t.classList.toggle('active', tabs[i] === tabName);
-  });
-  document.querySelectorAll('.tab-content').forEach((c, i) => {
-    c.classList.toggle('active', tabs[i] === tabName);
-  });
+function switchTab(name) {
+  const tabs = ['overview', 'attendance', 'raw', 'alerts', 'scanners', 'reports'];
+  document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', tabs[i] === name));
+  document.querySelectorAll('.tab-content').forEach((c, i) => c.classList.toggle('active', tabs[i] === name));
 }
 
 function onDateChange(date) {
@@ -1465,93 +781,74 @@ function onDateChange(date) {
   render();
 }
 
-function onSearch(query) {
-  SEARCH_QUERY = query.toLowerCase();
-  filterAttendance();
+function onGlobalSearch(q) {
+  GLOBAL_SEARCH = q.toLowerCase();
+  if (document.getElementById('tab-overview').classList.contains('active')) filterAttendance();
 }
 
 function filterAttendance() {
   const rows = document.querySelectorAll('#att-body tr');
-  const search = document.getElementById('att-search').value.toLowerCase();
-  const centreFilter = document.getElementById('att-centre').value;
-  const deptFilter = document.getElementById('att-dept').value;
-  const statusFilter = document.getElementById('att-status').value;
-  
-  let visible = 0;
-  rows.forEach(row => {
-    const status = row.dataset.status;
-    const centre = row.dataset.centre;
-    const dept = row.dataset.dept;
-    const text = row.textContent.toLowerCase();
-    
-    const matchSearch = !search || text.includes(search);
-    const matchCentre = !centreFilter || centre === centreFilter;
-    const matchDept = !deptFilter || dept === deptFilter;
-    const matchStatus = !statusFilter || status === statusFilter;
-    
-    if (matchSearch && matchCentre && matchDept && matchStatus) {
-      row.style.display = '';
-      visible++;
-    } else {
-      row.style.display = 'none';
-    }
+  const q = document.getElementById('att-search').value.toLowerCase() || GLOBAL_SEARCH;
+  const cf = document.getElementById('att-centre').value;
+  const df = document.getElementById('att-dept').value;
+  const sf = document.getElementById('att-status').value;
+  let vis = 0;
+  rows.forEach(r => {
+    const ok = (!q || r.textContent.toLowerCase().includes(q)) && (!cf || r.dataset.centre === cf) && (!df || r.dataset.dept === df) && (!sf || r.dataset.status === sf);
+    r.style.display = ok ? '' : 'none';
+    if (ok) vis++;
   });
-  
-  document.getElementById('att-count').textContent = visible + ' sewadars';
+  document.getElementById('att-count').textContent = vis + ' sewadars';
 }
 
-function filterAlerts() {
-  renderAlerts();
-}
+function filterRaw() { renderRawScans(); }
 
-function populateSelect(id, options) {
-  const select = document.getElementById(id);
-  const opts = (options || []).filter(o => o);
-  
-  if (select && select.options.length <= 1) {
-    const prefix = id.startsWith('att-') ? id.replace('att-', '') : (id.startsWith('scanner-') ? 'Centre' : '');
-    select.innerHTML = `<option value="">All ${prefix}</option>` + 
-      opts.map(o => `<option value="${o}">${o}</option>`).join('');
+function populateSelect(id, opts) {
+  const sel = document.getElementById(id);
+  if (sel && sel.options.length <= 1) {
+    const prefix = id.includes('att-') ? id.replace('att-', '') : id.includes('scanner') ? 'Centre' : '';
+    sel.innerHTML = `<option value="">All ${prefix}</option>` + opts.filter(o => o).map(o => `<option value="${o}">${o}</option>`).join('');
   }
 }
 
 function populateReportDropdowns() {
   const dates = RAW_DATA.dates || [];
-  const dateOptions = dates.map(d => `<option value="${d}">${formatDate(d)}</option>`).join('');
-  
-  ['report-date', 'report-attendance-date', 'report-absent-date', 'report-alerts-date', 'report-scanner-date'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.innerHTML = '<option value="all">All Dates</option>' + dateOptions;
-  });
+  const opts = '<option value="all">All Dates</option>' + dates.map(d => `<option value="${d}">${fmtDate(d)}</option>`).join('');
+  ['report-date', 'report-att-date', 'report-absent-date', 'report-alerts-date', 'report-scanner-date'].forEach(id => { const el = document.getElementById(id); if (el) el.innerHTML = opts; });
 }
 
-function formatDate(d) {
-  if (!d) return '-';
-  const date = new Date(d);
-  return date.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: '2-digit' });
-}
+function fmtDate(d) { if (!d) return '-'; return new Date(d).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: '2-digit' }); }
+function fmtTime(t) { if (!t) return '-'; const [h, m] = t.split(':'); const a = parseInt(h) >= 12 ? 'PM' : 'AM'; const h12 = parseInt(h) % 12 || 12; return `${h12}:${m} ${a}`; }
 
-function formatTime(t) {
-  if (!t) return '-';
-  const [h, m] = t.split(':');
-  const hr = parseInt(h);
-  const ampm = hr >= 12 ? 'PM' : 'AM';
-  const hr12 = hr % 12 || 12;
-  return `${hr12}:${m} ${ampm}`;
+// ============ FREEZE ============
+function freezeDay() {
+  const sel = document.getElementById('freeze-date-select');
+  const d = sel.value;
+  if (!d || FROZEN_DATES.includes(d)) return;
+  FROZEN_DATA[d] = JSON.parse(JSON.stringify(RAW_DATA));
+  FROZEN_DATES.push(d);
+  localStorage.setItem('frozen_dates', JSON.stringify(FROZEN_DATES));
+  localStorage.setItem('frozen_data', JSON.stringify(FROZEN_DATA));
+  loadData();
 }
+function unfreezeDay(d) {
+  FROZEN_DATES = FROZEN_DATES.filter(x => x !== d);
+  delete FROZEN_DATA[d];
+  localStorage.setItem('frozen_dates', JSON.stringify(FROZEN_DATES));
+  localStorage.setItem('frozen_data', JSON.stringify(FROZEN_DATA));
+  loadData();
+}
+function renderFrozenDates() {
+  document.getElementById('frozen-dates').innerHTML = FROZEN_DATES.map(fd => `<span class="freeze-date-tag">${fmtDate(fd)}<button onclick="unfreezeDay('${fd}')">×</button></span>`).join('');
+  const sel = document.getElementById('freeze-date-select');
+  const dates = RAW_DATA.dates || [];
+  sel.innerHTML = '<option value="">Select date...</option>' + dates.filter(d => !FROZEN_DATES.includes(d)).map(d => `<option value="${d}">${fmtDate(d)}</option>`).join('');
+}
+(function loadFrozen() { try { const s = localStorage.getItem('frozen_dates'); if (s) { FROZEN_DATES = JSON.parse(s); const sd = localStorage.getItem('frozen_data'); if (sd) FROZEN_DATA = JSON.parse(sd); } } catch(e) {} })();
 
 // ============ DOWNLOADS ============
 function downloadAttendance() {
-  const data = PROCESSED_DATA.sewadars.map(s => ({
-    'Badge No.': s.badge_no,
-    'Name': s.name,
-    'Centre': s.centre,
-    'Department': s.department,
-    'IN Time': s.in_time || '-',
-    'OUT Time': s.out_time || '-',
-    'Status': s.status.toUpperCase()
-  }));
-  
+  const data = PROCESSED_DATA.sewadars.map(s => ({ Badge: s.badge_no, Name: s.name, Centre: s.centre, Dept: s.department, 'IN Time': s.in_time || '-', 'OUT Time': s.out_time || '-', Status: s.status.toUpperCase() }));
   const ws = XLSX.utils.json_to_sheet(data);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Attendance');
@@ -1559,13 +856,7 @@ function downloadAttendance() {
 }
 
 function downloadAlerts() {
-  const p = PROCESSED_DATA;
-  const data = [
-    ...p.duplicateIN.map(a => ({ Type: 'Duplicate IN', Badge: a.badge_no, Name: a.name, Times: a.times.join(', ') })),
-    ...p.missingOUT.map(a => ({ Type: 'Missing OUT', Badge: a.badge_no, Name: a.name, 'IN Time': a.in_time })),
-    ...p.reEntry.map(a => ({ Type: 'Re-Entry', Badge: a.badge_no, Name: a.name, Times: `${a.first_in} -> ${a.out} -> ${a.second_in}` }))
-  ];
-  
+  const data = ALL_ISSUES.map(i => ({ Type: i.type, Badge: i.badge, Name: i.name, Centre: i.centre, Dept: i.dept, Scanner: i.scanner, Time: i.time }));
   const ws = XLSX.utils.json_to_sheet(data);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Alerts');
@@ -1573,56 +864,21 @@ function downloadAlerts() {
 }
 
 function downloadReport(type) {
-  if (type === 'attendance') {
-    downloadAttendance();
-  } else if (type === 'alerts') {
-    downloadAlerts();
-  } else if (type === 'overview') {
-    const p = PROCESSED_DATA;
-    const data = [{
-      'Date': SELECTED_DATE,
-      'Total Present': p.totalPresent,
-      'Currently Inside': p.totalInside,
-      'Total Scans': p.totalScans,
-      'Male': p.maleCount,
-      'Female': p.femaleCount,
-      'Missing OUT': p.missingOUT.length,
-      'Duplicate IN': p.duplicateIN.length,
-      'Re-Entry': p.reEntry.length
-    }];
+  if (type === 'attendance') { downloadAttendance(); return; }
+  if (type === 'alerts') { downloadAlerts(); return; }
+  const p = PROCESSED_DATA;
+  if (type === 'overview') {
+    const data = [{ Date: SELECTED_DATE, Present: p.totalPresent, Inside: p.totalInside, Scans: p.totalScans, Male: p.maleCount, Female: p.femaleCount, Issues: ALL_ISSUES.length }];
     const ws = XLSX.utils.json_to_sheet(data);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Overview');
-    XLSX.writeFile(wb, `overview_${SELECTED_DATE}.xlsx`);
+    XLSX.writeFile(XLSX.utils.book_new(), `overview_${SELECTED_DATE}.xlsx`);
   } else if (type === 'absent') {
-    const p = PROCESSED_DATA;
-    const absent = p.sewadars.filter(s => s.status === 'absent').map(s => ({
-      'Badge No.': s.badge_no,
-      'Name': s.name,
-      'Centre': s.centre,
-      'Department': s.department
-    }));
-    const ws = XLSX.utils.json_to_sheet(absent);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Absent');
-    XLSX.writeFile(wb, `absent_${SELECTED_DATE}.xlsx`);
-  } else if (type === 'scanner') {
-    const p = PROCESSED_DATA;
-    const data = p.scanners.map(s => ({
-      'Scanner Name': s.name,
-      'Centre': s.centre,
-      'Total Scans': s.totalScans,
-      'IN Count': s.inCount,
-      'OUT Count': s.outCount,
-      'Last Scan': s.lastScan || '-',
-      'Status': s.status,
-      'Avg Interval': s.avgInterval,
-      'Peak Hour': s.peakHour
-    }));
+    const data = p.sewadars.filter(s => s.status === 'absent').map(s => ({ Badge: s.badge_no, Name: s.name, Centre: s.centre, Dept: s.department }));
     const ws = XLSX.utils.json_to_sheet(data);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Scanners');
-    XLSX.writeFile(wb, `scanners_${SELECTED_DATE}.xlsx`);
+    XLSX.writeFile(XLSX.utils.book_new(), `absent_${SELECTED_DATE}.xlsx`);
+  } else if (type === 'scanner') {
+    const data = p.scanners.map(s => ({ Name: s.name, Centre: s.centre, Total: s.totalScans, IN: s.inCount, OUT: s.outCount, Status: s.status, 'Avg Interval': s.avgInterval, 'Peak Hour': s.peakHour }));
+    const ws = XLSX.utils.json_to_sheet(data);
+    XLSX.writeFile(XLSX.utils.book_new(), `scanners_${SELECTED_DATE}.xlsx`);
   }
 }
 </script>
