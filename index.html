@@ -1,2502 +1,1082 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Faridabad Area Bhati March 2026 — Sewadar Dashboard</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Inter',sans-serif;background:#f0f2f5;color:#1a1a2e;font-size:13px}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sewadar Attendance Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { 
+      font-family: 'Inter', sans-serif; 
+      background: #f5f7fa; 
+      color: #1a1a2e; 
+      font-size: 13px;
+      min-height: 100vh;
+    }
 
-/* Header */
-header{background:linear-gradient(135deg,#1a3c6e 0%,#2563a8 100%);color:white;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 4px 12px rgba(0,0,0,0.25);flex-wrap:wrap;gap:10px}
-.header-title{font-size:17px;font-weight:700}
-.header-sub{font-size:11px;opacity:.75;margin-top:2px}
-.header-right{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-.updated-tag{font-size:11px;opacity:.8}
-.live-pill{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:999px;padding:3px 10px;font-size:10px;letter-spacing:1px;text-transform:uppercase}
-.live-dot{width:6px;height:6px;border-radius:50%;background:#4ade80;animation:blink 1.5s ease-in-out infinite}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
-.last-scan-tag{font-size:10px;opacity:.7}
-.global-search{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:6px;padding:6px 12px;font-family:'Inter',sans-serif;font-size:12px;color:white;outline:none;width:220px}
-.global-search::placeholder{color:rgba(255,255,255,.6)}
-.global-search:focus{background:rgba(255,255,255,.25)}
-.date-filter-bar{background:white;padding:8px 24px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #e5e7eb;flex-wrap:wrap}
-.date-btn{padding:5px 14px;border-radius:999px;font-size:11px;font-weight:600;cursor:pointer;border:1.5px solid #d1d5db;background:white;color:#6b7280;transition:all .15s}
-.date-btn:hover{border-color:#2563a8;color:#2563a8}
-.date-btn.active{background:#2563a8;color:white;border-color:#2563a8}
-.date-filter-label{font-size:11px;color:#6b7280;font-weight:600}
+    /* Header */
+    header {
+      background: linear-gradient(135deg, #1a3c6e 0%, #2563a8 100%);
+      color: white;
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .header-title { font-size: 18px; font-weight: 700; }
+    .header-meta { font-size: 11px; opacity: 0.8; margin-top: 2px; }
+    .header-right { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    
+    .live-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-size: 11px;
+    }
+    .live-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #4ade80;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
 
-/* Tabs */
-.tab-bar{background:white;border-bottom:2px solid #e5e7eb;padding:0 24px;display:flex;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.06);overflow-x:auto}
-.tab{padding:14px 20px;font-size:12px;font-weight:600;color:#64748b;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .15s;white-space:nowrap;position:relative}
-.tab:hover{color:#2563a8;background:#f8fafc}
-.tab.active{color:#2563a8;border-bottom-color:#2563a8;background:#eff6ff}
-.tab .badge{display:inline-block;background:#fee2e2;color:#dc2626;border-radius:999px;padding:2px 8px;font-size:10px;margin-left:6px;font-weight:700}
-.tab .badge.blue{background:#dbeafe;color:#1d4ed8}
+    .date-select {
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 6px;
+      padding: 6px 12px;
+      color: white;
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      cursor: pointer;
+      outline: none;
+    }
+    .date-select option { color: #1a1a2e; background: white; }
 
-main{padding:20px 24px}
-.tab-content{display:none}
-.tab-content.active{display:block;animation:fadeIn .2s ease}
-@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+    .search-box {
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 6px;
+      padding: 6px 12px;
+      color: white;
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      width: 200px;
+      outline: none;
+    }
+    .search-box::placeholder { color: rgba(255,255,255,0.6); }
+    .search-box:focus { background: rgba(255,255,255,0.25); }
 
-/* KPI */
-.kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:20px}
-.kpi{background:white;border-radius:12px;padding:16px 18px;border:1px solid #e5e7eb;box-shadow:0 2px 8px rgba(0,0,0,.06);transition:transform .15s,box-shadow .15s;position:relative;overflow:hidden}
-.kpi:hover{transform:translateY(-2px);box-shadow:0 4px 16px rgba(0,0,0,.1)}
-.kpi::before{content:'';position:absolute;top:0;left:0;width:4px;height:100%}
-.kpi.blue::before{background:linear-gradient(180deg,#3b82f6,#2563a8)}.kpi.green::before{background:linear-gradient(180deg,#22c55e,#16a34a)}.kpi.orange::before{background:linear-gradient(180deg,#f97316,#ea580c)}.kpi.purple::before{background:linear-gradient(180deg,#8b5cf6,#7c3aed)}.kpi.red::before{background:linear-gradient(180deg,#ef4444,#dc2626)}.kpi.teal::before{background:linear-gradient(180deg,#14b8a6,#0891b2)}
-.kpi.blue{background:linear-gradient(135deg,#fff,#f8faff)}.kpi.green{background:linear-gradient(135deg,#fff,#f0fdf4)}.kpi.orange{background:linear-gradient(135deg,#fff,#fff7ed)}.kpi.purple{background:linear-gradient(135deg,#fff,#f5f3ff)}.kpi.red{background:linear-gradient(135deg,#fff,#fef2f2)}.kpi.teal{background:linear-gradient(135deg,#fff,#f0fdfa)}
-.kpi-label{font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px}
-.kpi-value{font-size:28px;font-weight:700;line-height:1}
-.kpi.blue .kpi-value{color:#2563a8}.kpi.green .kpi-value{color:#16a34a}.kpi.orange .kpi-value{color:#ea580c}.kpi.purple .kpi-value{color:#7c3aed}.kpi.red .kpi-value{color:#dc2626}.kpi.teal .kpi-value{color:#0891b2}
-.kpi-sub{font-size:11px;color:#9ca3af;margin-top:4px;font-weight:500}
-.kpi-icon{position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:32px;opacity:.1}
+    /* Tab Bar */
+    .tab-bar {
+      background: white;
+      border-bottom: 1px solid #e5e7eb;
+      padding: 0 24px;
+      display: flex;
+      gap: 4px;
+      overflow-x: auto;
+    }
+    .tab {
+      padding: 12px 20px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #64748b;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      white-space: nowrap;
+      transition: all 0.15s;
+    }
+    .tab:hover { color: #2563a8; background: #f8fafc; }
+    .tab.active { color: #2563a8; border-bottom-color: #2563a8; }
+    .tab-badge {
+      background: #fee2e2;
+      color: #dc2626;
+      border-radius: 10px;
+      padding: 2px 8px;
+      font-size: 11px;
+      margin-left: 6px;
+    }
+    .tab-badge.blue { background: #dbeafe; color: #1d4ed8; }
 
-/* Section */
-.sec-head{font-size:14px;font-weight:700;color:#1a3c6e;margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid #dbeafe;display:flex;align-items:center;justify-content:space-between;position:relative;padding-left:12px}
-.sec-head::before{content:'';position:absolute;left:0;bottom:-2px;width:30px;height:2px;background:#2563a8}
-.sec-head span{font-size:11px;font-weight:400;color:#9ca3af;margin-left:auto}
+    /* Main Content */
+    main { padding: 20px 24px; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
 
-/* Chart */
-.chart-box{background:white;border:1px solid #e5e7eb;border-radius:12px;padding:18px;margin-bottom:20px;box-shadow:0 2px 8px rgba(0,0,0,.04)}
-.bars{display:flex;align-items:flex-end;gap:8px;height:140px;padding-top:10px}
-.bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end}
-.bar-val{font-size:12px;font-weight:700;color:#1a3c6e}
-.bar-fill{width:100%;border-radius:6px 6px 0 0;background:linear-gradient(180deg,#3b82f6,#1a3c6e);min-height:4px;cursor:pointer;transition:filter .15s}
-.bar-fill:hover{filter:brightness(1.2)}
-.bar-lbl{font-size:10px;color:#6b7280;text-align:center;white-space:nowrap}
+    /* KPI Cards */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .kpi-card {
+      background: white;
+      border-radius: 10px;
+      padding: 18px;
+      border: 1px solid #e5e7eb;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+    .kpi-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+    .kpi-value {
+      font-size: 32px;
+      font-weight: 700;
+      line-height: 1;
+    }
+    .kpi-value.blue { color: #2563a8; }
+    .kpi-value.green { color: #16a34a; }
+    .kpi-value.red { color: #dc2626; }
+    .kpi-value.orange { color: #ea580c; }
+    .kpi-value.purple { color: #7c3aed; }
+    .kpi-sub { font-size: 11px; color: #9ca3af; margin-top: 4px; }
 
-/* Gender bar */
-.gender-row{display:flex;gap:14px;margin-bottom:20px;flex-wrap:wrap}
-.gender-card{background:white;border:1px solid #e5e7eb;border-radius:12px;padding:16px 20px;flex:1;min-width:180px;box-shadow:0 2px 8px rgba(0,0,0,.04);transition:transform .15s}
-.gender-card:hover{transform:translateY(-2px)}
-.gender-label{font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px}
-.gender-split{display:flex;align-items:center;gap:16px}
-.gender-m{font-size:24px;font-weight:700;color:#2563a8}
-.gender-f{font-size:24px;font-weight:700;color:#db2777}
-.gender-divider{color:#d1d5db;font-size:20px}
-.gender-sub{font-size:10px;color:#9ca3af;margin-top:2px}
-.gender-bar-wrap{height:8px;background:#f3f4f6;border-radius:4px;margin-top:12px;overflow:hidden}
-.gender-bar-m{height:100%;background:linear-gradient(90deg,#2563a8,#3b82f6);border-radius:4px;transition:width .5s ease}
-.gender-pct{font-size:12px;font-weight:600;color:#6b7280;margin-left:auto}
+    /* Stats Grid */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .stat-card {
+      background: white;
+      border-radius: 10px;
+      padding: 16px;
+      border: 1px solid #e5e7eb;
+    }
+    .stat-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #f1f5f9;
+    }
+    .stat-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    .stat-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 10px;
+      background: #f8fafc;
+      border-radius: 6px;
+    }
+    .stat-name { font-size: 12px; font-weight: 500; color: #374151; }
+    .stat-count { font-size: 14px; font-weight: 700; color: #2563a8; }
 
-/* Dept */
-.dept-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;margin-bottom:20px}
-.dept-card{background:white;border:1px solid #e5e7eb;border-radius:10px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 1px 4px rgba(0,0,0,.04);transition:all .15s}
-.dept-card:hover{border-color:#2563a8;box-shadow:0 3px 12px rgba(37,99,168,.12)}
-.dept-name{font-size:12px;font-weight:600;color:#374151}
-.dept-count{font-size:18px;font-weight:700;color:white;background:linear-gradient(135deg,#2563a8,#1a3c6e);border-radius:8px;padding:4px 12px}
+    /* Table Styles */
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .toolbar input, .toolbar select {
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      padding: 8px 12px;
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      outline: none;
+    }
+    .toolbar input:focus, .toolbar select:focus { border-color: #2563a8; }
+    .toolbar input { flex: 1; min-width: 180px; max-width: 300px; }
+    
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #16a34a;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 8px 14px;
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn:hover { background: #15803d; transform: translateY(-1px); }
+    .btn.blue { background: #2563a8; }
+    .btn.blue:hover { background: #1d4ed8; }
+    .btn.red { background: #dc2626; }
+    .btn.red:hover { background: #b91c1c; }
 
-/* Alert cards */
-.alert-summary-bar{display:flex;gap:12px;margin-bottom:18px;flex-wrap:wrap}
-.alert-summary-item{flex:1;min-width:140px;background:white;border:1px solid #e5e7eb;border-radius:8px;padding:12px 16px;display:flex;align-items:center;gap:12px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
-.alert-summary-icon{width:40px;height:40px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px}
-.alert-summary-icon.red{background:#fee2e2;color:#dc2626}
-.alert-summary-icon.amber{background:#fef3c7;color:#d97706}
-.alert-summary-icon.blue{background:#dbeafe;color:#1d4ed8}
-.alert-summary-icon.orange{background:#ffedd5;color:#ea580c}
-.alert-summary-content{flex:1}
-.alert-summary-label{font-size:10px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:.5px}
-.alert-summary-value{font-size:22px;font-weight:700;color:#1a1a2e;line-height:1.2}
-.alert-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px;margin-bottom:18px}
-.alert-card{background:white;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.04)}
-.alert-head{padding:8px 12px;display:flex;align-items:center;justify-content:space-between;font-size:11px;font-weight:700}
-.alert-head.red{background:#fee2e2;color:#dc2626;border-bottom:1px solid #fecaca}
-.alert-head.amber{background:#fef3c7;color:#d97706;border-bottom:1px solid #fde68a}
-.alert-head.blue{background:#dbeafe;color:#1d4ed8;border-bottom:1px solid #bfdbfe}
-.alert-head.orange{background:#ffedd5;color:#ea580c;border-bottom:1px solid #fed7aa}
-.alert-body{padding:8px 12px;font-size:11px;color:#374151}
-.alert-row{padding:4px 0;border-bottom:1px solid #f3f4f6;display:flex;gap:8px;align-items:center}
-.alert-row:last-child{border-bottom:none}
+    .count-badge {
+      background: #1a3c6e;
+      color: white;
+      border-radius: 20px;
+      padding: 6px 12px;
+      font-size: 11px;
+      font-weight: 600;
+    }
 
-/* Toolbar */
-.toolbar{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;align-items:center;background:white;border-radius:10px;padding:10px 14px;box-shadow:0 1px 4px rgba(0,0,0,.04)}
-.search-box{flex:1;min-width:180px;border:1px solid #e5e7eb;border-radius:8px;padding:8px 14px;font-family:'Inter',sans-serif;font-size:12px;outline:none;background:#f9fafb;transition:all .15s}
-.search-box:focus{border-color:#2563a8;background:white;box-shadow:0 0 0 3px rgba(37,99,168,.1)}
-.filter-select{border:1px solid #e5e7eb;border-radius:8px;padding:8px 12px;font-family:'Inter',sans-serif;font-size:12px;background:#f9fafb;outline:none;cursor:pointer;color:#374151;transition:all .15s}
-.filter-select:focus{border-color:#2563a8;background:white}
-.count-badge{background:linear-gradient(135deg,#2563a8,#1a3c6e);color:white;border-radius:999px;padding:6px 14px;font-size:11px;font-weight:600;white-space:nowrap}
-.dl-btn{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,#16a34a,#15803d);color:white;border:none;border-radius:8px;padding:8px 14px;font-family:'Inter',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap}
-.dl-btn:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(22,163,74,.3)}
-.dl-btn svg{width:14px;height:14px;flex-shrink:0}
+    .table-wrap {
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .table-scroll {
+      max-height: 60vh;
+      overflow-y: auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 800px;
+    }
+    thead {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    thead th {
+      background: #1a3c6e;
+      color: white;
+      padding: 12px 14px;
+      text-align: left;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    tbody tr:nth-child(even) { background: #f8fafc; }
+    tbody tr:hover { background: #eff6ff; }
+    td {
+      padding: 10px 14px;
+      border-bottom: 1px solid #f1f5f9;
+      vertical-align: middle;
+    }
+    .sno { color: #94a3b8; font-size: 11px; text-align: center; width: 50px; }
+    
+    .badge {
+      display: inline-block;
+      background: #eff6ff;
+      color: #1d4ed8;
+      border: 1px solid #bfdbfe;
+      border-radius: 4px;
+      padding: 3px 8px;
+      font-size: 11px;
+      font-weight: 600;
+      font-family: monospace;
+    }
+    .badge.green { background: #dcfce7; color: #15803d; border-color: #bbf7d0; }
+    .badge.red { background: #fee2e2; color: #dc2626; border-color: #fecaca; }
+    .badge.orange { background: #ffedd5; color: #ea580c; border-color: #fed7aa; }
 
-/* Table */
-.tbl-wrap{background:white;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.04);max-height:60vh}
-table{width:100%;border-collapse:collapse;min-width:800px}
-thead{position:sticky;top:0;z-index:5}
-thead tr th{background:linear-gradient(135deg,#1a3c6e,#2563a8);color:white;padding:12px 14px;text-align:left;font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;white-space:nowrap;border-right:1px solid rgba(255,255,255,.1)}
-thead tr th:last-child{border-right:none}
-.sub-header th{background:#2563a8 !important;color:rgba(255,255,255,.9) !important;font-size:9px !important;padding:6px 14px !important}
-tbody tr:nth-child(even){background:#f8fafc}
-tbody tr:hover{background:#eff6ff !important}
-td{padding:10px 14px;border-bottom:1px solid #f1f5f9;border-right:1px solid #f1f5f9;white-space:nowrap;vertical-align:middle}
-td:last-child{border-right:none}
-.sno{color:#94a3b8;font-size:11px;text-align:center;min-width:40px}
-.badge-tag{font-family:'Courier New',monospace;font-size:11px;font-weight:600;background:#eff6ff;border:1px solid #bfdbfe;border-radius:6px;padding:3px 8px;color:#1d4ed8}
-.name-primary{font-weight:600;color:#1e293b;font-size:12px}
-.name-sub{font-size:10px;color:#64748b;margin-top:2px}
-.centre-tag{display:inline-block;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:6px;padding:3px 10px;font-size:10px;font-weight:600;color:#15803d}
-.dept-tag{display:inline-block;background:#fff7ed;border:1px solid #fed7aa;border-radius:6px;padding:3px 10px;font-size:10px;font-weight:600;color:#c2410c}
-.type-in{background:#dcfce7;color:#15803d;border:1px solid #bbf7d0;border-radius:6px;padding:3px 10px;font-size:10px;font-weight:700}
-.type-out{background:#fee2e2;color:#dc2626;border:1px solid #fecaca;border-radius:6px;padding:3px 10px;font-size:10px;font-weight:700}
-.present-cell{background:linear-gradient(135deg,#dcfce7,#bbf7d0);color:#15803d;border-radius:6px;padding:4px 8px;font-size:10px;line-height:1.5;white-space:nowrap;display:inline-block;min-width:80px;text-align:center}
-.absent-cell{background:linear-gradient(135deg,#fee2e2,#fecaca);color:#dc2626;border-radius:6px;padding:4px 8px;font-size:10px;display:inline-block;min-width:60px;text-align:center}
+    .status-inside {
+      background: #dcfce7;
+      color: #15803d;
+      border-radius: 4px;
+      padding: 4px 10px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .status-exited {
+      background: #fee2e2;
+      color: #dc2626;
+      border-radius: 4px;
+      padding: 4px 10px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .status-absent {
+      background: #f3f4f6;
+      color: #6b7280;
+      border-radius: 4px;
+      padding: 4px 10px;
+      font-size: 11px;
+      font-weight: 700;
+    }
 
-/* Centre cards */
-.centre-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px}
-.centre-card{background:white;border:1px solid #e5e7eb;border-radius:14px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.05);transition:all .15s}
-.centre-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.1)}
-.centre-card-head{background:linear-gradient(135deg,#1a3c6e,#2563a8);color:white;padding:14px 18px;position:relative;overflow:hidden}
-.centre-card-head::after{content:'';position:absolute;right:-20px;top:-20px;width:80px;height:80px;background:rgba(255,255,255,.1);border-radius:50%}
-.centre-card-title{font-size:15px;font-weight:700;position:relative;z-index:1}
-.centre-card-meta{font-size:11px;opacity:.85;margin-top:4px;position:relative;z-index:1}
-.expected-bar{height:6px;background:rgba(255,255,255,.2);border-radius:3px;margin-top:12px;overflow:hidden;position:relative;z-index:1}
-.expected-fill{height:100%;background:#4ade80;border-radius:3px;transition:width .5s ease}
-.centre-date-row{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:1px solid #f1f5f9;font-size:12px;transition:background .1s}
-.centre-date-row:hover{background:#f8fafc}
-.centre-date-row:last-child{border-bottom:none}
-.cdr-date{font-weight:600;color:#334155;min-width:80px}
-.cdr-present{color:#15803d;font-weight:700;min-width:90px;text-align:right}
-.cdr-bar-wrap{flex:1;margin:0 12px;height:8px;background:#f1f5f9;border-radius:4px;overflow:hidden}
-.cdr-bar{height:100%;background:linear-gradient(90deg,#2563a8,#3b82f6);border-radius:4px;transition:width .4s ease}
+    /* Alert Cards */
+    .alert-section { margin-bottom: 24px; }
+    .alert-header {
+      font-size: 14px;
+      font-weight: 700;
+      color: #1a1a2e;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .alert-header .count {
+      background: #fee2e2;
+      color: #dc2626;
+      border-radius: 12px;
+      padding: 2px 10px;
+      font-size: 12px;
+    }
+    .alert-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 12px;
+    }
+    .alert-card {
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 14px;
+    }
+    .alert-card.dup { border-left: 4px solid #dc2626; }
+    .alert-card.missing { border-left: 4px solid #f97316; }
+    .alert-card.reentry { border-left: 4px solid #eab308; }
+    .alert-name { font-weight: 600; color: #1e293b; margin-bottom: 4px; }
+    .alert-meta { font-size: 11px; color: #64748b; }
+    .alert-times { font-size: 11px; color: #374151; margin-top: 6px; }
 
-/* Absent tab */
-.absent-date-section{margin-bottom:24px}
-.absent-date-head{background:linear-gradient(135deg,#fee2e2,#fecaca);border:1px solid #fecaca;border-radius:12px 12px 0 0;padding:12px 18px;display:flex;align-items:center;justify-content:space-between}
-.absent-date-title{font-size:14px;font-weight:700;color:#dc2626}
-.absent-date-count{font-size:12px;color:#b91c1c;font-weight:600;background:white;padding:4px 12px;border-radius:20px}
+    /* Reports */
+    .reports-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+    }
+    .report-card {
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 18px;
+    }
+    .report-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #1a3c6e;
+      margin-bottom: 6px;
+    }
+    .report-desc {
+      font-size: 12px;
+      color: #64748b;
+      margin-bottom: 14px;
+    }
+    .report-card select {
+      width: 100%;
+      margin-bottom: 10px;
+      padding: 8px;
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      font-size: 12px;
+    }
+    .report-card .btn { width: 100%; justify-content: center; }
 
-/* Absent by Centre/Dept */
-.absent-group-card{background:white;border:1px solid #e5e7eb;border-radius:14px;overflow:hidden;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,.04)}
-.absent-group-head{background:linear-gradient(135deg,#fee2e2,#fecaca);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #fecaca}
-.absent-group-title{font-size:14px;font-weight:700;color:#dc2626}
-.absent-group-count{font-size:12px;font-weight:600;color:#b91c1c;background:white;padding:4px 12px;border-radius:20px}
+    /* Loading */
+    #loading {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 80vh;
+      gap: 16px;
+    }
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid #e5e7eb;
+      border-top-color: #2563a8;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    #loading p { color: #64748b; font-size: 14px; }
+    #error-msg { display: none; text-align: center; padding: 4rem; color: #dc2626; }
+    #dashboard { display: none; }
 
-/* Reports */
-.reports-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px}
-.report-card{background:white;border:1px solid #e5e7eb;border-radius:14px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,.04);transition:all .15s}
-.report-card:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.08)}
-.report-card-title{font-size:15px;font-weight:700;color:#1a3c6e;margin-bottom:8px}
-.report-card-desc{font-size:12px;color:#64748b;margin-bottom:14px;line-height:1.5}
-.report-filters{margin-bottom:14px}
-.report-filters select{width:100%;margin-bottom:8px}
-.report-card .dl-btn{width:100%;justify-content:center}
-
-/* Print Register */
-.print-register{background:white;padding:24px;max-width:1000px;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.04)}
-.print-header{text-align:center;margin-bottom:24px;padding-bottom:14px;border-bottom:3px solid #1a3c6e}
-.print-title{font-size:22px;font-weight:700;color:#1a3c6e}
-.print-sub{font-size:12px;color:#64748b}
-.print-dept{margin-bottom:24px;page-break-inside:avoid}
-.print-dept-title{font-size:14px;font-weight:700;background:linear-gradient(135deg,#eff6ff,#dbeafe);padding:10px 14px;border-radius:8px;margin-bottom:12px;color:#1a3c6e}
-.print-table{width:100%;border-collapse:collapse;font-size:11px}
-.print-table th{background:#1a3c6e;color:white;padding:8px 10px;text-align:left;border:1px solid #cbd5e1}
-.print-table td{border:1px solid #cbd5e1;padding:8px 10px}
-.print-check{width:16px;height:16px;border:1px solid #64748b;border-radius:2px;display:inline-block}
-
-/* Unknown flag */
-.unknown-row{background:#fef3c7 !important}
-.unknown-tag{background:#f59e0b;color:white;font-size:8px;padding:2px 5px;border-radius:3px;margin-left:4px;font-weight:700}
-
-/* Multi-scan highlight */
-.multi-in{background:#fef3c7 !important;border:2px solid #f59e0b !important}
-.multi-out{background:#fee2e2 !important;border:2px solid #dc2626 !important}
-.re-entry{background:#e0e7ff !important;border:2px solid #6366f1 !important}
-.scan-warning{display:inline-flex;align-items:center;gap:3px;font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;margin-left:4px}
-.scan-warning.in{background:#fef3c7;color:#b45309}
-.scan-warning.out{background:#fee2e2;color:#dc2626}
-.scan-warning.re{background:#e0e7ff;color:#4338ca}
-
-/* Live Ops Bar */
-.live-ops-bar{background:linear-gradient(135deg,#0f172a,#1e293b);color:white;padding:14px 24px;display:flex;align-items:center;gap:28px;overflow-x:auto;flex-wrap:nowrap;min-height:70px;border-radius:12px;margin-bottom:20px;box-shadow:0 4px 12px rgba(0,0,0,.2)}
-.live-ops-section{flex-shrink:0}
-.live-ops-label{font-size:10px;text-transform:uppercase;letter-spacing:1px;opacity:.7;margin-bottom:6px}
-.live-ops-value{font-size:22px;font-weight:700;line-height:1}
-.scanner-card{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:8px 14px;display:inline-flex;flex-direction:column;margin-right:8px;min-width:110px;transition:all .15s}
-.scanner-card:hover{background:rgba(255,255,255,.15);transform:translateY(-2px)}
-.scanner-name{font-size:12px;font-weight:600;white-space:nowrap}
-.scanner-stats{font-size:11px;opacity:.8;margin-top:2px}
-.scanner-last{font-size:10px;opacity:.6;margin-top:2px}
-.scanner-inactive{opacity:.4}
-
-/* Hourly Chart */
-.heatmap-container{background:white;border:1px solid #e5e7eb;border-radius:12px;padding:16px;margin-bottom:20px}
-.heatmap-title{font-size:14px;font-weight:700;color:#1a3c6e;margin-bottom:12px}
-.heatmap-grid{display:grid;grid-template-columns:repeat(24,1fr);gap:3px}
-.heatmap-cell{aspect-ratio:1;border-radius:4px;cursor:pointer;transition:transform .1s;position:relative;min-width:20px}
-.heatmap-cell:hover{transform:scale(1.2);z-index:1}
-.heatmap-cell .heatmap-tooltip{position:absolute;bottom:100%;left:50%;transform:translateX(-50%);background:#1e293b;color:white;font-size:10px;padding:4px 8px;border-radius:4px;white-space:nowrap;display:none;z-index:10}
-.heatmap-cell:hover .heatmap-tooltip{display:block}
-.heatmap-label-row{display:flex;justify-content:space-between;margin-top:8px;font-size:9px;color:#64748b}
-.heatmap-hour-labels{display:flex;justify-content:space-between;font-size:8px;color:#94a3b8;margin-top:4px}
-.h-0{background:#f0fdf4}.h-1{background:#dcfce7}.h-2{background:#bbf7d0}.h-3{background:#86efac}.h-4{background:#4ade80}.h-5{background:#22c55e}.h-6{background:#16a34a}.h-7{background:#fcd34d}.h-8{background:#fbbf24}.h-9{background:#f59e0b}.h-10{background:#eab308}.h-11{background:#84cc16}.h-12{background:#10b981}.h-13{background:#14b8a6}.h-14{background:#06b6d4}.h-15{background:#0ea5e9}.h-16{background:#3b82f6}.h-17{background:#6366f1}.h-18{background:#8b5cf6}.h-19{background:#a855f7}.h-20{background:#d946ef}.h-21{background:#ec4899}.h-22{background:#f43f5e}.h-23{background:#fb7185}
-
-.hourly-chart{display:flex;align-items:flex-end;gap:6px;height:90px;padding:10px 0}
-.hourly-bar{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
-.hourly-fill{width:100%;background:linear-gradient(180deg,#10b981,#059669);border-radius:4px 4px 0 0;min-height:3px;transition:height .3s ease}
-.hourly-val{font-size:10px;font-weight:600}
-.hourly-lbl{font-size:9px;opacity:.7}
-
-/* Auto-refresh Toggle */
-.auto-refresh-toggle{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:8px;padding:6px 12px;cursor:pointer;transition:all .15s}
-.auto-refresh-toggle:hover{background:rgba(255,255,255,.25)}
-.auto-refresh-toggle.paused{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2)}
-.auto-refresh-toggle .toggle-icon{font-size:14px}
-.auto-refresh-toggle .toggle-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
-.auto-refresh-toggle.paused .toggle-label{opacity:.6}
-
-/* Date Range Picker */
-.date-range-wrap{display:flex;align-items:center;gap:10px}
-.date-range-select{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:8px;padding:6px 10px;font-family:'Inter',sans-serif;font-size:11px;color:white;outline:none;cursor:pointer;min-width:120px}
-.date-range-select option{color:#1a1a2e;background:white}
-
-/* Bulk Selection */
-.bulk-actions{display:none;align-items:center;gap:12px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:8px 14px;margin-bottom:12px}
-.bulk-actions.active{display:flex}
-.bulk-count{font-size:12px;font-weight:600;color:#1d4ed8}
-.bulk-btn{display:inline-flex;align-items:center;gap:4px;background:#2563a8;color:white;border:none;border-radius:6px;padding:5px 10px;font-size:11px;font-weight:600;cursor:pointer;transition:background .15s}
-.bulk-btn:hover{background:#1d4ed8}
-.bulk-btn.danger{background:#dc2626}
-.bulk-btn.danger:hover{background:#b91c1c}
-.checkbox-cell{width:30px;text-align:center}
-.row-checkbox{width:16px;height:16px;cursor:pointer;accent-color:#2563a8}
-
-/* Copy to Clipboard */
-.copy-btn{background:none;border:none;cursor:pointer;padding:2px 6px;border-radius:4px;color:#64748b;transition:all .15s;font-size:12px}
-.copy-btn:hover{background:#e2e8f0;color:#2563a8}
-.copy-btn.copied{color:#16a34a}
-.toast{position:fixed;bottom:20px;right:20px;background:#1e293b;color:white;padding:10px 16px;border-radius:8px;font-size:12px;z-index:1000;opacity:0;transition:opacity .3s;box-shadow:0 4px 12px rgba(0,0,0,.2)}
-.toast.show{opacity:1}
-
-/* Keyboard Shortcuts Hint */
-.kbd-hint{position:fixed;bottom:12px;left:12px;background:white;border:1px solid #e5e7eb;border-radius:6px;padding:6px 10px;font-size:10px;color:#64748b;display:flex;gap:8px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
-.kbd-hint kbd{background:#f1f5f9;border:1px solid #e2e8f0;border-radius:4px;padding:2px 5px;font-family:monospace;font-size:9px}
-
-/* Select All */
-.select-all-wrap{display:flex;align-items:center;gap:6px;font-size:11px;color:#64748b;margin-left:8px}
-
-/* Dept Expected vs Present */
-.dept-exp-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #f1f5f9}
-.dept-exp-row:last-child{border-bottom:none}
-.dept-exp-name{font-size:12px;font-weight:600;min-width:150px}
-.dept-exp-bar{flex:1;height:10px;background:#f1f5f9;border-radius:5px;overflow:hidden}
-.dept-exp-fill{height:100%;background:linear-gradient(90deg,#2563a8,#3b82f6);border-radius:5px;transition:width .4s ease}
-.dept-exp-fill.low{background:linear-gradient(90deg,#dc2626,#ef4444)}
-.dept-exp-fill.mid{background:linear-gradient(90deg,#f59e0b,#fbbf24)}
-.dept-exp-pct{font-size:12px;font-weight:700;min-width:50px;text-align:right}
-.dept-exp-nums{font-size:11px;color:#64748b;min-width:90px;text-align:right}
-
-/* Centre Timeline */
-.centre-timeline{display:flex;flex-direction:column;gap:14px}
-.timeline-row{display:flex;align-items:center;gap:14px}
-.timeline-centre{font-size:12px;font-weight:600;min-width:110px}
-.timeline-bars{display:flex;gap:3px;flex:1;height:24px;align-items:flex-end}
-.timeline-bar{height:100%;background:linear-gradient(180deg,#2563a8,#1a3c6e);border-radius:3px;min-width:5px;position:relative;transition:all .15s}
-.timeline-bar:hover{background:#1d4ed8;transform:scaleY(1.1)}
-.timeline-bar .tooltip{position:absolute;bottom:100%;left:50%;transform:translateX(-50%);background:#1e293b;color:white;font-size:9px;padding:3px 8px;border-radius:4px;white-space:nowrap;display:none;z-index:10}
-.timeline-bar:hover .tooltip{display:block}
-.timeline-time{font-size:11px;color:#64748b;min-width:70px}
-
-/* Scanner Performance */
-.scanner-perf-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
-.scanner-perf-card{background:white;border:1px solid #e5e7eb;border-radius:14px;padding:18px;box-shadow:0 2px 8px rgba(0,0,0,.04);transition:all .15s}
-.scanner-perf-card:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.08)}
-.scanner-perf-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid #f1f5f9}
-.scanner-perf-name{font-size:15px;font-weight:700;color:#1a3c6e}
-.scanner-perf-badge{background:linear-gradient(135deg,#2563a8,#1a3c6e);color:white;border-radius:8px;padding:4px 12px;font-size:11px;font-weight:600}
-.scanner-perf-stats{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.scanner-perf-stat{text-align:center;padding:14px;background:#f8fafc;border-radius:10px}
-.scanner-perf-stat-label{font-size:10px;color:#64748b;text-transform:uppercase;letter-spacing:.5px}
-.scanner-perf-stat-val{font-size:24px;font-weight:700;color:#1a3c6e;margin-top:4px}
-.scanner-perf-last{font-size:11px;color:#64748b;margin-top:12px;text-align:center;padding-top:12px;border-top:1px solid #f1f5f9}
-.scanner-perf-slow{color:#dc2626;font-weight:600}
-.scanner-perf-active{color:#16a34a;font-weight:600}
-
-/* Loading */
-#loading{display:flex;flex-direction:column;align-items:center;justify-content:center;height:60vh;gap:14px}
-.spinner{width:40px;height:40px;border:3px solid #dbeafe;border-top-color:#2563a8;border-radius:50%;animation:spin .7s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-#loading p{color:#64748b;font-size:14px}
-#error-msg{display:none;text-align:center;padding:4rem;color:#dc2626;line-height:2}
-#dashboard{display:none}
-
-/* Global search results */
-.gsearch-results{position:absolute;top:100%;right:0;background:white;border:1px solid #e5e7eb;border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,.15);width:380px;max-height:420px;overflow-y:auto;z-index:200;display:none}
-.gsearch-item{padding:12px 16px;border-bottom:1px solid #f1f5f9;cursor:pointer;transition:background .1s}
-.gsearch-item:hover{background:#eff6ff}
-.gsearch-item:last-child{border-bottom:none}
-.gsearch-name{font-weight:600;font-size:13px;color:#1e293b}
-.gsearch-meta{font-size:11px;color:#64748b;margin-top:3px}
-.gsearch-wrap{position:relative}
-
-@media(max-width:768px){header{padding:12px 16px}main{padding:14px 12px}.tab{padding:11px 14px;font-size:11px}}
-</style>
+    @media (max-width: 768px) {
+      header { padding: 12px 16px; }
+      main { padding: 16px 12px; }
+      .tab { padding: 10px 14px; font-size: 12px; }
+    }
+  </style>
 </head>
 <body>
 
-<div id="loading"><div class="spinner"></div><p>Loading Bhati attendance data...</p></div>
-<div id="error-msg">⚠️ Could not load data<br><small style="color:#6b7280">Check your Railway URL is set correctly.</small></div>
+<div id="loading">
+  <div class="spinner"></div>
+  <p>Loading attendance data...</p>
+</div>
+<div id="error-msg">
+  <h2>⚠️ Unable to load data</h2>
+  <p style="color: #64748b; margin-top: 8px;">Please check your connection and try again.</p>
+</div>
 
 <div id="dashboard">
   <header>
     <div>
-      <div class="header-title">🙏 Faridabad Area Bhati March 2026 — Sewadar Dashboard</div>
-      <div class="header-sub">Live attendance tracking • Updates every 60 seconds</div>
+      <div class="header-title">🙏 Sewadar Attendance Dashboard</div>
+      <div class="header-meta" id="header-date"></div>
     </div>
     <div class="header-right">
-      <div>
-        <div class="live-pill"><span class="live-dot"></span> Live</div>
-        <div class="updated-tag" id="last-updated">—</div>
-        <div class="last-scan-tag" id="last-scan-tag"></div>
+      <div class="live-indicator">
+        <span class="live-dot"></span>
+        <span>Live</span>
       </div>
-      <div class="date-range-wrap">
-        <select class="date-range-select" id="date-range-select" onchange="setDateRange(this.value)">
-          <option value="all">All Dates</option>
-          <option value="today">Today</option>
-          <option value="yesterday">Yesterday</option>
-          <option value="last3">Last 3 Days</option>
-          <option value="last7">Last 7 Days</option>
-        </select>
-      </div>
-      <div class="auto-refresh-toggle" id="auto-refresh-toggle" onclick="toggleAutoRefresh()">
-        <span class="toggle-icon">⏸️</span>
-        <span class="toggle-label">Auto</span>
-      </div>
-      <div class="gsearch-wrap">
-        <input class="global-search" id="global-search" placeholder="🔍 Search... (Ctrl+K)" oninput="debouncedGlobalSearch()" onblur="setTimeout(()=>document.getElementById('gsearch-results').style.display='none',200)"/>
-        <div class="gsearch-results" id="gsearch-results"></div>
-      </div>
+      <select class="date-select" id="date-select" onchange="onDateChange(this.value)">
+        <!-- Filled by JS -->
+      </select>
+      <input class="search-box" id="global-search" placeholder="🔍 Search sewadar..." oninput="onSearch(this.value)">
     </div>
   </header>
 
-  <!-- Toast Notification -->
-  <div class="toast" id="toast"></div>
-
-  <!-- Keyboard Shortcuts Hint -->
-  <div class="kbd-hint">
-    <span><kbd>Ctrl</kbd>+<kbd>K</kbd> Search</span>
-    <span><kbd>Esc</kbd> Close</span>
-  </div>
-
-  <!-- Date filter bar -->
-  <div class="date-filter-bar">
-    <span class="date-filter-label">Filter by date:</span>
-    <button class="date-btn active" onclick="setDateFilter('all',this)">All Dates</button>
-    <div id="date-btns"></div>
-  </div>
-
   <div class="tab-bar">
     <div class="tab active" onclick="switchTab('overview')">📊 Overview</div>
-    <div class="tab" onclick="switchTab('liveops')">⚡ Live Ops</div>
-    <div class="tab" onclick="switchTab('scans')">🔍 Scan Details</div>
-    <div class="tab" onclick="switchTab('attendance')">📅 Attendance</div>
-    <div class="tab" onclick="switchTab('centres')">🏢 Centres</div>
-    <div class="tab" onclick="switchTab('absent')">❌ Absent <span class="badge" id="absent-badge">0</span></div>
-    <div class="tab" onclick="switchTab('scanners')">📱 Scanners <span class="badge blue" id="scanner-badge">0</span></div>
-    <div class="tab" onclick="switchTab('alerts')">⚠️ Alerts <span class="badge" id="alerts-badge">0</span></div>
-    <div class="tab" onclick="switchTab('reports')">📥 Download Reports</div>
-    <div class="tab" onclick="switchTab('print')">🖨️ Print Register</div>
+    <div class="tab" onclick="switchTab('attendance')">📋 Attendance</div>
+    <div class="tab" onclick="switchTab('alerts')">⚠️ Alerts <span class="tab-badge" id="alert-badge">0</span></div>
+    <div class="tab" onclick="switchTab('reports')">📥 Reports</div>
   </div>
 
   <main>
-
-    <!-- LIVE OPS -->
-    <div class="tab-content" id="tab-liveops">
-      <div class="live-ops-bar" id="live-ops-bar">
-        <div class="live-ops-section">
-          <div class="live-ops-label">Active Scanners</div>
-          <div class="live-ops-value" id="live-active-scanners">0</div>
-        </div>
-        <div class="live-ops-section">
-          <div class="live-ops-label">Total Scans Today</div>
-          <div class="live-ops-value" id="live-total-scans">0</div>
-        </div>
-        <div class="live-ops-section">
-          <div class="live-ops-label">Scans This Hour</div>
-          <div class="live-ops-value" id="live-hourly-scans">0</div>
-        </div>
-        <div class="live-ops-section">
-          <div class="live-ops-label">Currently Present</div>
-          <div class="live-ops-value" id="live-present">0</div>
-        </div>
-        <div class="live-ops-section" style="flex:1;min-width:200px">
-          <div class="live-ops-label">Active Scanner Cards</div>
-          <div id="scanner-cards" style="display:flex;flex-wrap:wrap;gap:4px"></div>
-        </div>
-      </div>
-      
-      <div class="heatmap-container">
-        <div class="heatmap-title">📊 Peak Hours Heatmap <span style="font-size:11px;color:#64748b;font-weight:400;margin-left:8px">Scan intensity by hour across all dates</span></div>
-        <div class="heatmap-grid" id="heatmap-grid"></div>
-        <div class="heatmap-label-row"><span>Low</span><span>High</span></div>
-        <div class="heatmap-hour-labels"><span>12AM</span><span>6AM</span><span>12PM</span><span>6PM</span><span>11PM</span></div>
-      </div>
-      
-      <div class="sec-head" style="margin-top:18px">Hourly Scan Rate <span>Scans per hour today</span></div>
-      <div class="chart-box"><div class="hourly-chart" id="hourly-chart"></div></div>
-      <div class="sec-head">Department Expected vs Present <span>Target headcount from registration</span></div>
-      <div class="chart-box" id="dept-exp-chart"></div>
-      <div class="sec-head">Centre Arrival Timeline <span>When each centre started receiving sewadars</span></div>
-      <div class="chart-box" id="centre-timeline"></div>
-    </div>
-
-    <!-- OVERVIEW -->
+    <!-- Overview Tab -->
     <div class="tab-content active" id="tab-overview">
-      <div class="kpi-row" id="kpi-row"></div>
-      <div id="gender-row" class="gender-row"></div>
-      <div class="sec-head">Daily Headcount <span id="date-range-label"></span></div>
-      <div class="chart-box"><div class="bars" id="bar-chart"></div></div>
-      <div class="sec-head">Department Breakdown <span>Unique sewadars per department</span></div>
-      <div class="dept-grid" id="dept-grid"></div>
-      <div style="margin-top:14px">
-        <button class="dl-btn" onclick="downloadOverviewExcel()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
-          Download Overview Excel
-        </button>
+      <div class="kpi-grid" id="kpi-grid">
+        <!-- KPIs filled by JS -->
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-title">Department Breakdown</div>
+          <div class="stat-list" id="dept-list"></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-title">Centre Breakdown</div>
+          <div class="stat-list" id="centre-list"></div>
+        </div>
       </div>
     </div>
 
-    <!-- SCAN DETAILS -->
-    <div class="tab-content" id="tab-scans">
-      <div class="bulk-actions" id="bulk-actions">
-        <span class="bulk-count" id="bulk-count">0 selected</span>
-        <button class="bulk-btn" onclick="exportSelectedRows()">📥 Export Selected</button>
-        <button class="bulk-btn danger" onclick="clearSelection()">✕ Clear</button>
-      </div>
-      <div class="toolbar">
-        <div id="scan-note" style="font-size:10px;color:#64748b;display:none;margin-right:8px"></div>
-        <input class="search-box" id="scan-search" placeholder="Search name, badge, centre..." oninput="debouncedFilterScans()"/>
-        <select class="filter-select" id="scan-type-filter" onchange="filterScans()"><option value="">All Types</option><option value="IN">IN only</option><option value="OUT">OUT only</option></select>
-        <select class="filter-select" id="scan-dept-filter" onchange="filterScans()"><option value="">All Departments</option></select>
-        <div class="count-badge" id="scan-count">0 records</div>
-        <button class="dl-btn" onclick="downloadScansExcel()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
-          Download
-        </button>
-      </div>
-      <div class="tbl-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th rowspan="2" class="checkbox-cell">
-                <input type="checkbox" id="select-all" onchange="toggleAllRows(this)" style="width:16px;height:16px;accent-color:#2563a8">
-              </th>
-              <th colspan="4" style="text-align:center;border-right:2px solid rgba(255,255,255,.3)">SCANNED SEWADAR</th>
-              <th colspan="3" style="text-align:center;border-right:2px solid rgba(255,255,255,.3)">SCAN DETAILS</th>
-              <th colspan="3" style="text-align:center">SCANNED BY</th>
-            </tr>
-            <tr class="sub-header">
-              <th>Badge No.</th><th>Name</th><th>Centre</th><th style="border-right:2px solid rgba(255,255,255,.3)">Department</th>
-              <th>Type</th><th>Date</th><th style="border-right:2px solid rgba(255,255,255,.3)">Time (IST)</th>
-              <th>Badge No.</th><th>Name</th><th>Centre</th>
-            </tr>
-          </thead>
-          <tbody id="scan-body"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- ATTENDANCE MATRIX -->
+    <!-- Attendance Tab -->
     <div class="tab-content" id="tab-attendance">
       <div class="toolbar">
-        <input class="search-box" id="att-search" placeholder="Search sewadar..." oninput="debouncedFilterAttendance()"/>
-        <select class="filter-select" id="att-centre-filter" onchange="filterAttendance()"><option value="">All Centres</option></select>
-        <select class="filter-select" id="att-dept-filter" onchange="filterAttendance()"><option value="">All Departments</option></select>
-        <select class="filter-select" id="att-gender-filter" onchange="filterAttendance()"><option value="">All Genders</option><option value="m">Male</option><option value="f">Female</option></select>
-        <div class="count-badge" id="att-count">0 sewadars</div>
-        <button class="dl-btn" onclick="downloadAttendanceExcel()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
-          Download (filtered)
+        <input type="text" id="att-search" placeholder="Search by name or badge..." oninput="filterAttendance()">
+        <select id="att-centre" onchange="filterAttendance()">
+          <option value="">All Centres</option>
+        </select>
+        <select id="att-dept" onchange="filterAttendance()">
+          <option value="">All Departments</option>
+        </select>
+        <select id="att-status" onchange="filterAttendance()">
+          <option value="">All Status</option>
+          <option value="inside">Inside</option>
+          <option value="exited">Exited</option>
+          <option value="absent">Not Arrived</option>
+        </select>
+        <span class="count-badge" id="att-count">0</span>
+        <button class="btn" onclick="downloadAttendance()">
+          📥 Download Excel
         </button>
       </div>
-      <div class="tbl-wrap">
-        <table><thead id="att-head"></thead><tbody id="att-body"></tbody></table>
+      <div class="table-wrap">
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Badge No.</th>
+                <th>Name</th>
+                <th>Centre</th>
+                <th>Department</th>
+                <th>IN Time</th>
+                <th>OUT Time</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="att-body"></tbody>
+          </table>
+        </div>
       </div>
     </div>
 
-    <!-- CENTRES -->
-    <div class="tab-content" id="tab-centres">
-      <div class="toolbar">
-        <input class="search-box" id="centre-search" placeholder="Search centre..." oninput="debouncedFilterCentres()" style="max-width:280px"/>
-        <div class="count-badge" id="centre-count">0 centres</div>
-        <button class="dl-btn" onclick="downloadCentreExcel()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
-          Download Centre Summary
-        </button>
-      </div>
-      <div class="centre-cards" id="centre-cards"></div>
-    </div>
-
-<!-- ABSENT -->
-    <div class="tab-content" id="tab-absent">
-      <div class="toolbar">
-        <input class="search-box" id="absent-search" placeholder="Search absent sewadar..." oninput="debouncedFilterAbsent()"/>
-        <select class="filter-select" id="absent-centre-filter" onchange="filterAbsent()"><option value="">All Centres</option></select>
-        <select class="filter-select" id="absent-dept-filter" onchange="filterAbsent()"><option value="">All Departments</option></select>
-        <select class="filter-select" id="absent-group-filter" onchange="renderAbsent(DATA.absent_per_day||[], ACTIVE_DATE==='all'?DATA.dates:[ACTIVE_DATE])"><option value="date">Group by Date</option><option value="centre">Group by Centre</option><option value="dept">Group by Department</option></select>
-        <div class="count-badge" id="absent-count">0 absent</div>
-        <button class="dl-btn" onclick="downloadAbsentExcel()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
-          Download Absent List
-        </button>
-      </div>
-      <div id="absent-content"></div>
-    </div>
-
-    <!-- SCANNERS -->
-    <div class="tab-content" id="tab-scanners">
-      <div class="toolbar">
-        <input class="search-box" id="scanner-search" placeholder="Search scanner..." oninput="debouncedFilterScanners()" style="max-width:280px"/>
-        <select class="filter-select" id="scanner-centre-filter" onchange="filterScanners()"><option value="">All Centres</option></select>
-        <div class="count-badge" id="scanner-count">0 scanners</div>
-      </div>
-      <div class="scanner-perf-grid" id="scanner-perf-grid"></div>
-    </div>
-
-    <!-- ALERTS -->
+    <!-- Alerts Tab -->
     <div class="tab-content" id="tab-alerts">
-      <div class="alert-summary-bar" id="alert-summary-bar"></div>
-      <div class="sec-head">Duplicate IN Scans <span>Same sewadar scanned IN more than once in a day</span></div>
-      <div class="alert-grid" id="dup-grid"></div>
-      <div class="sec-head" style="margin-top:16px">Re-Entry Alerts <span>IN → OUT → IN pattern detected</span></div>
-      <div class="alert-grid" id="reentry-grid"></div>
-      <div class="sec-head" style="margin-top:16px">Multi-Scan Alerts <span>Multiple scans of same type</span></div>
-      <div class="alert-grid" id="multiscan-grid"></div>
-      <div class="sec-head" style="margin-top:16px">Missing OUT Scans <span>Sewadars who have IN but no OUT recorded</span></div>
-      <div class="toolbar" style="margin-bottom:10px">
-        <input class="search-box" id="missing-search" placeholder="Search..." oninput="debouncedFilterMissingOut()" style="max-width:280px"/>
-        <select class="filter-select" id="missing-dept-filter" onchange="filterMissingOut()"><option value="">All Departments</option></select>
-        <div class="count-badge" id="missing-count">0 records</div>
-        <button class="dl-btn" onclick="downloadAlertsExcel()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
-          Download Alerts
-        </button>
-      </div>
-      <div class="tbl-wrap">
-        <table>
-          <thead><tr><th>#</th><th>Badge No.</th><th>Sewadar Name</th><th>Centre</th><th>Department</th><th>Date</th><th>IN Time</th></tr></thead>
-          <tbody id="missing-body"></tbody>
-        </table>
-      </div>
-    </div>
-
-  <!-- DOWNLOAD REPORTS -->
-    <div class="tab-content" id="tab-reports">
-      <div class="sec-head">Download Reports <span>Date-filtered Excel downloads</span></div>
-      
-      <div class="reports-grid">
-        
-        <div class="report-card">
-          <div class="report-card-title">📊 Overview Report</div>
-          <div class="report-card-desc">Daily headcount, gender breakdown, department-wise stats</div>
-          <div class="report-filters">
-            <select class="filter-select" id="report-overview-date" style="width:100%">
-              <option value="all">All Dates</option>
-            </select>
-          </div>
-          <button class="dl-btn" onclick="downloadReport('overview')">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
-            Download Excel
-          </button>
-        </div>
-
-        <div class="report-card">
-          <div class="report-card-title">🔍 Scan Details</div>
-          <div class="report-card-desc">All scan records with timestamps and scanner info</div>
-          <div class="report-filters">
-            <select class="filter-select" id="report-scans-date" style="width:100%;margin-bottom:8px">
-              <option value="all">All Dates</option>
-            </select>
-            <select class="filter-select" id="report-scans-type" style="width:100%">
-              <option value="">All Types</option>
-              <option value="IN">IN Only</option>
-              <option value="OUT">OUT Only</option>
-            </select>
-          </div>
-          <button class="dl-btn" onclick="downloadReport('scans')">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
-            Download Excel
-          </button>
-        </div>
-
-        <div class="report-card">
-          <div class="report-card-title">📅 Attendance Matrix</div>
-          <div class="report-card-desc">Complete attendance for all sewadars by date</div>
-          <div class="report-filters">
-            <select class="filter-select" id="report-attendance-date" style="width:100%;margin-bottom:8px">
-              <option value="all">All Dates</option>
-            </select>
-            <select class="filter-select" id="report-attendance-centre" style="width:100%;margin-bottom:8px">
-              <option value="">All Centres</option>
-            </select>
-            <select class="filter-select" id="report-attendance-dept" style="width:100%">
-              <option value="">All Departments</option>
-            </select>
-          </div>
-          <button class="dl-btn" onclick="downloadReport('attendance')">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
-            Download Excel
-          </button>
-        </div>
-
-        <div class="report-card">
-          <div class="report-card-title">🏢 Centre Summary</div>
-          <div class="report-card-desc">Per-centre attendance with expected vs present</div>
-          <div class="report-filters">
-            <select class="filter-select" id="report-centre-date" style="width:100%;margin-bottom:8px">
-              <option value="all">All Dates</option>
-            </select>
-            <select class="filter-select" id="report-centre-name" style="width:100%">
-              <option value="">All Centres</option>
-            </select>
-          </div>
-          <button class="dl-btn" onclick="downloadReport('centre')">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
-            Download Excel
-          </button>
-        </div>
-
-        <div class="report-card">
-          <div class="report-card-title" style="color:#dc2626">❌ Absent List</div>
-          <div class="report-card-desc">Sewadars who did not scan on selected dates</div>
-          <div class="report-filters">
-            <select class="filter-select" id="report-absent-date" style="width:100%;margin-bottom:8px">
-              <option value="all">All Dates</option>
-            </select>
-            <select class="filter-select" id="report-absent-centre" style="width:100%;margin-bottom:8px">
-              <option value="">All Centres</option>
-            </select>
-            <select class="filter-select" id="report-absent-dept" style="width:100%">
-              <option value="">All Departments</option>
-            </select>
-          </div>
-          <button class="dl-btn" onclick="downloadReport('absent')" style="background:#dc2626">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
-            Download Excel
-          </button>
-        </div>
-
-        <div class="report-card">
-          <div class="report-card-title" style="color:#ea580c">⚠️ Alerts Report</div>
-          <div class="report-card-desc">Duplicate IN, Missing OUT, Re-entry alerts</div>
-          <div class="report-filters">
-            <select class="filter-select" id="report-alerts-date" style="width:100%;margin-bottom:8px">
-              <option value="all">All Dates</option>
-            </select>
-            <select class="filter-select" id="report-alerts-type" style="width:100%">
-              <option value="">All Alerts</option>
-              <option value="duplicate">Duplicate IN</option>
-              <option value="missing">Missing OUT</option>
-              <option value="reentry">Re-entry</option>
-              <option value="multi">Multi-scan</option>
-            </select>
-          </div>
-          <button class="dl-btn" onclick="downloadReport('alerts')" style="background:#ea580c">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
-            Download Excel
-          </button>
-        </div>
-
-        <div class="report-card">
-          <div class="report-card-title" style="color:#7c3aed">📱 Scanner Performance</div>
-          <div class="report-card-desc">Scanner-wise scan counts and performance metrics</div>
-          <div class="report-filters">
-            <select class="filter-select" id="report-scanner-date" style="width:100%;margin-bottom:8px">
-              <option value="all">All Dates</option>
-            </select>
-            <select class="filter-select" id="report-scanner-centre" style="width:100%">
-              <option value="">All Centres</option>
-            </select>
-          </div>
-          <button class="dl-btn" onclick="downloadReport('scanner')" style="background:#7c3aed">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
-            Download Excel
-          </button>
-        </div>
-
-        <div class="report-card">
-          <div class="report-card-title" style="color:#0891b2">👥 Gender Report</div>
-          <div class="report-card-desc">Male/Female breakdown by date</div>
-          <div class="report-filters">
-            <select class="filter-select" id="report-gender-date" style="width:100%">
-              <option value="all">All Dates</option>
-            </select>
-          </div>
-          <button class="dl-btn" onclick="downloadReport('gender')" style="background:#0891b2">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
-            Download Excel
-          </button>
-        </div>
-
-      </div>
-    </div>
-
-  <!-- PRINT REGISTER -->
-    <div class="tab-content" id="tab-print">
       <div class="toolbar">
-        <select class="filter-select" id="print-dept-filter" onchange="renderPrintRegister()"><option value="">All Departments</option></select>
-        <select class="filter-select" id="print-centre-filter" onchange="renderPrintRegister()"><option value="">All Centres</option></select>
-        <button class="dl-btn" onclick="window.print()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2M6 14h12v8H6z"/></svg>
-          Print Register
-        </button>
-        <button class="dl-btn" onclick="downloadPrintRegisterExcel()" style="background:#2563a8">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
-          Download Excel
+        <select id="alert-type" onchange="filterAlerts()">
+          <option value="">All Alerts</option>
+          <option value="duplicate">Duplicate IN</option>
+          <option value="missing">Missing OUT</option>
+          <option value="reentry">Re-Entry</option>
+        </select>
+        <span class="count-badge" id="alert-count">0</span>
+        <button class="btn" onclick="downloadAlerts()">
+          📥 Download Alerts
         </button>
       </div>
-      <div class="print-register" id="print-register"></div>
+
+      <div class="alert-section" id="dup-section">
+        <div class="alert-header">
+          🔴 Duplicate IN Scans
+          <span class="count" id="dup-count">0</span>
+        </div>
+        <div class="alert-grid" id="dup-grid"></div>
+      </div>
+
+      <div class="alert-section" id="missing-section">
+        <div class="alert-header">
+          🟠 Missing OUT Scans
+          <span class="count" id="missing-count">0</span>
+        </div>
+        <div class="alert-grid" id="missing-grid"></div>
+      </div>
+
+      <div class="alert-section" id="reentry-section">
+        <div class="alert-header">
+          🟡 Re-Entry Cases
+          <span class="count" id="reentry-count">0</span>
+        </div>
+        <div class="alert-grid" id="reentry-grid"></div>
+      </div>
     </div>
 
+    <!-- Reports Tab -->
+    <div class="tab-content" id="tab-reports">
+      <div class="reports-grid">
+        <div class="report-card">
+          <div class="report-title">📊 Overview Report</div>
+          <div class="report-desc">Daily stats and breakdowns</div>
+          <select id="report-date"></select>
+          <button class="btn" onclick="downloadReport('overview')">Download</button>
+        </div>
+        <div class="report-card">
+          <div class="report-title">📋 Attendance List</div>
+          <div class="report-desc">All sewadars with times</div>
+          <select id="report-attendance-date"></select>
+          <button class="btn blue" onclick="downloadReport('attendance')">Download</button>
+        </div>
+        <div class="report-card">
+          <div class="report-title">❌ Absent List</div>
+          <div class="report-desc">Sewadars not present</div>
+          <select id="report-absent-date"></select>
+          <button class="btn red" onclick="downloadReport('absent')">Download</button>
+        </div>
+        <div class="report-card">
+          <div class="report-title">⚠️ Alerts Report</div>
+          <div class="report-desc">All scan issues</div>
+          <select id="report-alerts-date"></select>
+          <button class="btn" onclick="downloadReport('alerts')">Download</button>
+        </div>
+      </div>
+    </div>
   </main>
 </div>
 
 <script>
-// ── Config ────────────────────────────────────────────────────────────────────
-// IMPORTANT: Replace with your Railway URL or base endpoint after deployment
-// The server may serve the JSON directly at the root, so you can point to the
-// base URL instead of /data.json if that's where the payload lives.
-const RAILWAY_URL = 'https://bhati-server-production.up.railway.app/data.json';
-const DATA_URL = (window.location.hostname === 'localhost' || window.location.protocol === 'file:')
-  ? 'data.json'
-  : RAILWAY_URL;
+// ============ CONFIG ============
+const DATA_URL = 'https://bhati-server-production.up.railway.app/data.json';
 
-let DATA = null;
-let ACTIVE_DATE = 'all';
-let RENDER_PENDING = false;
-const SCAN_TABLE_MAX_ROWS = 2000;
-let AUTO_REFRESH = true;
-let AUTO_REFRESH_TIMER = null;
-let SELECTED_ROWS = new Set();
+// ============ STATE ============
+let RAW_DATA = null;
+let PROCESSED_DATA = null;
+let SELECTED_DATE = null;
+let SEARCH_QUERY = '';
 
-// ── Date Range & Auto Refresh ─────────────────────────────────────────────────
-function setDateRange(range){
-  const dates = DATA?.dates || [];
-  if(!dates.length) return;
-  let selectedDates = [];
-  const today = dates[dates.length - 1];
+// ============ INITIALIZE ============
+document.addEventListener('DOMContentLoaded', loadData);
+
+async function loadData() {
+  try {
+    const res = await fetch(DATA_URL + '?t=' + Date.now());
+    if (!res.ok) throw new Error('Failed to fetch');
+    const data = await res.json();
+    
+    RAW_DATA = data;
+    processData();
+    
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'block';
+    
+    render();
+  } catch (e) {
+    console.error(e);
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('error-msg').style.display = 'block';
+  }
+}
+
+// ============ DATA PROCESSING ============
+function processData() {
+  const scans = RAW_DATA.scans || RAW_DATA.raw_log || [];
+  const dates = RAW_DATA.dates || [];
   
-  switch(range){
-    case 'today': selectedDates = [today]; break;
-    case 'yesterday': selectedDates = dates.length > 1 ? [dates[dates.length - 2]] : [today]; break;
-    case 'last3': selectedDates = dates.slice(-3); break;
-    case 'last7': selectedDates = dates.slice(-7); break;
-    default: selectedDates = dates;
-  }
+  if (!dates.length) return;
   
-  if(selectedDates.length === 1){
-    setDateFilter(selectedDates[0], document.querySelector('.date-btn'));
-  } else if(selectedDates.length > 1){
-    ACTIVE_DATE = 'all';
-    document.querySelectorAll('.date-btn').forEach(b=>b.classList.remove('active'));
-    document.querySelector('.date-btn').classList.add('active');
-    document.getElementById('date-range-select').value = range;
-    applyDateFilterForDates(selectedDates);
-  }
-}
-
-function applyDateFilterForDates(dates){
-  if(!DATA) return;
-  renderOverview(DATA, dates);
-  renderScanTable(getFilteredScans(DATA.scans||DATA.raw_log||[], dates), dates);
-  renderAttendanceTable(DATA.sewadar_attendance||[], dates);
-  renderCentreCards(DATA.centre_summary||[], dates);
-  renderAbsent(DATA.absent_per_day||[], dates);
-}
-
-function toggleAutoRefresh(){
-  AUTO_REFRESH = !AUTO_REFRESH;
-  const toggle = document.getElementById('auto-refresh-toggle');
-  if(AUTO_REFRESH){
-    toggle.classList.remove('paused');
-    toggle.querySelector('.toggle-icon').textContent = '⏸️';
-    toggle.querySelector('.toggle-label').textContent = 'Auto';
-    startAutoRefresh();
-  } else {
-    toggle.classList.add('paused');
-    toggle.querySelector('.toggle-icon').textContent = '▶️';
-    toggle.querySelector('.toggle-label').textContent = 'Paused';
-    stopAutoRefresh();
-  }
-}
-
-function startAutoRefresh(){
-  if(AUTO_REFRESH_TIMER) clearInterval(AUTO_REFRESH_TIMER);
-  AUTO_REFRESH_TIMER = setInterval(() => loadData(true), 60000);
-}
-
-function stopAutoRefresh(){
-  if(AUTO_REFRESH_TIMER){ clearInterval(AUTO_REFRESH_TIMER); AUTO_REFRESH_TIMER = null; }
-}
-
-// ── Keyboard Shortcuts ───────────────────────────────────────────────────────
-document.addEventListener('keydown', function(e){
-  if((e.ctrlKey || e.metaKey) && e.key === 'k'){
-    e.preventDefault();
-    document.getElementById('global-search').focus();
-  }
-  if(e.key === 'Escape'){
-    document.getElementById('gsearch-results').style.display = 'none';
-    document.activeElement.blur();
-  }
-});
-
-// ── Copy to Clipboard ───────────────────────────────────────────────────────
-function copyToClipboard(text, btn){
-  navigator.clipboard.writeText(text).then(() => {
-    showToast('Copied: ' + text);
-    if(btn){
-      btn.classList.add('copied');
-      btn.textContent = '✓';
-      setTimeout(() => { btn.classList.remove('copied'); btn.innerHTML = '📋'; }, 1500);
+  SELECTED_DATE = dates[dates.length - 1];
+  
+  // Build date options
+  const dateSelect = document.getElementById('date-select');
+  dateSelect.innerHTML = dates.map(d => 
+    `<option value="${d}" ${d === SELECTED_DATE ? 'selected' : ''}>${formatDate(d)}</option>`
+  ).join('');
+  
+  document.getElementById('header-date').textContent = `Date: ${formatDate(SELECTED_DATE)}`;
+  
+  // Filter scans for selected date
+  const todayScans = scans.filter(s => s.date === SELECTED_DATE);
+  
+  // Compute attendance per sewadar
+  const sewadarMap = {};
+  todayScans.forEach(s => {
+    const badge = s.badge_no;
+    if (!sewadarMap[badge]) {
+      sewadarMap[badge] = {
+        badge_no: badge,
+        name: s.sewadar_name || 'Unknown',
+        centre: s.sewadar_centre || 'Unknown',
+        department: s.department || 'Unknown',
+        gender: s.gender || 'M',
+        in_time: null,
+        out_time: null
+      };
+    }
+    if (s.type === 'IN' && (!sewadarMap[badge].in_time || s.time < sewadarMap[badge].in_time)) {
+      sewadarMap[badge].in_time = s.time;
+    }
+    if (s.type === 'OUT' && (!sewadarMap[badge].out_time || s.time > sewadarMap[badge].out_time)) {
+      sewadarMap[badge].out_time = s.time;
     }
   });
-}
-
-function showToast(msg){
-  const toast = document.getElementById('toast');
-  toast.textContent = msg;
-  toast.classList.add('show');
-  setTimeout(() => toast.classList.remove('show'), 2000);
-}
-
-// ── Bulk Selection ──────────────────────────────────────────────────────────
-function toggleRowSelection(checkbox, rowId){
-  if(checkbox.checked){
-    SELECTED_ROWS.add(rowId);
-  } else {
-    SELECTED_ROWS.delete(rowId);
-  }
-  updateBulkActions();
-}
-
-function toggleAllRows(selectAll){
-  const checkboxes = document.querySelectorAll('.row-checkbox');
-  checkboxes.forEach(cb => {
-    cb.checked = selectAll.checked;
-    const rowId = cb.dataset.id;
-    if(selectAll.checked){
-      SELECTED_ROWS.add(rowId);
+  
+  // Determine status
+  Object.values(sewadarMap).forEach(s => {
+    if (s.in_time && !s.out_time) {
+      s.status = 'inside';
+    } else if (s.in_time && s.out_time) {
+      s.status = 'exited';
     } else {
-      SELECTED_ROWS.delete(rowId);
-    }
-  });
-  updateBulkActions();
-}
-
-function updateBulkActions(){
-  const bulkDiv = document.getElementById('bulk-actions');
-  const countSpan = document.getElementById('bulk-count');
-  if(SELECTED_ROWS.size > 0){
-    bulkDiv.classList.add('active');
-    countSpan.textContent = SELECTED_ROWS.size + ' selected';
-  } else {
-    bulkDiv.classList.remove('active');
-  }
-}
-
-function exportSelectedRows(){
-  const rows = document.querySelectorAll('#scan-body tr');
-  const selectedData = [];
-  rows.forEach(row => {
-    if(SELECTED_ROWS.has(row.dataset.id)){
-      const cells = row.querySelectorAll('td');
-      selectedData.push({
-        badge: cells[1]?.textContent?.trim(),
-        name: cells[2]?.textContent?.trim(),
-        centre: cells[3]?.textContent?.trim(),
-        dept: cells[4]?.textContent?.trim(),
-        type: cells[5]?.textContent?.trim(),
-        date: cells[6]?.textContent?.trim(),
-        time: cells[7]?.textContent?.trim()
-      });
-    }
-  });
-  if(selectedData.length){
-    const ws = XLSX.utils.json_to_sheet(selectedData);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Selected");
-    XLSX.writeFile(wb, `selected_scans_${nowStamp()}.xlsx`);
-    showToast('Exported ' + selectedData.length + ' rows');
-  }
-  clearSelection();
-}
-
-function clearSelection(){
-  SELECTED_ROWS.clear();
-  document.querySelectorAll('.row-checkbox').forEach(cb => cb.checked = false);
-  document.getElementById('select-all').checked = false;
-  updateBulkActions();
-}
-
-// ── Helpers ───────────────────────────────────────────────────────────────────
-function fmtDate(d){ if(!d)return'—'; return new Date(d).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'2-digit'}); }
-function fmtTime(t){ if(!t)return'—'; const [h,m]=t.split(':'); const hr=parseInt(h); const ampm=hr>=12?'PM':'AM'; const hr12=hr%12||12; return `${hr12}:${m||'00'} ${ampm}`; }
-function nowStamp(){ return new Date().toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}).replace(/ /g,'-'); }
-function dlIcon(){ return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>`; }
-function debounce(fn, ms){
-  let t;
-  return function(...a){
-    clearTimeout(t);
-    t = setTimeout(()=>fn.apply(this,a), ms);
-  };
-}
-
-function switchTab(name){
-  ['overview','liveops','scans','attendance','centres','absent','scanners','alerts','reports','print'].forEach((n,i)=>{
-    document.querySelectorAll('.tab')[i].classList.toggle('active',n===name);
-    document.getElementById('tab-'+n).classList.toggle('active',n===name);
-  });
-}
-
-function setDateFilter(date, btn){
-  ACTIVE_DATE = date;
-  document.querySelectorAll('.date-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  if(DATA) applyDateFilter();
-}
-
-function applyDateFilter(){
-  const d = DATA;
-  const dates = ACTIVE_DATE==='all' ? d.dates : [ACTIVE_DATE];
-  renderOverview(d, dates);
-  renderScanTable(getFilteredScans(d.scans||d.raw_log||[], dates), dates);
-  renderAttendanceTable(d.sewadar_attendance||[], dates);
-  renderCentreCards(d.centre_summary||[], dates);
-  renderAbsent(d.absent_per_day||[], dates);
-}
-
-function getFilteredScans(scans, dates){
-  if(ACTIVE_DATE==='all') return scans;
-  return scans.filter(s=>dates.includes(s.date));
-}
-
-// ── Load ──────────────────────────────────────────────────────────────────────
-let LAST_DATA_HASH = '';
-let LAST_SCAN_COUNT = 0;
-let UPDATE_TIMER = null;
-
-async function loadData(isAutoRefresh = false){
-  try{
-    let url = DATA_URL;
-    let res = await fetch(url+'?t='+Date.now());
-    
-    // If local file fails, try Railway
-    if(!res.ok && url === 'data.json'){
-      url = RAILWAY_URL;
-      res = await fetch(url+'?t='+Date.now());
-    }
-    
-    if(!res.ok) throw new Error('Failed to fetch data');
-    
-    let d = await res.json();
-    const scanCount = (d.scans||d.raw_log||[]).length;
-    
-    // Quick check if data actually changed (BEFORE heavy calculations)
-    if(isAutoRefresh && scanCount === LAST_SCAN_COUNT){
-      return; // No new scans
-    }
-    
-    // Calculate aggregated data from scans if not provided
-    if(!d.headcount_per_day && d.scans){
-      d = calculateAggregates(d);
-    }
-    
-    const oldScanCount = LAST_SCAN_COUNT;
-    DATA = d;
-    LAST_SCAN_COUNT = scanCount;
-    
-    // Show dashboard on first load
-    document.getElementById('loading').style.display='none';
-    document.getElementById('dashboard').style.display='block';
-    
-    // For first load, do full render
-    if(oldScanCount === 0){
-      render(DATA);
-    } else {
-      // For incremental updates, re-apply current filter without rebuilding filter UI
-      incrementalRender(DATA);
-    }
-    
-    // Always update timestamp
-    document.getElementById('last-updated').textContent = 'Updated: '+new Date().toLocaleTimeString('en-IN');
-  }catch(e){
-    console.error('Load error:', e);
-    if(!DATA){
-      document.getElementById('loading').style.display='none';
-      document.getElementById('error-msg').style.display='block';
-    }
-  }
-}
-
-// Incremental render: Re-apply current filter without expensive UI rebuilds
-function incrementalRender(d){
-  const dates = ACTIVE_DATE==='all' ? d.dates : [ACTIVE_DATE];
-  const activeId = document.querySelector('.tab.active')?.getAttribute('onclick')?.match(/switchTab\('([^']+)'\)/)?.[1];
-
-  // always update badges/kpis
-  if(activeId==='overview' || activeId===undefined){
-    renderOverview(d, dates);
-  }
-
-  // update metric badges which are cheap
-  const alertCount = (d.duplicate_flags||[]).length + (d.re_entry_flags||[]).length + (d.multi_scan_flags||[]).length + (d.missing_out||[]).length;
-  document.getElementById('alerts-badge').textContent = alertCount > 999 ? '999+' : alertCount;
-  const absentTotal = (d.absent_per_day||[]).reduce((a,b)=>a+b.absent_count,0);
-  document.getElementById('absent-badge').textContent = absentTotal > 999 ? '999+' : absentTotal;
-
-  // render tab-specific sections only when active
-  if(activeId==='scans'){
-    renderScanTable(getFilteredScans(d.scans||d.raw_log||[], dates), dates);
-  } else if(activeId==='attendance'){
-    renderAttendanceTable(d.sewadar_attendance||[], dates);
-  } else if(activeId==='centres'){
-    renderCentreCards(d.centre_summary||[], dates);
-  } else if(activeId==='absent'){
-    renderAbsent(d.absent_per_day||[], dates);
-  }
-}
-
-
-function renderLiveOpsBar(d){
-  const scans = d.scans||d.raw_log||[];
-  const today = (d.dates||[])[d.dates.length-1];
-  if(!today) return;
-  
-  const todayScans = scans.filter(s=>s.date===today);
-  const scannerStats={};
-  todayScans.forEach(s=>{
-    const sb = s.scanned_by_badge;
-    if(!scannerStats[sb]) scannerStats[sb] = {name:s.scanned_by_name, centre:s.scanned_by_centre, scans:0, last:''};
-    scannerStats[sb].scans++;
-    if(!scannerStats[sb].last || s.time > scannerStats[sb].last) scannerStats[sb].last = s.time;
-  });
-  
-  const activeScanners = Object.values(scannerStats).filter(s=>{
-    if(!s.last) return false;
-    const lastTime = new Date(`${today}T${s.last}`);
-    const now = new Date();
-    return (now - lastTime) < 30*60*1000;
-  });
-  
-  const hour = new Date().getHours();
-  const hourlyScans = todayScans.filter(s=>{
-    const scanHour = parseInt(s.time.split(':')[0]);
-    return scanHour === hour;
-  }).length;
-  
-  const presentToday = (d.headcount_per_day||[]).find(h=>h.date===today)?.total_present||0;
-  
-  const activeScanEl = document.getElementById('live-active-scanners');
-  const totalScansEl = document.getElementById('live-total-scans');
-  const hourlyScansEl = document.getElementById('live-hourly-scans');
-  const presentEl = document.getElementById('live-present');
-  
-  if(activeScanEl) activeScanEl.textContent = activeScanners.length;
-  if(totalScansEl) totalScansEl.textContent = todayScans.length;
-  if(hourlyScansEl) hourlyScansEl.textContent = hourlyScans;
-  if(presentEl) presentEl.textContent = presentToday;
-  
-  // Update scanner cards
-  const cardsHtml = Object.entries(scannerStats).map(([badge,s])=>{
-    const isActive = s.last && (new Date() - new Date(`${today}T${s.last}`)) < 30*60*1000;
-    return `<div class="scanner-card ${isActive?'':'scanner-inactive'}">
-      <div class="scanner-name">${s.name||badge}</div>
-      <div class="scanner-stats">${s.scans} scans</div>
-      <div class="scanner-last">${s.last?fmtTime(s.last):'No scans'}</div>
-    </div>`;
-  }).join('');
-  
-  const cardsEl = document.getElementById('scanner-cards');
-  if(cardsEl) cardsEl.innerHTML = cardsHtml || '<span style="opacity:0.6;font-size:11px">No scanner activity</span>';
-}
-
-function calculateAggregates(d){
-  const scans = d.scans||[];
-  const dates = d.dates||[];
-  
-  // Headcount per day
-  const headcountPerDay = dates.map(date=>{
-    const dayScans = scans.filter(s=>s.date===date);
-    const uniqueIn = new Set(dayScans.filter(s=>s.type==='IN').map(s=>s.badge_no));
-    const uniqueOut = new Set(dayScans.filter(s=>s.type==='OUT').map(s=>s.badge_no));
-    return {
-      date,
-      total_present: uniqueIn.size,
-      total_in: dayScans.filter(s=>s.type==='IN').length,
-      total_out: dayScans.filter(s=>s.type==='OUT').length
-    };
-  });
-  
-  // Gender summary
-  const genderSummary = dates.map(date=>{
-    const dayScans = scans.filter(s=>s.date===date);
-    const uniqueBadges = new Map();
-    dayScans.filter(s=>s.type==='IN').forEach(s=>{
-      if(!uniqueBadges.has(s.badge_no)) uniqueBadges.set(s.badge_no, s);
-    });
-    let male=0, female=0;
-    uniqueBadges.forEach(s=>{
-      if(s.gender==='M') male++;
-      else if(s.gender==='F') female++;
-    });
-    return {date, male, female};
-  });
-  
-  // Centre summary
-  const centreMap = {};
-  scans.forEach(s=>{
-    const c = s.sewadar_centre||'Unknown';
-    if(!centreMap[c]) centreMap[c]={centre:c, dates:{}, total_sewadars:new Set()};
-    if(!centreMap[c].dates[s.date]) centreMap[c].dates[s.date]={present:0,in:0,out:0};
-    centreMap[c].dates[s.date].in++;
-    centreMap[c].dates[s.date].out++;
-    if(s.type==='IN') centreMap[c].total_sewadars.add(s.badge_no);
-  });
-  const centreSummary = Object.values(centreMap).map(c=>{
-    c.total_sewadars = c.total_sewadars.size;
-    dates.forEach(dt=>{
-      if(!c.dates[dt]) c.dates[dt]={present:0,in:0,out:0};
-      c.dates[dt].present = new Set(scans.filter(s=>s.sewadar_centre===c.centre && s.date===dt && s.type==='IN').map(s=>s.badge_no)).size;
-    });
-    return c;
-  });
-  
-  // Duplicate flags (multiple IN on same day)
-  const duplicateFlags = [];
-  const badgeDayIn = {};
-  scans.filter(s=>s.type==='IN').forEach(s=>{
-    const key = s.badge_no+'|'+s.date;
-    if(!badgeDayIn[key]) badgeDayIn[key]=[];
-    badgeDayIn[key].push(s.time);
-  });
-  Object.entries(badgeDayIn).forEach(([key, times])=>{
-    if(times.length>1){
-      const [badge_no, date] = key.split('|');
-      const sewadar = scans.find(s=>s.badge_no===badge_no && s.date===date);
-      duplicateFlags.push({
-        badge_no,
-        sewadar_name: sewadar?.sewadar_name||'Unknown',
-        date,
-        in_count: times.length,
-        times: times.sort()
-      });
+      s.status = 'absent';
     }
   });
   
-  // Missing OUT (has IN but no OUT same day)
-  const missingOut = [];
-  const hasIn = new Set();
-  const hasOut = new Set();
-  scans.forEach(s=>{
-    const key = s.badge_no+'|'+s.date;
-    if(s.type==='IN'){
-      hasIn.add(key);
-    }else if(s.type==='OUT'){
-      hasOut.add(key);
-    }
-  });
-  hasIn.forEach(key=>{
-    if(!hasOut.has(key)){
-      const [badge_no, date] = key.split('|');
-      const scan = scans.find(s=>s.badge_no===badge_no && s.date===date && s.type==='IN');
-      if(scan){
-        missingOut.push({
-          badge_no,
-          sewadar_name: scan.sewadar_name,
-          centre: scan.sewadar_centre,
-          department: scan.department,
-          date,
-          in_time: scan.time
-        });
-      }
-    }
-  });
+  // Alert detection
+  const duplicateIN = [];
+  const missingOUT = [];
+  const reEntry = [];
   
-  // Re-entry flags (IN -> OUT -> IN)
-  const reEntryFlags = [];
-  scans.forEach(s=>{
-    if(s.type==='IN'){
-      const badge = s.badge_no;
-      const date = s.date;
-      const dayScans = scans.filter(sc=>sc.badge_no===badge && sc.date===date).sort((a,b)=>a.time.localeCompare(b.time));
-      for(let i=0;i<dayScans.length-2;i++){
-        if(dayScans[i].type==='IN' && dayScans[i+1].type==='OUT' && dayScans[i+2].type==='IN'){
-          reEntryFlags.push({
-            badge_no: badge,
-            sewadar_name: dayScans[i].sewadar_name,
-            date,
-            first_in: dayScans[i].time,
-            out_time: dayScans[i+1].time,
-            second_in: dayScans[i+2].time
-          });
-          break;
-        }
-      }
-    }
-  });
-  
-  // Multi scan flags
-  const multiScanFlags = [];
   const badgeDayScans = {};
-  scans.forEach(s=>{
-    const key = s.badge_no+'|'+s.date;
-    if(!badgeDayScans[key]) badgeDayScans[key]=[];
+  todayScans.forEach(s => {
+    const key = s.badge_no;
+    if (!badgeDayScans[key]) badgeDayScans[key] = [];
     badgeDayScans[key].push(s);
   });
-  Object.entries(badgeDayScans).forEach(([key, dayScans])=>{
-    const inCount = dayScans.filter(s=>s.type==='IN').length;
-    const outCount = dayScans.filter(s=>s.type==='OUT').length;
-    const [badge_no, date] = key.split('|');
-    const sewadar = dayScans[0];
-    if(inCount>1){
-      multiScanFlags.push({
-        badge_no, date, type: 'IN', count: inCount,
-        times: dayScans.filter(s=>s.type==='IN').map(s=>s.time).sort(),
-        sewadar_name: sewadar?.sewadar_name
+  
+  Object.entries(badgeDayScans).forEach(([badge, dayScans]) => {
+    const inScans = dayScans.filter(s => s.type === 'IN');
+    const outScans = dayScans.filter(s => s.type === 'OUT');
+    
+    // Duplicate IN
+    if (inScans.length > 1) {
+      const times = inScans.map(s => s.time).sort();
+      duplicateIN.push({
+        badge_no: badge,
+        name: inScans[0]?.sewadar_name || 'Unknown',
+        date: SELECTED_DATE,
+        times: times
       });
     }
-    if(outCount>1){
-      multiScanFlags.push({
-        badge_no, date, type: 'OUT', count: outCount,
-        times: dayScans.filter(s=>s.type==='OUT').map(s=>s.time).sort(),
-        sewadar_name: sewadar?.sewadar_name
+    
+    // Missing OUT (has IN but no OUT)
+    if (inScans.length > 0 && outScans.length === 0) {
+      missingOUT.push({
+        badge_no: badge,
+        name: inScans[0]?.sewadar_name || 'Unknown',
+        centre: inScans[0]?.sewadar_centre || 'Unknown',
+        dept: inScans[0]?.department || 'Unknown',
+        date: SELECTED_DATE,
+        in_time: inScans[0]?.time
       });
+    }
+    
+    // Re-entry: IN -> OUT -> IN
+    const sorted = dayScans.sort((a, b) => a.time.localeCompare(b.time));
+    for (let i = 0; i < sorted.length - 2; i++) {
+      if (sorted[i].type === 'IN' && sorted[i+1].type === 'OUT' && sorted[i+2].type === 'IN') {
+        reEntry.push({
+          badge_no: badge,
+          name: sorted[i]?.sewadar_name || 'Unknown',
+          date: SELECTED_DATE,
+          first_in: sorted[i].time,
+          out: sorted[i+1].time,
+          second_in: sorted[i+2].time
+        });
+        break;
+      }
     }
   });
   
-  // Department expected counts (unique sewadars per department from scans)
-  const deptExpected = {};
-  const deptBadges = {};
-  scans.forEach(s=>{
-    if(s.department && s.type==='IN'){
-      if(!deptBadges[s.department]) deptBadges[s.department] = new Set();
-      deptBadges[s.department].add(s.badge_no);
+  PROCESSED_DATA = {
+    scans: todayScans,
+    sewadars: Object.values(sewadarMap),
+    duplicateIN,
+    missingOUT,
+    reEntry,
+    totalPresent: Object.values(sewadarMap).filter(s => s.status === 'inside' || s.status === 'exited').length,
+    totalInside: Object.values(sewadarMap).filter(s => s.status === 'inside').length,
+    totalScans: todayScans.length,
+    maleCount: Object.values(sewadarMap).filter(s => s.gender === 'M').length,
+    femaleCount: Object.values(sewadarMap).filter(s => s.gender === 'F').length
+  };
+  
+  // Build dept/centre lists
+  const deptCounts = {};
+  const centreCounts = {};
+  Object.values(sewadarMap).forEach(s => {
+    if (s.status !== 'absent') {
+      deptCounts[s.department] = (deptCounts[s.department] || 0) + 1;
+      centreCounts[s.centre] = (centreCounts[s.centre] || 0) + 1;
     }
   });
-  Object.entries(deptBadges).forEach(([dept, badges])=>{
-    deptExpected[dept] = badges.size;
-  });
+  PROCESSED_DATA.deptCounts = Object.entries(deptCounts).sort((a, b) => b[1] - a[1]);
+  PROCESSED_DATA.centreCounts = Object.entries(centreCounts).sort((a, b) => b[1] - a[1]);
+}
+
+// ============ RENDER ============
+function render() {
+  if (!PROCESSED_DATA) return;
   
-  return {
-    ...d,
-    headcount_per_day: headcountPerDay,
-    gender_summary: genderSummary,
-    centre_summary: centreSummary,
-    duplicate_flags: duplicateFlags,
-    missing_out: missingOut,
-    re_entry_flags: reEntryFlags,
-    multi_scan_flags: multiScanFlags,
-    department_expected: deptExpected
-  };
-}
-
-// ── Render all ────────────────────────────────────────────────────────────────
-function render(d){
-  document.getElementById('last-updated').textContent='Updated: '+d.last_updated;
-  if(d.last_scan_at) document.getElementById('last-scan-tag').textContent='Last scan: '+fmtTime(d.last_scan_at.slice(11,16));
-
-  // Date filter buttons
-  const btnContainer = document.getElementById('date-btns');
-  btnContainer.innerHTML = (d.dates||[]).map(dt=>
-    `<button class="date-btn" onclick="setDateFilter('${dt}',this)">${fmtDate(dt)}</button>`
-  ).join('');
-
-  // Alert badges
-  const alertCount = (d.duplicate_flags||[]).length + (d.re_entry_flags||[]).length + (d.multi_scan_flags||[]).length + (d.missing_out||[]).length;
-  document.getElementById('alerts-badge').textContent = alertCount > 999 ? '999+' : alertCount;
-  const absentTotal = (d.absent_per_day||[]).reduce((a,b)=>a+b.absent_count,0);
-  document.getElementById('absent-badge').textContent = absentTotal > 999 ? '999+' : absentTotal;
-
-  // Populate filters
-  populateFilters(d);
-  populateReportFilters();
-
-  applyDateFilter();
-
-  // Alerts tab (not date-filtered)
-  renderAlerts(d);
-
-  // Live Ops tab
-  renderLiveOps(d);
+  renderKPIs();
+  renderStats();
+  renderAttendance();
+  renderAlerts();
+  populateReportDropdowns();
   
-  // Scanner Performance tab
-  renderScannerPerformance(d);
+  // Auto-refresh
+  setTimeout(loadData, 60000);
+}
+
+function renderKPIs() {
+  const p = PROCESSED_DATA;
+  const totalSewadars = p.sewadars.length;
+  const inside = p.totalInside;
+  const exited = totalSewadars - inside - Object.values(p.sewadars).filter(s => s.status === 'absent').length;
   
-  // Print Register
-  renderPrintRegister();
-
-  // Global search index
-  buildSearchIndex(d);
-}
-
-function renderOverview(d, dates){
-  const hpd = (d.headcount_per_day||[]).filter(h=>dates.includes(h.date));
-  const totalPresent = hpd.reduce((a,b)=>a+b.total_present,0);
-  const peak = hpd.reduce((a,b)=>a.total_present>b.total_present?a:b,{total_present:0,date:''});
-
-  document.getElementById('kpi-row').innerHTML=[
-    {cls:'blue',  label:'Total Sewadars',   val:d.total_sewadars,    sub:'scanned at least once'},
-    {cls:'green', label:'Registered',       val:d.total_registered||0, sub:'in Sewadar_Details.xlsx'},
-    {cls:'orange',label:'Total Scans',      val:hpd.reduce((a,b)=>a+b.total_in+b.total_out,0), sub:'IN + OUT'},
-    {cls:'purple',label:'Peak Day',         val:peak.total_present,  sub:fmtDate(peak.date)},
-    {cls:'red',   label:'Absent Today',     val:(d.absent_per_day||[]).find(a=>a.date===dates[dates.length-1])?.absent_count||0, sub:'not scanned yet'},
-    {cls:'teal',  label:'Missing OUT',      val:(d.missing_out||[]).filter(m=>dates.includes(m.date)).length, sub:'IN but no OUT'},
-  ].map(k=>`<div class="kpi ${k.cls}"><div class="kpi-label">${k.label}</div><div class="kpi-value">${k.val}</div><div class="kpi-sub">${k.sub}</div></div>`).join('');
-
-  if(d.dates&&d.dates.length)
-    document.getElementById('date-range-label').textContent=
-      fmtDate(d.dates[0])+(d.dates.length>1?' – '+fmtDate(d.dates[d.dates.length-1]):'');
-
-  // Gender
-  const gs = (d.gender_summary||[]).filter(g=>dates.includes(g.date));
-  const totalM = gs.reduce((a,b)=>a+b.male,0);
-  const totalF = gs.reduce((a,b)=>a+b.female,0);
-  const totalG = totalM+totalF||1;
-  document.getElementById('gender-row').innerHTML = gs.map(g=>{
-    const tot=g.male+g.female||1;
-    const malePct=Math.round(g.male/tot*100);
-    return`<div class="gender-card">
-      <div class="gender-label">${fmtDate(g.date)}</div>
-      <div class="gender-split">
-        <div><div class="gender-m">${g.male}</div><div class="gender-sub">Male ${malePct}%</div></div>
-        <div class="gender-divider">|</div>
-        <div><div class="gender-f">${g.female}</div><div class="gender-sub">Female ${100-malePct}%</div></div>
-      </div>
-      <div class="gender-bar-wrap"><div class="gender-bar-m" style="width:${malePct}%"></div></div>
-    </div>`;
-  }).join('');
-
-  // Bar chart
-  const maxH = Math.max(...hpd.map(h=>h.total_present),1);
-  document.getElementById('bar-chart').innerHTML = hpd.map(h=>`
-    <div class="bar-col">
-      <div class="bar-val">${h.total_present}</div>
-      <div class="bar-fill" style="height:${Math.max((h.total_present/maxH)*100,3)}%"
-           title="${fmtDate(h.date)}: ${h.total_present} present"></div>
-      <div class="bar-lbl">${fmtDate(h.date)}</div>
-    </div>`).join('');
-
-  // Dept
-  const allScans = d.scans||d.raw_log||[];
-  const scans = ACTIVE_DATE==='all' ? allScans : allScans.filter(s=>dates.includes(s.date));
-  const deptMap={};
-  scans.forEach(s=>{ if(s.department){if(!deptMap[s.department])deptMap[s.department]=new Set(); deptMap[s.department].add(s.badge_no);} });
-  document.getElementById('dept-grid').innerHTML=Object.entries(deptMap)
-    .sort((a,b)=>b[1].size-a[1].size)
-    .map(([dept,badges])=>`<div class="dept-card"><div class="dept-name">${dept}</div><div class="dept-count">${badges.size}</div></div>`)
-    .join('');
-}
-
-// ── Scan Table ────────────────────────────────────────────────────────────────
-function renderScanTable(rows, dates){
-  // cap rows for performance
-  const totalCount = rows.length;
-  if(totalCount > SCAN_TABLE_MAX_ROWS){
-    rows = rows.slice(-SCAN_TABLE_MAX_ROWS);
-    document.getElementById('scan-note').textContent = `Showing latest ${SCAN_TABLE_MAX_ROWS} of ${totalCount} records (use filters to reduce)`;
-    document.getElementById('scan-note').style.display = 'block';
-  } else {
-    document.getElementById('scan-note').style.display = 'none';
-  }
-  // Only flag EXTRA duplicate scans (skip first valid one), not all of them
-  const multiIn = DATA.multi_scan_flags?.filter(f=>f.type==='IN').flatMap(f=>f.times.slice(1).map(t=>({badge:f.badge_no,type:'IN',time:t,date:f.date})))||[];
-  const multiOut = DATA.multi_scan_flags?.filter(f=>f.type==='OUT').flatMap(f=>f.times.slice(1).map(t=>({badge:f.badge_no,type:'OUT',time:t,date:f.date})))||[];
-  // Only flag the SECOND IN time for re-entry, not the OUT (OUT is legitimate)
-  const reEntry = DATA.re_entry_flags?.map(f=>({badge:f.badge_no,time:f.second_in,date:f.date}))||[];
-  
-  const getHighlight = (s)=>{
-    const isMultiIn = multiIn.some(m=>m.badge===s.badge_no && m.date===s.date && m.time===s.time);
-    const isMultiOut = multiOut.some(m=>m.badge===s.badge_no && m.date===s.date && m.time===s.time);
-    const isReEntry = reEntry.some(m=>m.badge===s.badge_no && m.date===s.date && m.time===s.time);
-    if(isMultiIn) return 'multi-in';
-    if(isMultiOut) return 'multi-out';
-    if(isReEntry) return 're-entry';
-    return '';
-  };
-  
-  const getWarning = (s)=>{
-    const isMultiIn = multiIn.some(m=>m.badge===s.badge_no && m.date===s.date && m.time===s.time);
-    const isMultiOut = multiOut.some(m=>m.badge===s.badge_no && m.date===s.date && m.time===s.time);
-    const isReEntry = reEntry.some(m=>m.badge===s.badge_no && m.date===s.date && m.time===s.time);
-    // Count total issues for this badge/date, not just this specific row
-    const totalMultiIn = DATA.multi_scan_flags?.find(f=>f.badge_no===s.badge_no && f.date===s.date && f.type==='IN')?.count||0;
-    const totalMultiOut = DATA.multi_scan_flags?.find(f=>f.badge_no===s.badge_no && f.date===s.date && f.type==='OUT')?.count||0;
-    if(isMultiIn && totalMultiIn>1) return `<span class="scan-warning in">+${totalMultiIn-1} extra IN</span>`;
-    if(isMultiOut && totalMultiOut>1) return `<span class="scan-warning out">+${totalMultiOut-1} extra OUT</span>`;
-    if(isReEntry) return `<span class="scan-warning re">↩️ RE-ENTRY</span>`;
-    return '';
-  };
-  
-  const fragment = document.createDocumentFragment();
-  rows.forEach((s,i)=>{
-    const tr = document.createElement('tr');
-    const hl = getHighlight(s);
-    const warning = getWarning(s);
-    const isUnknown = !s.sewadar_name || s.sewadar_name==='Unknown';
-    const rowClass = hl + (isUnknown?' unknown-row':'');
-    const rowId = `${s.badge_no}-${s.date}-${s.time}`;
-    tr.className = rowClass;
-    tr.dataset.id = rowId;
-    tr.dataset.search = [s.badge_no,s.sewadar_name,s.sewadar_centre,s.department,s.scanned_by_name].join(' ').toLowerCase();
-    tr.dataset.type = s.type||'';
-    tr.dataset.dept = s.department||'';
-    tr.innerHTML = `<td class="checkbox-cell"><input type="checkbox" class="row-checkbox" data-id="${rowId}" onchange="toggleRowSelection(this,'${rowId}')"></td>
-      <td class="sno">${i+1}</td>
-      <td>${s.badge_no?`<span class="badge-tag">${s.badge_no}</span><button class="copy-btn" onclick="copyToClipboard('${s.badge_no}',this)">📋</button>`:'—'}${isUnknown?'<span class="unknown-tag">UNKNOWN</span>':''}</td>
-      <td><div class="name-primary">${s.sewadar_name||'Unknown'}${warning}</div><div class="name-sub">${s.satsang_point||''}</div></td>
-      <td>${s.sewadar_centre?`<span class="centre-tag">${s.sewadar_centre}</span>`:'—'}</td>
-      <td>${s.department?`<span class="dept-tag">${s.department}</span>`:'—'}</td>
-      <td><span class="${s.type==='IN'?'type-in':'type-out'}">${s.type||'—'}</span></td>
-      <td style="color:#374151">${s.date||'—'}</td>
-      <td style="font-weight:600;color:${s.type==='IN'?'#15803d':'#dc2626'}">${fmtTime(s.time)||'—'}</td>
-      <td><span class="badge-tag">${s.scanned_by_badge||'—'}</span></td>
-      <td><div class="name-primary">${s.scanned_by_name||'—'}</div></td>
-      <td>${s.scanned_by_centre?`<span class="centre-tag">${s.scanned_by_centre}</span>`:'—'}</td>`;
-    fragment.appendChild(tr);
-  });
-  const scanBody = document.getElementById('scan-body');
-  scanBody.innerHTML = '';
-  scanBody.appendChild(fragment);
-  document.getElementById('scan-count').textContent=rows.length+' records';
-}
-
-function filterScans(){
-  const q=document.getElementById('scan-search').value.toLowerCase();
-  const type=document.getElementById('scan-type-filter').value;
-  const dept=document.getElementById('scan-dept-filter').value;
-  let vis=0;
-  document.querySelectorAll('#scan-body tr').forEach(row=>{
-    const ok=(!q||row.dataset.search.includes(q))&&(!type||row.dataset.type===type)&&(!dept||row.dataset.dept===dept);
-    row.style.display=ok?'':'none';
-    if(ok)vis++;
-  });
-  document.getElementById('scan-count').textContent=vis+' records';
-}
-const debouncedFilterScans = debounce(filterScans, 150);
-
-// ── Attendance ────────────────────────────────────────────────────────────────
-function renderAttendanceTable(rows, dates){
-  document.getElementById('att-head').innerHTML=`<tr>
-    <th>#</th><th>Badge No.</th><th>Name</th><th>Centre</th><th>Dept</th><th>Gender</th>
-    ${dates.map(dt=>`<th style="text-align:center;min-width:88px">${fmtDate(dt)}</th>`).join('')}
-  </tr>`;
-  document.getElementById('att-body').innerHTML=rows.map((s,i)=>`
-    <tr data-name="${(s.sewadar_name||'').toLowerCase()}" data-badge="${(s.badge_no||'').toLowerCase()}"
-        data-centre="${(s.sewadar_centre||'').toLowerCase()}" data-dept="${(s.department||'').toLowerCase()}"
-        data-gender="${(s.gender||'').toLowerCase()}">
-      <td class="sno">${i+1}</td>
-      <td><span class="badge-tag">${s.badge_no||'—'}</span></td>
-      <td><div class="name-primary">${s.sewadar_name||'Unknown'}</div><div class="name-sub">${s.satsang_point||''}</div></td>
-      <td>${s.sewadar_centre?`<span class="centre-tag">${s.sewadar_centre}</span>`:'—'}</td>
-      <td>${s.department?`<span class="dept-tag">${s.department}</span>`:'—'}</td>
-      <td style="text-align:center;font-weight:600;color:${s.gender==='M'?'#2563a8':'#db2777'}">${s.gender||'—'}</td>
-      ${dates.map(dt=>{
-        const info=s[dt];
-        if(!info||info.status==='ABSENT')return`<td style="text-align:center"><span class="absent-cell">ABSENT</span></td>`;
-        if(info.status==='INVALID')return`<td style="text-align:center"><span style="background:#fee2e2;color:#dc2626;border-radius:4px;padding:3px 6px;font-size:10px;font-weight:700">⚠️ INVALID</span></td>`;
-        return`<td style="text-align:center"><span class="present-cell">↓${fmtTime(info.first_in)||'—'}<br>↑${fmtTime(info.last_out)||'—'}</span></td>`;
-      }).join('')}
-    </tr>`).join('');
-  document.getElementById('att-count').textContent=rows.length+' sewadars';
-}
-
-function filterAttendance(){
-  const q=document.getElementById('att-search').value.toLowerCase();
-  const centre=document.getElementById('att-centre-filter').value.toLowerCase();
-  const dept=document.getElementById('att-dept-filter').value.toLowerCase();
-  const gender=document.getElementById('att-gender-filter').value.toLowerCase();
-  let vis=0;
-  document.querySelectorAll('#att-body tr').forEach(row=>{
-    const ok=(!q||(row.dataset.name+row.dataset.badge).includes(q))
-          &&(!centre||row.dataset.centre===centre)
-          &&(!dept||row.dataset.dept===dept)
-          &&(!gender||row.dataset.gender===gender);
-    row.style.display=ok?'':'none';
-    if(ok)vis++;
-  });
-  document.getElementById('att-count').textContent=vis+' sewadars';
-}
-const debouncedFilterAttendance = debounce(filterAttendance, 150);
-
-// ── Centre Cards ──────────────────────────────────────────────────────────────
-function renderCentreCards(centres, dates){
-  const maxP=Math.max(...centres.map(c=>Math.max(...dates.map(d=>c.dates[d]?.present||0))),1);
-  document.getElementById('centre-count').textContent=centres.length+' centres';
-  document.getElementById('centre-cards').innerHTML=centres.map(c=>{
-    const totalPresent = dates.reduce((a,dt)=>a+(c.dates[dt]?.present||0),0);
-    const pct = c.expected ? Math.round((c.total_sewadars/c.expected)*100) : 0;
-    return`<div class="centre-card" data-name="${c.centre.toLowerCase()}">
-      <div class="centre-card-head">
-        <div class="centre-card-title">${c.centre}</div>
-        <div class="centre-card-meta">${c.total_sewadars} scanned ${c.expected?`/ ${c.expected} expected (${pct}%)`:''}}</div>
-        ${c.expected?`<div class="expected-bar"><div class="expected-fill" style="width:${Math.min(pct,100)}%"></div></div>`:''}
-      </div>
-      ${dates.map(dt=>{
-        const info=c.dates[dt]||{present:0,in:0,out:0};
-        const barW=Math.round((info.present/maxP)*100);
-        return`<div class="centre-date-row">
-          <div class="cdr-date">${fmtDate(dt)}</div>
-          <div class="cdr-bar-wrap"><div class="cdr-bar" style="width:${barW}%"></div></div>
-          <div class="cdr-present">${info.present} <span style="font-size:10px;color:#6b7280;font-weight:400">(↓${info.in_count||0} ↑${info.out_count||0})</span></div>
-        </div>`;
-      }).join('')}
-    </div>`;
-  }).join('');
-}
-
-function filterCentres(){
-  const q=document.getElementById('centre-search').value.toLowerCase();
-  let vis=0;
-  document.querySelectorAll('.centre-card').forEach(c=>{
-    const ok=!q||c.dataset.name.includes(q);
-    c.style.display=ok?'':'none';
-    if(ok)vis++;
-  });
-  document.getElementById('centre-count').textContent=vis+' centres';
-}
-const debouncedFilterCentres = debounce(filterCentres, 150);
-
-// ── Absent ────────────────────────────────────────────────────────────────────
-function renderAbsent(absentPerDay, dates){
-  const filtered = absentPerDay.filter(a=>dates.includes(a.date));
-  const content  = document.getElementById('absent-content');
-  if(!filtered.length){ content.innerHTML='<p style="color:#6b7280;padding:20px">No data yet.</p>'; return; }
-
-  const groupBy = document.getElementById('absent-group-filter')?.value || 'date';
-  
-  const allAbsent = filtered.flatMap(a=>a.absent||[]);
-  const centres = [...new Set(allAbsent.map(a=>a.centre).filter(Boolean))].sort();
-  const depts   = [...new Set(allAbsent.map(a=>a.department).filter(Boolean))].sort();
-  const acf=document.getElementById('absent-centre-filter');
-  while(acf.options.length>1)acf.remove(1);
-  centres.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;acf.appendChild(o);});
-  const adf=document.getElementById('absent-dept-filter');
-  while(adf.options.length>1)adf.remove(1);
-  depts.forEach(d=>{const o=document.createElement('option');o.value=d;o.textContent=d;adf.appendChild(o);});
-
-  let html = '';
-  const centreFilter = document.getElementById('absent-centre-filter')?.value?.toLowerCase() || '';
-  const deptFilter = document.getElementById('absent-dept-filter')?.value?.toLowerCase() || '';
-  
-  if(groupBy === 'date'){
-    html = filtered.map(day=>{
-      const dayAbsent = (day.absent||[]).filter(a=>(!centreFilter||(a.centre||'').toLowerCase()===centreFilter)&&(!deptFilter||(a.department||'').toLowerCase()===deptFilter));
-      if(!dayAbsent.length)return'';
-      return `<div class="absent-date-section">
-        <div class="absent-date-head">
-          <div class="absent-date-title">❌ ${fmtDate(day.date)}</div>
-          <div class="absent-date-count">${dayAbsent.length} absent out of ${(DATA.total_registered||0)}</div>
-        </div>
-        <div class="tbl-wrap" style="border-radius:0 0 8px 8px;max-height:300px">
-          <table>
-            <thead><tr><th>#</th><th>Badge No.</th><th>Name</th><th>Centre</th><th>Department</th><th>Gender</th></tr></thead>
-            <tbody>${dayAbsent.map((s,i)=>`
-              <tr class="absent-row" data-name="${(s.name||'').toLowerCase()}" data-centre="${(s.centre||'').toLowerCase()}" data-dept="${(s.department||'').toLowerCase()}">
-                <td class="sno">${i+1}</td>
-                <td><span class="badge-tag">${s.badge_no||'—'}</span></td>
-                <td><div class="name-primary">${s.name||'Unknown'}</div></td>
-                <td>${s.centre?`<span class="centre-tag">${s.centre}</span>`:'—'}</td>
-                <td>${s.department?`<span class="dept-tag">${s.department}</span>`:'—'}</td>
-                <td style="font-weight:600;color:${s.gender==='M'?'#2563a8':'#db2777'}">${s.gender||'—'}</td>
-              </tr>`).join('')}
-            </tbody>
-          </table>
-        </div>
-      </div>`;
-    }).join('');
-  }else if(groupBy === 'centre'){
-    const centreGroups = {};
-    filtered.forEach(day=>{
-      (day.absent||[]).forEach(a=>{
-        const c = a.centre||'Unknown';
-        if(!centreGroups[c])centreGroups[c]=[];
-        centreGroups[c].push({...a,date:day.date});
-      });
-    });
-    Object.entries(centreGroups).sort((a,b)=>b[1].length-a[1].length).forEach(([centre,rows])=>{
-      const filteredRows = rows.filter(a=>(!deptFilter||(a.department||'').toLowerCase()===deptFilter));
-      if(!filteredRows.length)return;
-      html+=`<div class="absent-group-card">
-        <div class="absent-group-head">
-          <span class="absent-group-title">🏢 ${centre}</span>
-          <span class="absent-group-count">${filteredRows.length} absent</span>
-        </div>
-        <table class="missing-dept-table"><thead><tr><th>#</th><th>Badge</th><th>Name</th><th>Department</th><th>Date</th></tr></thead>
-        <tbody>${filteredRows.map((s,i)=>`<tr class="absent-row" data-name="${(s.name||'').toLowerCase()}" data-centre="${(s.centre||'').toLowerCase()}" data-dept="${(s.department||'').toLowerCase()}"><td>${i+1}</td><td><span class="badge-tag">${s.badge_no||'—'}</span></td><td>${s.name||'Unknown'}</td><td>${s.department||'—'}</td><td>${s.date||'—'}</td></tr>`).join('')}</tbody></table>
-      </div>`;
-    });
-  }else if(groupBy === 'dept'){
-    const deptGroups = {};
-    filtered.forEach(day=>{
-      (day.absent||[]).forEach(a=>{
-        const dpt = a.department||'Unknown';
-        if(!deptGroups[dpt])deptGroups[dpt]=[];
-        deptGroups[dpt].push({...a,date:day.date});
-      });
-    });
-    Object.entries(deptGroups).sort((a,b)=>b[1].length-a[1].length).forEach(([dept,rows])=>{
-      const filteredRows = rows.filter(a=>(!centreFilter||(a.centre||'').toLowerCase()===centreFilter));
-      if(!filteredRows.length)return;
-      html+=`<div class="absent-group-card">
-        <div class="absent-group-head">
-          <span class="absent-group-title">📋 ${dept}</span>
-          <span class="absent-group-count">${filteredRows.length} absent</span>
-        </div>
-        <table class="missing-dept-table"><thead><tr><th>#</th><th>Badge</th><th>Name</th><th>Centre</th><th>Date</th></tr></thead>
-        <tbody>${filteredRows.map((s,i)=>`<tr class="absent-row" data-name="${(s.name||'').toLowerCase()}" data-centre="${(s.centre||'').toLowerCase()}" data-dept="${(s.department||'').toLowerCase()}"><td>${i+1}</td><td><span class="badge-tag">${s.badge_no||'—'}</span></td><td>${s.name||'Unknown'}</td><td>${s.centre||'—'}</td><td>${s.date||'—'}</td></tr>`).join('')}</tbody></table>
-      </div>`;
-    });
-  }
-
-  content.innerHTML = html || '<p style="color:#6b7280;padding:20px">No data matches the filter.</p>';
-
-  const total = filtered.reduce((a,b)=>a+b.absent_count,0);
-  document.getElementById('absent-count').textContent=total+' absent';
-}
-
-function filterAbsent(){
-  const q=document.getElementById('absent-search').value.toLowerCase();
-  const centre=document.getElementById('absent-centre-filter').value.toLowerCase();
-  const dept=document.getElementById('absent-dept-filter').value.toLowerCase();
-  let vis=0;
-  document.querySelectorAll('.absent-row').forEach(row=>{
-    const ok=(!q||row.dataset.name.includes(q))&&(!centre||row.dataset.centre===centre)&&(!dept||row.dataset.dept===dept);
-    row.style.display=ok?'':'none';
-    if(ok)vis++;
-  });
-  document.getElementById('absent-count').textContent=vis+' absent';
-}
-const debouncedFilterAbsent = debounce(filterAbsent, 150);
-
-// ── Alerts ────────────────────────────────────────────────────────────────────
-function renderAlerts(d){
-  const dups = d.duplicate_flags||[];
-  const reEntry = d.re_entry_flags||[];
-  const multiScan = d.multi_scan_flags||[];
-  const missing = d.missing_out||[];
-  const unknown = d.unknown_scans||[];
-  const totalAlerts = dups.length+reEntry.length+multiScan.length+missing.length;
-  document.getElementById('alerts-badge').textContent = totalAlerts > 999 ? '999+' : totalAlerts;
-
-  document.getElementById('alert-summary-bar').innerHTML = `
-    <div class="alert-summary-item">
-      <div class="alert-summary-icon red">⚠️</div>
-      <div class="alert-summary-content">
-        <div class="alert-summary-label">Duplicate IN</div>
-        <div class="alert-summary-value">${dups.length}</div>
-      </div>
+  document.getElementById('kpi-grid').innerHTML = `
+    <div class="kpi-card">
+      <div class="kpi-label">Present Today</div>
+      <div class="kpi-value blue">${p.totalPresent}</div>
+      <div class="kpi-sub">of ${totalSewadars} registered</div>
     </div>
-    <div class="alert-summary-item">
-      <div class="alert-summary-icon amber">↩️</div>
-      <div class="alert-summary-content">
-        <div class="alert-summary-label">Re-Entry</div>
-        <div class="alert-summary-value">${reEntry.length}</div>
-      </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Currently Inside</div>
+      <div class="kpi-value green">${inside}</div>
+      <div class="kpi-sub">sewadars inside premises</div>
     </div>
-    <div class="alert-summary-item">
-      <div class="alert-summary-icon blue">📊</div>
-      <div class="alert-summary-content">
-        <div class="alert-summary-label">Multi-Scan</div>
-        <div class="alert-summary-value">${multiScan.length}</div>
-      </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Total Scans</div>
+      <div class="kpi-value purple">${p.totalScans}</div>
+      <div class="kpi-sub">IN + OUT scans today</div>
     </div>
-    <div class="alert-summary-item">
-      <div class="alert-summary-icon orange">🚪</div>
-      <div class="alert-summary-content">
-        <div class="alert-summary-label">Missing OUT</div>
-        <div class="alert-summary-value">${missing.length}</div>
+    <div class="kpi-card">
+      <div class="kpi-label">Gender Split</div>
+      <div class="kpi-value" style="font-size:20px">
+        <span style="color:#2563a8">👨 ${p.maleCount}</span>
+        <span style="margin:0 8px">|</span>
+        <span style="color:#db2777">👩 ${p.femaleCount}</span>
       </div>
+      <div class="kpi-sub">Male | Female</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Missing OUT</div>
+      <div class="kpi-value orange">${p.missingOUT.length}</div>
+      <div class="kpi-sub">IN but no OUT recorded</div>
     </div>
   `;
-
-  document.getElementById('dup-grid').innerHTML = dups.length ? dups.map(f=>`
-    <div class="alert-card">
-      <div class="alert-head red">
-        <span>Duplicate IN</span>
-        <span>${f.in_count}x</span>
-      </div>
-      <div class="alert-body">
-        <div style="font-weight:600;color:#1a1a2e;margin-bottom:4px">${f.sewadar_name}</div>
-        <span class="badge-tag">${f.badge_no}</span>
-        <div style="margin-top:6px;color:#6b7280;font-size:10px">${fmtDate(f.date)} • ${f.times.map(t=>fmtTime(t)).join(', ')}</div>
-      </div>
-    </div>`).join('')
-  : '<p style="color:#16a34a;font-size:12px;padding:8px 12px;background:#dcfce7;border-radius:6px">✓ No duplicate scans detected</p>';
-
-  document.getElementById('reentry-grid').innerHTML = reEntry.length ? reEntry.map(f=>`
-    <div class="alert-card">
-      <div class="alert-head amber">
-        <span>Re-Entry</span>
-        <span>IN→OUT→IN</span>
-      </div>
-      <div class="alert-body">
-        <div style="font-weight:600;color:#1a1a2e;margin-bottom:4px">${f.sewadar_name}</div>
-        <span class="badge-tag">${f.badge_no}</span>
-        <div style="margin-top:6px;color:#6b7280;font-size:10px">${fmtDate(f.date)}<br>↓ ${fmtTime(f.first_in)} → ↑ ${fmtTime(f.out_time)} → ↓ ${fmtTime(f.second_in)}</div>
-      </div>
-    </div>`).join('')
-  : '<p style="color:#16a34a;font-size:12px;padding:8px 12px;background:#dcfce7;border-radius:6px">✓ No re-entry alerts</p>';
-
-  document.getElementById('multiscan-grid').innerHTML = multiScan.length ? multiScan.map(f=>`
-    <div class="alert-card">
-      <div class="alert-head ${f.type==='IN'?'blue':'orange'}">
-        <span>${f.type==='IN'?'Multiple IN':'Multiple OUT'}</span>
-        <span>${f.count}x ${f.type}</span>
-      </div>
-      <div class="alert-body">
-        <div style="font-weight:600;color:#1a1a2e;margin-bottom:4px">${f.sewadar_name||'Unknown'}</div>
-        <span class="badge-tag">${f.badge_no}</span>
-        <div style="margin-top:6px;color:#6b7280;font-size:10px">${fmtDate(f.date)} • ${f.times.map(t=>fmtTime(t)).join(', ')}</div>
-      </div>
-    </div>`).join('')
-  : '<p style="color:#16a34a;font-size:12px;padding:8px 12px;background:#dcfce7;border-radius:6px">✓ No multi-scan alerts</p>';
-
-  const missingDepts=[...new Set(missing.map(m=>m.department).filter(Boolean))].sort();
-  const mdf=document.getElementById('missing-dept-filter');
-  while(mdf.options.length>1)mdf.remove(1);
-  missingDepts.forEach(dept=>{const o=document.createElement('option');o.value=dept;o.textContent=dept;mdf.appendChild(o);});
-
-  document.getElementById('missing-body').innerHTML=missing.map((m,i)=>`
-    <tr class="missing-row" data-name="${(m.sewadar_name||'').toLowerCase()}" data-dept="${(m.department||'').toLowerCase()}" style="${m.is_orphaned?'background:#fee2e2;border-left:3px solid #dc2626':''}">
-      <td class="sno">${i+1}</td>
-      <td><span class="badge-tag">${m.badge_no||'—'}</span></td>
-      <td><div class="name-primary">${m.sewadar_name||'Unknown'}${m.is_orphaned?'<span style="font-size:9px;background:#dc2626;color:white;padding:2px 6px;border-radius:3px;margin-left:6px">OUT ONLY</span>':''}</div></td>
-      <td>${m.centre?`<span class="centre-tag">${m.centre}</span>`:'—'}</td>
-      <td>${m.department?`<span class="dept-tag">${m.department}</span>`:'—'}</td>
-      <td>${m.date||'—'}</td>
-      <td style="font-weight:600;${m.is_orphaned?'color:#dc2626':'color:#15803d'}">${m.is_orphaned ? 'NO IN ⚠️' : (fmtTime(m.in_time)||'—')}</td>
-    </tr>`).join('');
-  document.getElementById('missing-count').textContent=missing.length+' records';
 }
 
-function renderLiveOps(d){
-  const scans = d.scans||d.raw_log||[];
-  const today = d.dates[d.dates.length-1];
-  const todayScans = scans.filter(s=>s.date===today);
+function renderStats() {
+  const deptList = document.getElementById('dept-list');
+  const centreList = document.getElementById('centre-list');
   
-  const scannerStats={};
-  todayScans.forEach(s=>{
-    const sb=s.scanned_by_badge;
-    if(!scannerStats[sb])scannerStats[sb]={name:s.scanned_by_name,centre:s.scanned_by_centre,scans:0,last:''};
-    scannerStats[sb].scans++;
-    if(!scannerStats[sb].last||s.time>scannerStats[sb].last)scannerStats[sb].last=s.time;
-  });
+  deptList.innerHTML = PROCESSED_DATA.deptCounts.slice(0, 10).map(([name, count]) => `
+    <div class="stat-item">
+      <span class="stat-name">${name}</span>
+      <span class="stat-count">${count}</span>
+    </div>
+  `).join('');
   
-  const activeScanners = Object.values(scannerStats).filter(s=>{
-    if(!s.last)return false;
-    const lastTime = new Date(`${today}T${s.last}`);
-    const now = new Date();
-    return (now-lastTime)<30*60*1000;
-  });
-  
-  const hour = new Date().getHours();
-  const hourlyScans = todayScans.filter(s=>{
-    const scanHour = parseInt(s.time.split(':')[0]);
-    return scanHour===hour;
-  }).length;
-  
-  const presentToday = (d.headcount_per_day||[]).find(h=>h.date===today)?.total_present||0;
-  
-  document.getElementById('live-active-scanners').textContent = activeScanners.length;
-  document.getElementById('live-total-scans').textContent = todayScans.length;
-  document.getElementById('live-hourly-scans').textContent = hourlyScans;
-  document.getElementById('live-present').textContent = presentToday;
-  
-  const cardsHtml = Object.entries(scannerStats).map(([badge,s])=>{
-    const isActive = s.last && (new Date()-new Date(`${today}T${s.last}`))<30*60*1000;
-    return `<div class="scanner-card ${isActive?'':'scanner-inactive'}">
-      <div class="scanner-name">${s.name||badge}</div>
-      <div class="scanner-stats">${s.scans} scans</div>
-      <div class="scanner-last">${s.last?fmtTime(s.last):'No scans'}</div>
-    </div>`;
-  }).join('');
-  document.getElementById('scanner-cards').innerHTML = cardsHtml || '<span style="opacity:0.6;font-size:11px">No scanner activity</span>';
-  
-  renderHourlyChart(d);
-  renderDeptExpectedVsPresent(d);
-  renderCentreTimeline(d);
-}
-
-function renderHourlyChart(d){
-  const today = d.dates[d.dates.length-1];
-  const scans = (d.scans||d.raw_log||[]).filter(s=>s.date===today);
-  const hourly = Array(24).fill(0);
-  scans.forEach(s=>{
-    const h = parseInt(s.time.split(':')[0]);
-    if(h>=0&&h<24)hourly[h]++;
-  });
-  const maxH = Math.max(...hourly,1);
-  document.getElementById('hourly-chart').innerHTML = hourly.map((c,h)=>`
-    <div class="hourly-bar">
-      <div class="hourly-val">${c}</div>
-      <div class="hourly-fill" style="height:${(c/maxH)*100}%"></div>
-      <div class="hourly-lbl">${h}:00</div>
-    </div>`).join('');
-  
-  renderHeatmap(d);
-}
-
-function renderHeatmap(d){
-  const scans = d.scans||d.raw_log||[];
-  const dates = d.dates||[];
-  const hourlyByDate = {};
-  
-  dates.forEach(dt => hourlyByDate[dt] = Array(24).fill(0));
-  
-  scans.forEach(s=>{
-    if(hourlyByDate[s.date]){
-      const h = parseInt(s.time.split(':')[0]);
-      if(h>=0&&h<24) hourlyByDate[s.date][h]++;
-    }
-  });
-  
-  const hourlyTotals = Array(24).fill(0);
-  Object.values(hourlyByDate).forEach(hourly => {
-    hourly.forEach((c, h) => hourlyTotals[h] += c);
-  });
-  
-  const maxVal = Math.max(...hourlyTotals, 1);
-  const getColorClass = (val) => {
-    const ratio = val / maxVal;
-    if(ratio === 0) return 'h-0';
-    if(ratio < 0.1) return 'h-1';
-    if(ratio < 0.2) return 'h-2';
-    if(ratio < 0.3) return 'h-3';
-    if(ratio < 0.4) return 'h-4';
-    if(ratio < 0.5) return 'h-5';
-    if(ratio < 0.6) return 'h-6';
-    if(ratio < 0.7) return 'h-10';
-    if(ratio < 0.8) return 'h-15';
-    if(ratio < 0.9) return 'h-20';
-    return 'h-23';
-  };
-  
-  document.getElementById('heatmap-grid').innerHTML = hourlyTotals.map((c, h) => `
-    <div class="heatmap-cell ${getColorClass(c)}" title="${h}:00 - ${c} scans">
-      <span class="heatmap-tooltip">${h}:00 - ${c} scans</span>
+  centreList.innerHTML = PROCESSED_DATA.centreCounts.slice(0, 10).map(([name, count]) => `
+    <div class="stat-item">
+      <span class="stat-name">${name}</span>
+      <span class="stat-count">${count}</span>
     </div>
   `).join('');
 }
 
-function renderDeptExpectedVsPresent(d){
-  const today = d.dates[d.dates.length-1];
-  const deptExpected = d.department_expected||{};
-  const deptPresent = {};
-  (d.scans||d.raw_log||[]).filter(s=>s.date===today&&s.type==='IN').forEach(s=>{
-    if(!deptPresent[s.department])deptPresent[s.department]=new Set();
-    deptPresent[s.department].add(s.badge_no);
+function renderAttendance() {
+  const tbody = document.getElementById('att-body');
+  const search = document.getElementById('att-search').value.toLowerCase();
+  const centreFilter = document.getElementById('att-centre').value;
+  const deptFilter = document.getElementById('att-dept').value;
+  const statusFilter = document.getElementById('att-status').value;
+  
+  let filtered = PROCESSED_DATA.sewadars.filter(s => {
+    const matchSearch = !search || 
+      s.name.toLowerCase().includes(search) || 
+      s.badge_no.toLowerCase().includes(search);
+    const matchCentre = !centreFilter || s.centre === centreFilter;
+    const matchDept = !deptFilter || s.department === deptFilter;
+    const matchStatus = !statusFilter || s.status === statusFilter;
+    return matchSearch && matchCentre && matchDept && matchStatus;
   });
   
-  const depts = Object.keys(deptExpected);
-  const maxExp = Math.max(...Object.values(deptExpected),1);
-  
-  document.getElementById('dept-exp-chart').innerHTML = depts.length ? depts.map(dept=>{
-    const exp = deptExpected[dept]||0;
-    const pres = deptPresent[dept]?.size||0;
-    const pct = exp ? Math.round((pres/exp)*100) : 0;
-    const fillClass = pct<50?'low':pct<80?'mid':'';
-    return `<div class="dept-exp-row">
-      <div class="dept-exp-name">${dept}</div>
-      <div class="dept-exp-bar"><div class="dept-exp-fill ${fillClass}" style="width:${Math.min(pct,100)}%"></div></div>
-      <div class="dept-exp-pct">${pct}%</div>
-      <div class="dept-exp-nums">${pres} / ${exp}</div>
-    </div>`;
-  }).join('') : '<p style="color:#6b7280;padding:10px">No expected headcount data available</p>';
-}
-
-function renderCentreTimeline(d){
-  const today = d.dates[d.dates.length-1];
-  const scans = (d.scans||d.raw_log||[]).filter(s=>s.date===today);
-  const centreFirstScan = {};
-  scans.forEach(s=>{
-    if(!centreFirstScan[s.sewadar_centre] || s.time<centreFirstScan[s.sewadar_centre]){
-      centreFirstScan[s.sewadar_centre] = s.time;
-    }
-  });
-  
-  const centres = Object.keys(centreFirstScan).sort();
-  const maxTime = 12;
-  
-  document.getElementById('centre-timeline').innerHTML = centres.length ? `<div class="centre-timeline">${centres.map(c=>{
-    const first = centreFirstScan[c];
-    const hour = parseInt(first.split(':')[0]);
-    const pos = Math.min((hour/12)*100,100);
-    return `<div class="timeline-row">
-      <div class="timeline-centre">${c}</div>
-      <div class="timeline-bars"><div class="timeline-bar" style="width:${pos}%"><span class="tooltip">First scan: ${fmtTime(first)}</span></div></div>
-      <div class="timeline-time">${fmtTime(first)}</div>
-    </div>`;
-  }).join('')}</div>` : '<p style="color:#6b7280;padding:10px">No centre timeline data</p>';
-}
-
-function renderScannerPerformance(d){
-  const scans = d.scans||d.raw_log||[];
-  const scannerStats={};
-  
-  scans.forEach(s=>{
-    const sb = s.scanned_by_badge;
-    if(!sb)return;
-    if(!scannerStats[sb]){
-      scannerStats[sb]={name:s.scanned_by_name,centre:s.scanned_by_centre,scans:[],last:''};
-    }
-    scannerStats[sb].scans.push(s);
-    if(!scannerStats[sb].last || s.time>scannerStats[sb].last)scannerStats[sb].last=s.time;
-  });
-  
-  const list = Object.entries(scannerStats).map(([badge,s])=>{
-    const uniqueSewadars = new Set(s.scans.map(sc=>sc.badge_no)).size;
-    const times = s.scans.map(sc=>sc.time).sort();
-    let avgGap = 0;
-    if(times.length>1){
-      const gaps = [];
-      for(let i=1;i<times.length;i++){
-        const t1 = new Date(`2000-01-01T${times[i-1]}`);
-        const t2 = new Date(`2000-01-01T${times[i]}`);
-        gaps.push((t2-t1)/60000);
-      }
-      avgGap = Math.round(gaps.reduce((a,b)=>a+b,0)/gaps.length);
-    }
-    const isSlow = avgGap>10;
-    
-    return {badge,name:s.name,centre:s.centre,totalScans:s.scans.length,uniqueSewadars,avgGap,last:s.last,isSlow};
-  }).sort((a,b)=>b.totalScans-a.totalScans);
-  
-  document.getElementById('scanner-count').textContent = list.length+' scanners';
-  document.getElementById('scanner-badge').textContent = list.length;
-  
-  document.getElementById('scanner-perf-grid').innerHTML = list.map(s=>`
-    <div class="scanner-perf-card" data-centre="${(s.centre||'').toLowerCase()}">
-      <div class="scanner-perf-header">
-        <div class="scanner-perf-name">${s.name||s.badge}</div>
-        <div class="scanner-perf-badge">${s.badge}</div>
-      </div>
-      <div class="scanner-perf-stats">
-        <div class="scanner-perf-stat">
-          <div class="scanner-perf-stat-label">Total Scans</div>
-          <div class="scanner-perf-stat-val">${s.totalScans}</div>
-        </div>
-        <div class="scanner-perf-stat">
-          <div class="scanner-perf-stat-label">Unique Sewadars</div>
-          <div class="scanner-perf-stat-val">${s.uniqueSewadars}</div>
-        </div>
-      </div>
-      <div class="scanner-perf-last">
-        Avg gap: <span class="${s.isSlow?'scanner-perf-slow':'scanner-perf-active'}">${s.avgGap||0} min</span> • Last: ${s.last?fmtTime(s.last):'—'}
-      </div>
-    </div>
+  tbody.innerHTML = filtered.map((s, i) => `
+    <tr data-status="${s.status}" data-centre="${s.centre}" data-dept="${s.department}">
+      <td class="sno">${i + 1}</td>
+      <td><span class="badge">${s.badge_no}</span></td>
+      <td style="font-weight:500">${s.name}</td>
+      <td>${s.centre}</td>
+      <td>${s.department}</td>
+      <td style="font-weight:600;color:#15803d">${s.in_time ? formatTime(s.in_time) : '-'}</td>
+      <td style="font-weight:600;color:#dc2626">${s.out_time ? formatTime(s.out_time) : '-'}</td>
+      <td>
+        ${s.status === 'inside' ? '<span class="status-inside">INSIDE</span>' : ''}
+        ${s.status === 'exited' ? '<span class="status-exited">EXITED</span>' : ''}
+        ${s.status === 'absent' ? '<span class="status-absent">NOT ARRIVED</span>' : ''}
+      </td>
+    </tr>
   `).join('');
   
-  const centres = [...new Set(list.map(s=>s.centre).filter(Boolean))].sort();
-  const scf = document.getElementById('scanner-centre-filter');
-  while(scf.options.length>1)scf.remove(1);
-  centres.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;scf.appendChild(o);});
+  document.getElementById('att-count').textContent = filtered.length + ' sewadars';
+  
+  // Populate filters
+  populateSelect('att-centre', PROCESSED_DATA.centreCounts.map(c => c[0]));
+  populateSelect('att-dept', PROCESSED_DATA.deptCounts.map(d => d[0]));
 }
 
-function filterScanners(){
-  const q = document.getElementById('scanner-search').value.toLowerCase();
-  const centre = document.getElementById('scanner-centre-filter').value.toLowerCase();
-  let vis = 0;
-  document.querySelectorAll('.scanner-perf-card').forEach(card=>{
-    const name = card.querySelector('.scanner-perf-name').textContent.toLowerCase();
-    const cardCentre = card.dataset.centre;
-    const ok = (!q||name.includes(q)) && (!centre||cardCentre===centre);
-    card.style.display = ok?'':'none';
-    if(ok)vis++;
-  });
-  document.getElementById('scanner-count').textContent = vis+' scanners';
-}
-const debouncedFilterScanners = debounce(filterScanners, 150);
-
-function filterMissingOut(){
-  const q=document.getElementById('missing-search').value.toLowerCase();
-  const dept=document.getElementById('missing-dept-filter').value.toLowerCase();
-  let vis=0;
-  document.querySelectorAll('.missing-row').forEach(row=>{
-    const ok=(!q||row.dataset.name.includes(q))&&(!dept||row.dataset.dept===dept);
-    row.style.display=ok?'':'none';
-    if(ok)vis++;
-  });
-  document.getElementById('missing-count').textContent=vis+' records';
-}
-const debouncedFilterMissingOut = debounce(filterMissingOut, 150);
-
-// ── Populate filters ──────────────────────────────────────────────────────────
-function populateFilters(d){
-  const scanDepts=[...new Set((d.scans||d.raw_log||[]).map(s=>s.department).filter(Boolean))].sort();
-  const sdp=document.getElementById('scan-dept-filter');
-  while(sdp.options.length>1)sdp.remove(1);
-  scanDepts.forEach(dep=>{const o=document.createElement('option');o.value=dep;o.textContent=dep;sdp.appendChild(o);});
-
-  const attCentres=[...new Set((d.sewadar_attendance||[]).map(s=>s.sewadar_centre).filter(Boolean))].sort();
-  const attDepts=[...new Set((d.sewadar_attendance||[]).map(s=>s.department).filter(Boolean))].sort();
-  const acf=document.getElementById('att-centre-filter'); while(acf.options.length>1)acf.remove(1);
-  attCentres.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;acf.appendChild(o);});
-  const adf=document.getElementById('att-dept-filter'); while(adf.options.length>1)adf.remove(1);
-  attDepts.forEach(d=>{const o=document.createElement('option');o.value=d;o.textContent=d;adf.appendChild(o);});
-}
-
-function renderPrintRegister(){
-  const deptFilter = document.getElementById('print-dept-filter').value;
-  const centreFilter = document.getElementById('print-centre-filter').value;
-  const today = DATA.dates[DATA.dates.length-1];
+function renderAlerts() {
+  const p = PROCESSED_DATA;
+  const typeFilter = document.getElementById('alert-type').value;
   
-  let sewadars = DATA.sewadar_attendance||[];
-  if(deptFilter) sewadars = sewadars.filter(s=>s.department===deptFilter);
-  if(centreFilter) sewadars = sewadars.filter(s=>s.sewadar_centre===centreFilter);
+  const dupGrid = document.getElementById('dup-grid');
+  const missingGrid = document.getElementById('missing-grid');
+  const reentryGrid = document.getElementById('reentry-grid');
   
-  const depts = [...new Set(sewadars.map(s=>s.department).filter(Boolean))].sort();
-  let html = `<div class="print-header">
-    <div class="print-title">Faridabad Area Bhati March 2026 — Attendance Register</div>
-    <div class="print-sub">Generated: ${new Date().toLocaleString('en-IN')} | Date: ${fmtDate(today)}</div>
-  </div>`;
-   
-  depts.forEach(dept=>{
-    const deptSewadars = sewadars.filter(s=>s.department===dept);
-    html += `<div class="print-dept">
-      <div class="print-dept-title">${dept} (${deptSewadars.length} sewadars)</div>
-      <table class="print-table">
-        <thead><tr><th>S.No.</th><th>Badge No.</th><th>Name</th><th>Centre</th><th>IN Time</th><th>OUT Time</th><th>Present</th><th>Signature</th></tr></thead>
-        <tbody>${deptSewadars.map((s,i)=>{
-          const info = s[today];
-          const present = info && info.status!=='ABSENT';
-          return `<tr>
-            <td>${i+1}</td>
-            <td>${s.badge_no||''}</td>
-            <td>${s.sewadar_name||''}</td>
-            <td>${s.sewadar_centre||''}</td>
-            <td>${info?fmtTime(info.first_in):''}</td>
-            <td>${info?fmtTime(info.last_out):''}</td>
-            <td style="text-align:center">${present?'✓':''}</td>
-            <td><span class="print-check"></span></td>
-          </tr>`;
-        }).join('')}</tbody>
-      </table>
-    </div>`;
-  });
+  const showDup = !typeFilter || typeFilter === 'duplicate';
+  const showMissing = !typeFilter || typeFilter === 'missing';
+  const showReentry = !typeFilter || typeFilter === 'reentry';
   
-  document.getElementById('print-register').innerHTML = html;
+  document.getElementById('dup-section').style.display = showDup ? 'block' : 'none';
+  document.getElementById('missing-section').style.display = showMissing ? 'block' : 'none';
+  document.getElementById('reentry-section').style.display = showReentry ? 'block' : 'none';
   
-  const allDepts = [...new Set((DATA.sewadar_attendance||[]).map(s=>s.department).filter(Boolean))].sort();
-  const pdf = document.getElementById('print-dept-filter');
-  while(pdf.options.length>1)pdf.remove(1);
-  allDepts.forEach(d=>{const o=document.createElement('option');o.value=d;o.textContent=d;pdf.appendChild(o);});
+  dupGrid.innerHTML = p.duplicateIN.map(a => `
+    <div class="alert-card dup">
+      <div class="alert-name">${a.name}</div>
+      <div class="alert-meta"><span class="badge">${a.badge_no}</span></div>
+      <div class="alert-times">${a.times.map(t => formatTime(t)).join(', ')}</div>
+    </div>
+  `).join('') || '<p style="color:#16a34a;font-size:12px;padding:8px">✓ No duplicate scans</p>';
   
-  const allCentres = [...new Set((DATA.sewadar_attendance||[]).map(s=>s.sewadar_centre).filter(Boolean))].sort();
-  const pcf = document.getElementById('print-centre-filter');
-  while(pcf.options.length>1)pcf.remove(1);
-  allCentres.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;pcf.appendChild(o);});
+  missingGrid.innerHTML = p.missingOUT.map(a => `
+    <div class="alert-card missing">
+      <div class="alert-name">${a.name}</div>
+      <div class="alert-meta"><span class="badge">${a.badge_no}</span> • ${a.centre}</div>
+      <div class="alert-times">IN: ${formatTime(a.in_time)}</div>
+    </div>
+  `).join('') || '<p style="color:#16a34a;font-size:12px;padding:8px">✓ No missing OUT</p>';
+  
+  reentryGrid.innerHTML = p.reEntry.map(a => `
+    <div class="alert-card reentry">
+      <div class="alert-name">${a.name}</div>
+      <div class="alert-meta"><span class="badge">${a.badge_no}</span></div>
+      <div class="alert-times">↓${formatTime(a.first_in)} → ↑${formatTime(a.out)} → ↓${formatTime(a.second_in)}</div>
+    </div>
+  `).join('') || '<p style="color:#16a34a;font-size:12px;padding:8px">✓ No re-entry cases</p>';
+  
+  document.getElementById('dup-count').textContent = p.duplicateIN.length;
+  document.getElementById('missing-count').textContent = p.missingOUT.length;
+  document.getElementById('reentry-count').textContent = p.reEntry.length;
+  
+  const totalAlerts = p.duplicateIN.length + p.missingOUT.length + p.reEntry.length;
+  document.getElementById('alert-badge').textContent = totalAlerts;
+  document.getElementById('alert-count').textContent = totalAlerts + ' alerts';
 }
 
-function downloadPrintRegisterExcel(){
-  if(!DATA)return;
-  const deptFilter = document.getElementById('print-dept-filter').value;
-  const centreFilter = document.getElementById('print-centre-filter').value;
-  const today = DATA.dates[DATA.dates.length-1];
+// ============ HELPERS ============
+function switchTab(tabName) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
   
-  let sewadars = DATA.sewadar_attendance||[];
-  if(deptFilter) sewadars = sewadars.filter(s=>s.department===deptFilter);
-  if(centreFilter) sewadars = sewadars.filter(s=>s.sewadar_centre===centreFilter);
-  
-  const wb = XLSX.utils.book_new();
-  const ws = XLSX.utils.aoa_to_sheet([
-    ['Faridabad Area Bhati March 2026 — Attendance Register'],
-    ['Generated',new Date().toLocaleString('en-IN')],
-    ['Date',fmtDate(today)],
-    [''],
-    ['S.No.','Badge No.','Name','Centre','Department','Gender','IN Time','OUT Time','Status']
-  ]);
-  
-  sewadars.forEach((s,i)=>{
-    const info = s[today];
-    const present = info && info.status!=='ABSENT';
-    XLSX.utils.sheet_add_row(ws,[i+1,s.badge_no,s.sewadar_name,s.sewadar_centre,s.department,s.gender,info?fmtTime(info.first_in):'',info?fmtTime(info.last_out):'',present?'Present':'Absent']);
-  });
-  
-  styleWS(ws);
-  XLSX.utils.book_append_sheet(wb,ws,'Attendance Register');
-  saveXL(wb,`Bhati-Attendance-Register-${nowStamp()}.xlsx`);
+  const tabIndex = ['overview', 'attendance', 'alerts', 'reports'].indexOf(tabName);
+  document.querySelectorAll('.tab')[tabIndex].classList.add('active');
+  document.getElementById('tab-' + tabName).classList.add('active');
 }
 
-// ── Global Search ─────────────────────────────────────────────────────────────
-let searchIndex = [];
-function buildSearchIndex(d){
-  searchIndex = (d.sewadar_attendance||[]).map(s=>({
-    badge: s.badge_no, name: s.sewadar_name,
-    centre: s.sewadar_centre, dept: s.department,
-    key: (s.badge_no+' '+s.sewadar_name+' '+s.sewadar_centre).toLowerCase()
-  }));
+function onDateChange(date) {
+  SELECTED_DATE = date;
+  processData();
+  render();
 }
 
-function globalSearch(){
-  const q = document.getElementById('global-search').value.toLowerCase().trim();
-  const box = document.getElementById('gsearch-results');
-  if(q.length < 2){ box.style.display='none'; return; }
-  const results = searchIndex.filter(s=>s.key.includes(q)).slice(0,8);
-  if(!results.length){ box.style.display='none'; return; }
-  box.innerHTML = results.map(r=>`
-    <div class="gsearch-item" onclick="jumpToSewadar('${r.badge}')">
-      <div class="gsearch-name">${r.name} <span class="badge-tag" style="font-size:10px">${r.badge}</span></div>
-      <div class="gsearch-meta">${r.centre} • ${r.dept}</div>
-    </div>`).join('');
-  box.style.display='block';
-}
-const debouncedGlobalSearch = debounce(globalSearch, 150);
-
-function jumpToSewadar(badge){
-  document.getElementById('gsearch-results').style.display='none';
-  document.getElementById('global-search').value='';
-  switchTab('attendance');
-  document.getElementById('att-search').value=badge;
+function onSearch(query) {
+  SEARCH_QUERY = query.toLowerCase();
   filterAttendance();
 }
 
-// ══════════════════════════════════════════════════════════════════════════════
-//   EXCEL DOWNLOADS
-// ══════════════════════════════════════════════════════════════════════════════
-function styleWS(ws){
-  const range=XLSX.utils.decode_range(ws['!ref']);
-  const cols=[];
-  for(let C=range.s.c;C<=range.e.c;C++){
-    let w=10;
-    for(let R=range.s.r;R<=range.e.r;R++){
-      const cell=ws[XLSX.utils.encode_cell({r:R,c:C})];
-      if(cell&&cell.v) w=Math.min(Math.max(w,String(cell.v).length+2),40);
-    }
-    cols.push({wch:w});
-  }
-  ws['!cols']=cols;
-  return ws;
-}
-
-function saveXL(wb, name){ XLSX.writeFile(wb, name); }
-
-function downloadOverviewExcel(){
-  if(!DATA)return;
-  const wb=XLSX.utils.book_new();
-  const dates = ACTIVE_DATE==='all'?DATA.dates:[ACTIVE_DATE];
-  const hpd=(DATA.headcount_per_day||[]).filter(h=>dates.includes(h.date));
-  const ws1=XLSX.utils.aoa_to_sheet([
-    ['Bhati March 2026 — Overview'],['Generated',new Date().toLocaleString('en-IN')],[''],
-    ['DATE','PRESENT','IN','OUT'],
-    ...hpd.map(h=>[h.date,h.total_present,h.total_in,h.total_out])
-  ]);
-  styleWS(ws1); XLSX.utils.book_append_sheet(wb,ws1,'Headcount');
-  const gs=(DATA.gender_summary||[]).filter(g=>dates.includes(g.date));
-  const ws2=XLSX.utils.aoa_to_sheet([['DATE','MALE','FEMALE'],...gs.map(g=>[g.date,g.male,g.female])]);
-  styleWS(ws2); XLSX.utils.book_append_sheet(wb,ws2,'Gender');
-  saveXL(wb,`Bhati-Overview-${nowStamp()}.xlsx`);
-}
-
-function downloadScansExcel(){
-  if(!DATA)return;
-  const vis=[...document.querySelectorAll('#scan-body tr')].filter(r=>r.style.display!=='none');
-  const wb=XLSX.utils.book_new();
-  const ws=XLSX.utils.aoa_to_sheet([
-    [`Bhati Scan Details (${vis.length} records)`],['Generated',new Date().toLocaleString('en-IN')],[''],
-    ['#','Badge No.','Name','Satsang Point','Centre','Department','Type','Date','Time (IST)','Scanned By Badge','Scanned By Name','Scanned By Centre'],
-    ...vis.map((row,i)=>{
-      const t=row.querySelectorAll('td');
-      return[i+1,t[1]?.textContent?.trim(),t[2]?.querySelector('.name-primary')?.textContent?.trim(),
-        t[2]?.querySelector('.name-sub')?.textContent?.trim(),t[3]?.textContent?.trim(),
-        t[4]?.textContent?.trim(),t[5]?.textContent?.trim(),t[6]?.textContent?.trim(),
-        t[7]?.textContent?.trim(),t[8]?.textContent?.trim(),
-        t[9]?.querySelector('.name-primary')?.textContent?.trim(),t[10]?.textContent?.trim()];
-    })
-  ]);
-  styleWS(ws); XLSX.utils.book_append_sheet(wb,ws,'Scans');
-  saveXL(wb,`Bhati-Scans-${nowStamp()}.xlsx`);
-}
-
-function downloadAttendanceExcel(){
-  if(!DATA)return;
-  const dates=ACTIVE_DATE==='all'?DATA.dates:[ACTIVE_DATE];
-  const vis=[...document.querySelectorAll('#att-body tr')].filter(r=>r.style.display!=='none');
-  const wb=XLSX.utils.book_new();
-  const ws=XLSX.utils.aoa_to_sheet([
-    [`Bhati Attendance Matrix (${vis.length} sewadars)`],['Generated',new Date().toLocaleString('en-IN')],[''],
-    ['#','Badge No.','Name','Satsang Point','Centre','Department','Gender',...dates.map(fmtDate)],
-    ...vis.map((row,i)=>{
-      const t=row.querySelectorAll('td');
-      const base=[i+1,t[1]?.textContent?.trim(),t[2]?.querySelector('.name-primary')?.textContent?.trim(),
-        t[2]?.querySelector('.name-sub')?.textContent?.trim(),t[3]?.textContent?.trim(),
-        t[4]?.textContent?.trim(),t[5]?.textContent?.trim()];
-      const dc=dates.map((_,di)=>t[7+di]?.textContent?.trim().replace(/\s+/g,' ')||'ABSENT');
-      return[...base,...dc];
-    })
-  ]);
-  styleWS(ws); XLSX.utils.book_append_sheet(wb,ws,'Attendance');
-  saveXL(wb,`Bhati-Attendance-${nowStamp()}.xlsx`);
-}
-
-function downloadCentreExcel(){
-  if(!DATA)return;
-  const dates=ACTIVE_DATE==='all'?DATA.dates:[ACTIVE_DATE];
-  const vis=[...document.querySelectorAll('.centre-card')].filter(c=>c.style.display!=='none').map(c=>c.dataset.name.toUpperCase());
-  const centres=(DATA.centre_summary||[]).filter(c=>vis.includes(c.centre));
-  const wb=XLSX.utils.book_new();
-  const ws=XLSX.utils.aoa_to_sheet([
-    ['Bhati Centre Summary'],['Generated',new Date().toLocaleString('en-IN')],[''],
-    ['Centre','Total Scanned','Expected',...dates.flatMap(dt=>[`${fmtDate(dt)} Present`,`${fmtDate(dt)} IN`,`${fmtDate(dt)} OUT`])],
-    ...centres.map(c=>[c.centre,c.total_sewadars,c.expected||0,...dates.flatMap(dt=>{const i=c.dates[dt]||{present:0,in:0,out:0};return[i.present,i.in,i.out];})])
-  ]);
-  styleWS(ws); XLSX.utils.book_append_sheet(wb,ws,'Centres');
-  saveXL(wb,`Bhati-Centres-${nowStamp()}.xlsx`);
-}
-
-function downloadAbsentExcel(){
-  if(!DATA)return;
-  const dates = ACTIVE_DATE==='all'?DATA.dates:[ACTIVE_DATE];
-  const groupBy = document.getElementById('absent-group-filter')?.value || 'date';
-  const wb = XLSX.utils.book_new();
+function filterAttendance() {
+  const rows = document.querySelectorAll('#att-body tr');
+  const search = document.getElementById('att-search').value.toLowerCase();
+  const centreFilter = document.getElementById('att-centre').value;
+  const deptFilter = document.getElementById('att-dept').value;
+  const statusFilter = document.getElementById('att-status').value;
   
-  if(groupBy === 'date'){
-    const rows=[];
-    (DATA.absent_per_day||[]).filter(a=>dates.includes(a.date)).forEach(day=>{
-      (day.absent||[]).forEach(s=>rows.push([day.date,s.badge_no,s.name,s.centre,s.department,s.gender]));
-    });
-    const ws = XLSX.utils.aoa_to_sheet([
-      ['Bhati Absent Sewadar List'],['Generated',new Date().toLocaleString('en-IN')],[''],
-      ['Date','Badge No.','Name','Centre','Department','Gender'],...rows
-    ]);
-    styleWS(ws); XLSX.utils.book_append_sheet(wb,ws,'By Date');
-  }else if(groupBy === 'centre'){
-    const centreGroups = {};
-    (DATA.absent_per_day||[]).filter(a=>dates.includes(a.date)).forEach(day=>{
-      (day.absent||[]).forEach(a=>{
-        const c = a.centre||'Unknown';
-        if(!centreGroups[c])centreGroups[c]=[];
-        centreGroups[c].push({...a,date:day.date});
-      });
-    });
-    const rows=[];
-    Object.entries(centreGroups).sort((a,b)=>b[1].length-a[1].length).forEach(([centre,items])=>{
-      items.forEach(s=>rows.push([centre,s.badge_no,s.name,s.department,s.date,s.gender]));
-    });
-    const ws = XLSX.utils.aoa_to_sheet([
-      ['Bhati Absent List by Centre'],['Generated',new Date().toLocaleString('en-IN')],[''],
-      ['Centre','Badge No.','Name','Department','Date','Gender'],...rows
-    ]);
-    styleWS(ws); XLSX.utils.book_append_sheet(wb,ws,'By Centre');
-  }else if(groupBy === 'dept'){
-    const deptGroups = {};
-    (DATA.absent_per_day||[]).filter(a=>dates.includes(a.date)).forEach(day=>{
-      (day.absent||[]).forEach(a=>{
-        const dpt = a.department||'Unknown';
-        if(!deptGroups[dpt])deptGroups[dpt]=[];
-        deptGroups[dpt].push({...a,date:day.date});
-      });
-    });
-    const rows=[];
-    Object.entries(deptGroups).sort((a,b)=>b[1].length-a[1].length).forEach(([dept,items])=>{
-      items.forEach(s=>rows.push([dept,s.badge_no,s.name,s.centre,s.date,s.gender]));
-    });
-    const ws = XLSX.utils.aoa_to_sheet([
-      ['Bhati Absent List by Department'],['Generated',new Date().toLocaleString('en-IN')],[''],
-      ['Department','Badge No.','Name','Centre','Date','Gender'],...rows
-    ]);
-    styleWS(ws); XLSX.utils.book_append_sheet(wb,ws,'By Department');
-  }
-  
-  saveXL(wb,`Bhati-Absent-${nowStamp()}.xlsx`);
-}
-
-function downloadAlertsExcel(){
-  if(!DATA)return;
-  const wb=XLSX.utils.book_new();
-  const ws1=XLSX.utils.aoa_to_sheet([
-    ['Duplicate IN Scans'],[''],['Badge','Name','Date','IN Count','Times'],
-    ...(DATA.duplicate_flags||[]).map(f=>[f.badge_no,f.sewadar_name,f.date,f.in_count,f.times.join(', ')])
-  ]);
-  styleWS(ws1); XLSX.utils.book_append_sheet(wb,ws1,'Duplicates');
-  const ws2=XLSX.utils.aoa_to_sheet([
-    ['Missing OUT Scans & Orphaned OUTs'],[''],['Badge','Name','Centre','Department','Date','Status','Time'],
-    ...(DATA.missing_out||[]).map(m=>[m.badge_no,m.sewadar_name,m.centre,m.department,m.date,m.is_orphaned?'OUT ONLY':'Missing OUT',m.in_time])
-  ]);
-  styleWS(ws2); XLSX.utils.book_append_sheet(wb,ws2,'Missing OUT');
-  saveXL(wb,`Bhati-Alerts-${nowStamp()}.xlsx`);
-}
-
-function populateReportFilters(){
-  if(!DATA)return;
-  const dates = DATA.dates||[];
-  const dateOptions = '<option value="all">All Dates</option>' + dates.map(d=>`<option value="${d}">${fmtDate(d)}</option>`).join('');
-  
-  ['overview','scans','attendance','centre','absent','alerts','scanner','gender'].forEach(id=>{
-    const el = document.getElementById('report-'+id+'-date');
-    if(el) el.innerHTML = dateOptions;
-  });
-  
-  const centres = [...new Set((DATA.scans||[]).map(s=>s.sewadar_centre).filter(Boolean))].sort();
-  const centreOptions = '<option value="">All Centres</option>' + centres.map(c=>`<option value="${c}">${c}</option>`).join('');
-  ['attendance','centre','scanner'].forEach(id=>{
-    const el = document.getElementById('report-'+id+'-centre');
-    if(el) el.innerHTML = centreOptions;
-  });
-  const ac = document.getElementById('report-absent-centre');
-  if(ac) ac.innerHTML = centreOptions;
-  const sc = document.getElementById('report-scanner-centre');
-  if(sc) sc.innerHTML = centreOptions;
-  
-  const depts = [...new Set((DATA.scans||[]).map(s=>s.department).filter(Boolean))].sort();
-  const deptOptions = '<option value="">All Departments</option>' + depts.map(d=>`<option value="${d}">${d}</option>`).join('');
-  ['attendance','absent'].forEach(id=>{
-    const el = document.getElementById('report-'+id+'-dept');
-    if(el) el.innerHTML = deptOptions;
-  });
-}
-
-function getReportDates(reportType){
-  const dateSel = document.getElementById('report-'+reportType+'-date');
-  if(!dateSel) return DATA.dates||[];
-  return dateSel.value === 'all' ? (DATA.dates||[]) : [dateSel.value];
-}
-
-function downloadReport(type){
-  if(!DATA)return;
-  const dates = getReportDates(type);
-  const wb = XLSX.utils.book_new();
-  
-  if(type === 'overview'){
-    const hpd = (DATA.headcount_per_day||[]).filter(h=>dates.includes(h.date));
-    const ws1 = XLSX.utils.aoa_to_sheet([
-      ['Bhati March 2026 — Overview Report'],['Generated',new Date().toLocaleString('en-IN')],['Date Filter',dates.length === (DATA.dates||[]).length ? 'All Dates' : dates.join(', ')],[''],
-      ['DATE','PRESENT','IN','OUT'],
-      ...hpd.map(h=>[h.date,h.total_present,h.total_in,h.total_out])
-    ]);
-    styleWS(ws1); XLSX.utils.book_append_sheet(wb,ws1,'Headcount');
-    const gs = (DATA.gender_summary||[]).filter(g=>dates.includes(g.date));
-    const ws2 = XLSX.utils.aoa_to_sheet([['DATE','MALE','FEMALE'],...gs.map(g=>[g.date,g.male,g.female])]);
-    styleWS(ws2); XLSX.utils.book_append_sheet(wb,ws2,'Gender');
-    const ds = (DATA.department_expected||{});
-    const ws3 = XLSX.utils.aoa_to_sheet([['DEPARTMENT','REGISTERED'],...Object.entries(ds).map(([d,c])=>[d,c])]);
-    styleWS(ws3); XLSX.utils.book_append_sheet(wb,ws3,'Departments');
-  }
-  else if(type === 'scans'){
-    const typeFilter = document.getElementById('report-scans-type')?.value || '';
-    const scans = (DATA.scans||[]).filter(s=>dates.includes(s.date) && (!typeFilter || s.type === typeFilter));
-    const ws = XLSX.utils.aoa_to_sheet([
-      ['Bhati March 2026 — Scan Details'],['Generated',new Date().toLocaleString('en-IN')],['Records',scans.length],[''],
-      ['Badge No.','Name','Centre','Dept','Gender','Type','Date','Time','Scanned By Badge','Scanned By Name'],
-      ...scans.map(s=>[s.badge_no,s.sewadar_name,s.sewadar_centre,s.department,s.gender,s.type,s.date,s.time,s.scanned_by_badge,s.scanned_by_name])
-    ]);
-    styleWS(ws); XLSX.utils.book_append_sheet(wb,ws,'Scans');
-  }
-  else if(type === 'attendance'){
-    const centreFilter = document.getElementById('report-attendance-centre')?.value || '';
-    const deptFilter = document.getElementById('report-attendance-dept')?.value || '';
-    let rows = DATA.sewadar_attendance||[];
-    if(centreFilter) rows = rows.filter(r=>r.sewadar_centre === centreFilter);
-    if(deptFilter) rows = rows.filter(r=>r.department === deptFilter);
-    const ws = XLSX.utils.aoa_to_sheet([
-      ['Bhati March 2026 — Attendance Matrix'],['Generated',new Date().toLocaleString('en-IN')],[''],
-      ['Badge No.','Name','Centre','Department','Gender',...dates.map(d=>fmtDate(d))],
-      ...rows.map(r=>[r.badge_no,r.sewadar_name,r.sewadar_centre,r.department,r.gender,...dates.map(d=>{
-        const info = r[d];
-        if(!info || info.status === 'ABSENT') return 'ABSENT';
-        return `IN:${info.first_in} OUT:${info.last_out}`;
-      })])
-    ]);
-    styleWS(ws); XLSX.utils.book_append_sheet(wb,ws,'Attendance');
-  }
-  else if(type === 'centre'){
-    const centreFilter = document.getElementById('report-centre-name')?.value || '';
-    let centres = DATA.centre_summary||[];
-    if(centreFilter) centres = centres.filter(c=>c.centre === centreFilter);
-    const ws = XLSX.utils.aoa_to_sheet([
-      ['Bhati March 2026 — Centre Summary'],['Generated',new Date().toLocaleString('en-IN')],[''],
-      ['Centre','Expected','Scanned',...dates.map(d=>fmtDate(d))],
-      ...centres.map(c=>[c.centre,c.expected,c.total_sewadars,...dates.map(d=>c.dates?.[d]?.present||0)])
-    ]);
-    styleWS(ws); XLSX.utils.book_append_sheet(wb,ws,'Centres');
-  }
-  else if(type === 'absent'){
-    const centreFilter = document.getElementById('report-absent-centre')?.value || '';
-    const deptFilter = document.getElementById('report-absent-dept')?.value || '';
-    const absentData = (DATA.absent_per_day||[]).filter(a=>dates.includes(a.date));
-    let allAbsent = absentData.flatMap(a=>a.absent||[]);
-    if(centreFilter) allAbsent = allAbsent.filter(a=>a.centre === centreFilter);
-    if(deptFilter) allAbsent = allAbsent.filter(a=>a.department === deptFilter);
-    const ws = XLSX.utils.aoa_to_sheet([
-      ['Bhati March 2026 — Absent List'],['Generated',new Date().toLocaleString('en-IN')],['Total Absent',allAbsent.length],[''],
-      ['Badge No.','Name','Centre','Department','Gender'],
-      ...allAbsent.map(a=>[a.badge_no,a.name,a.centre,a.department,a.gender])
-    ]);
-    styleWS(ws); XLSX.utils.book_append_sheet(wb,ws,'Absent');
-  }
-  else if(type === 'alerts'){
-    const alertType = document.getElementById('report-alerts-type')?.value || '';
-    const dups = alertType === '' || alertType === 'duplicate' ? (DATA.duplicate_flags||[]).filter(f=>dates.includes(f.date)) : [];
-    const miss = alertType === '' || alertType === 'missing' ? (DATA.missing_out||[]).filter(m=>dates.includes(m.date)) : [];
-    const reentry = alertType === '' || alertType === 'reentry' ? (DATA.re_entry_flags||[]).filter(r=>dates.includes(r.date)) : [];
-    const multi = alertType === '' || alertType === 'multi' ? (DATA.multi_scan_flags||[]).filter(m=>dates.includes(m.date)) : [];
+  let visible = 0;
+  rows.forEach(row => {
+    const status = row.dataset.status;
+    const centre = row.dataset.centre;
+    const dept = row.dataset.dept;
+    const text = row.textContent.toLowerCase();
     
-    if(dups.length){
-      const ws1 = XLSX.utils.aoa_to_sheet([
-        ['Duplicate IN Scans'],[''],['Badge','Name','Date','Count','Times'],
-        ...dups.map(f=>[f.badge_no,f.sewadar_name,f.date,f.in_count,f.times.join(', ')])
-      ]);
-      styleWS(ws1); XLSX.utils.book_append_sheet(wb,ws1,'Duplicates');
+    const matchSearch = !search || text.includes(search);
+    const matchCentre = !centreFilter || centre === centreFilter;
+    const matchDept = !deptFilter || dept === deptFilter;
+    const matchStatus = !statusFilter || status === statusFilter;
+    
+    if (matchSearch && matchCentre && matchDept && matchStatus) {
+      row.style.display = '';
+      visible++;
+    } else {
+      row.style.display = 'none';
     }
-    if(miss.length){
-      const ws2 = XLSX.utils.aoa_to_sheet([
-        ['Missing OUT Scans & Orphaned OUTs'],[''],['Badge','Name','Centre','Department','Date','Status','Time'],
-        ...miss.map(m=>[m.badge_no,m.sewadar_name,m.centre,m.department,m.date,m.is_orphaned?'OUT ONLY':'Missing OUT',m.in_time])
-      ]);
-      styleWS(ws2); XLSX.utils.book_append_sheet(wb,ws2,'Missing OUT');
-    }
-    if(reentry.length){
-      const ws3 = XLSX.utils.aoa_to_sheet([
-        ['Re-entry Scans (IN→OUT→IN)'],[''],['Badge','Name','Date','First IN','OUT Time','Second IN'],
-        ...reentry.map(r=>[r.badge_no,r.sewadar_name,r.date,r.first_in,r.out_time,r.second_in])
-      ]);
-      styleWS(ws3); XLSX.utils.book_append_sheet(wb,ws3,'Re-entry');
-    }
-    if(multi.length){
-      const ws4 = XLSX.utils.aoa_to_sheet([
-        ['Multi Scans'],[''],['Badge','Name','Date','Type','Count','Times'],
-        ...multi.map(m=>[m.badge_no,m.sewadar_name,m.date,m.type,m.count,m.times.join(', ')])
-      ]);
-      styleWS(ws4); XLSX.utils.book_append_sheet(wb,ws4,'Multi-scan');
-    }
-  }
-  else if(type === 'scanner'){
-    const centreFilter = document.getElementById('report-scanner-centre')?.value || '';
-    const scans = (DATA.scans||[]).filter(s=>dates.includes(s.date) && (!centreFilter || s.scanned_by_centre === centreFilter));
-    const scannerMap = {};
-    scans.forEach(s=>{
-      const sb = s.scanned_by_badge;
-      if(!sb)return;
-      if(!scannerMap[sb]) scannerMap[sb]={name:s.scanned_by_name,centre:s.scanned_by_centre,scans:0,badges:new Set()};
-      scannerMap[sb].scans++;
-      scannerMap[sb].badges.add(s.badge_no);
-    });
-    const ws = XLSX.utils.aoa_to_sheet([
-      ['Bhati March 2026 — Scanner Performance'],['Generated',new Date().toLocaleString('en-IN')],[''],
-      ['Scanner Badge','Scanner Name','Centre','Total Scans','Unique Sewadars'],
-      ...Object.entries(scannerMap).map(([badge,s])=>[badge,s.name,s.centre,s.scans,s.badges.size])
-    ]);
-    styleWS(ws); XLSX.utils.book_append_sheet(wb,ws,'Scanners');
-  }
-  else if(type === 'gender'){
-    const gs = (DATA.gender_summary||[]).filter(g=>dates.includes(g.date));
-    const ws = XLSX.utils.aoa_to_sheet([
-      ['Bhati March 2026 — Gender Report'],['Generated',new Date().toLocaleString('en-IN')],[''],
-      ['Date','Male','Female','Total'],
-      ...gs.map(g=>[g.date,g.male,g.female,g.male+g.female])
-    ]);
-    styleWS(ws); XLSX.utils.book_append_sheet(wb,ws,'Gender');
-  }
+  });
   
-  saveXL(wb,`Bhati-${type.charAt(0).toUpperCase()+type.slice(1)}-${nowStamp()}.xlsx`);
+  document.getElementById('att-count').textContent = visible + ' sewadars';
 }
 
-// ── Init ──────────────────────────────────────────────────────────────────────
-loadData();
-startAutoRefresh();
+function filterAlerts() {
+  renderAlerts();
+}
+
+function populateSelect(id, options) {
+  const select = document.getElementById(id);
+  const currentValue = select.value;
+  const opts = options.filter(o => o);
+  
+  if (select.options.length <= 1) {
+    select.innerHTML = `<option value="">All ${id.startsWith('att-') ? id.replace('att-', '') : ''}</option>` + 
+      opts.map(o => `<option value="${o}">${o}</option>`).join('');
+  }
+}
+
+function populateReportDropdowns() {
+  const dates = RAW_DATA.dates || [];
+  const dateOptions = dates.map(d => `<option value="${d}">${formatDate(d)}</option>`).join('');
+  
+  ['report-date', 'report-attendance-date', 'report-absent-date', 'report-alerts-date'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = '<option value="all">All Dates</option>' + dateOptions;
+  });
+}
+
+function formatDate(d) {
+  if (!d) return '-';
+  const date = new Date(d);
+  return date.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: '2-digit' });
+}
+
+function formatTime(t) {
+  if (!t) return '-';
+  const [h, m] = t.split(':');
+  const hr = parseInt(h);
+  const ampm = hr >= 12 ? 'PM' : 'AM';
+  const hr12 = hr % 12 || 12;
+  return `${hr12}:${m} ${ampm}`;
+}
+
+// ============ DOWNLOADS ============
+function downloadAttendance() {
+  const data = PROCESSED_DATA.sewadars.map(s => ({
+    'Badge No.': s.badge_no,
+    'Name': s.name,
+    'Centre': s.centre,
+    'Department': s.department,
+    'IN Time': s.in_time || '-',
+    'OUT Time': s.out_time || '-',
+    'Status': s.status.toUpperCase()
+  }));
+  
+  const ws = XLSX.utils.json_to_sheet(data);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Attendance');
+  XLSX.writeFile(wb, `attendance_${SELECTED_DATE}.xlsx`);
+}
+
+function downloadAlerts() {
+  const p = PROCESSED_DATA;
+  const data = [
+    ...p.duplicateIN.map(a => ({ Type: 'Duplicate IN', Badge: a.badge_no, Name: a.name, Times: a.times.join(', ') })),
+    ...p.missingOUT.map(a => ({ Type: 'Missing OUT', Badge: a.badge_no, Name: a.name, 'IN Time': a.in_time })),
+    ...p.reEntry.map(a => ({ Type: 'Re-Entry', Badge: a.badge_no, Name: a.name, Times: `${a.first_in} -> ${a.out} -> ${a.second_in}` }))
+  ];
+  
+  const ws = XLSX.utils.json_to_sheet(data);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Alerts');
+  XLSX.writeFile(wb, `alerts_${SELECTED_DATE}.xlsx`);
+}
+
+function downloadReport(type) {
+  const dateSelect = document.getElementById(`report-${type}-date`);
+  const dateFilter = dateSelect?.value || 'all';
+  
+  if (type === 'attendance') {
+    downloadAttendance();
+  } else if (type === 'alerts') {
+    downloadAlerts();
+  } else if (type === 'overview') {
+    const p = PROCESSED_DATA;
+    const data = [{
+      'Date': SELECTED_DATE,
+      'Total Present': p.totalPresent,
+      'Currently Inside': p.totalInside,
+      'Total Scans': p.totalScans,
+      'Male': p.maleCount,
+      'Female': p.femaleCount,
+      'Missing OUT': p.missingOUT.length,
+      'Duplicate IN': p.duplicateIN.length,
+      'Re-Entry': p.reEntry.length
+    }];
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Overview');
+    XLSX.writeFile(wb, `overview_${SELECTED_DATE}.xlsx`);
+  } else if (type === 'absent') {
+    const absent = p.sewadars.filter(s => s.status === 'absent').map(s => ({
+      'Badge No.': s.badge_no,
+      'Name': s.name,
+      'Centre': s.centre,
+      'Department': s.department
+    }));
+    const ws = XLSX.utils.json_to_sheet(absent);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Absent');
+    XLSX.writeFile(wb, `absent_${SELECTED_DATE}.xlsx`);
+  }
+}
 </script>
 </body>
 </html>
