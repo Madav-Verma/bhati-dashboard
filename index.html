@@ -694,7 +694,8 @@ function getFilteredScans(scans, dates){
 
 // ── Load ──────────────────────────────────────────────────────────────────────
 let LAST_DATA_HASH = '';
-let REFRESH_TIMER = null;
+let LAST_SCAN_COUNT = 0;
+let UPDATE_TIMER = null;
 
 async function loadData(isAutoRefresh = false){
   try{
@@ -710,34 +711,35 @@ async function loadData(isAutoRefresh = false){
     if(!res.ok) throw new Error('Failed to fetch data');
     
     let d = await res.json();
+    const scanCount = (d.scans||d.raw_log||[]).length;
     
     // Quick check if data actually changed (BEFORE heavy calculations)
-    const scanCount = (d.scans||d.raw_log||[]).length;
-    const dataHash = JSON.stringify({dates: d.dates, last_updated: d.last_updated, scanCount: scanCount});
-    if(isAutoRefresh && dataHash === LAST_DATA_HASH){
-      return; // No new data, skip everything
+    if(isAutoRefresh && scanCount === LAST_SCAN_COUNT){
+      return; // No new scans
     }
-    LAST_DATA_HASH = dataHash;
     
     // Calculate aggregated data from scans if not provided
     if(!d.headcount_per_day && d.scans){
       d = calculateAggregates(d);
     }
     
+    const oldScanCount = LAST_SCAN_COUNT;
     DATA = d;
+    LAST_SCAN_COUNT = scanCount;
     
-    // Batch render using requestAnimationFrame to avoid lag
-    if(RENDER_PENDING) return;
-    RENDER_PENDING = true;
-    requestAnimationFrame(() => {
-      render(DATA);
-      RENDER_PENDING = false;
-    });
-    
+    // Show dashboard on first load
     document.getElementById('loading').style.display='none';
     document.getElementById('dashboard').style.display='block';
     
-    // Update last refresh time
+    // For first load, do full render
+    if(oldScanCount === 0){
+      render(DATA);
+    } else {
+      // For incremental updates, re-apply current filter without rebuilding filter UI
+      incrementalRender(DATA);
+    }
+    
+    // Always update timestamp
     document.getElementById('last-updated').textContent = 'Updated: '+new Date().toLocaleTimeString('en-IN');
   }catch(e){
     console.error('Load error:', e);
@@ -746,6 +748,78 @@ async function loadData(isAutoRefresh = false){
       document.getElementById('error-msg').style.display='block';
     }
   }
+}
+
+// Incremental render: Re-apply current filter without expensive UI rebuilds
+function incrementalRender(d){
+  // Update overview/KPIs with current date filter
+  const dates = ACTIVE_DATE==='all' ? d.dates : [ACTIVE_DATE];
+  renderOverview(d, dates);
+  
+  // Re-render tables with new data but preserve filter states
+  renderScanTable(getFilteredScans(d.scans||d.raw_log||[], dates), dates);
+  renderAttendanceTable(d.sewadar_attendance||[], dates);
+  renderCentreCards(d.centre_summary||[], dates);
+  renderAbsent(d.absent_per_day||[], dates);
+  
+  // Update metrics
+  const alertCount = (d.duplicate_flags||[]).length + (d.re_entry_flags||[]).length + (d.multi_scan_flags||[]).length + (d.missing_out||[]).length;
+  document.getElementById('alerts-badge').textContent = alertCount > 999 ? '999+' : alertCount;
+  const absentTotal = (d.absent_per_day||[]).reduce((a,b)=>a+b.absent_count,0);
+  document.getElementById('absent-badge').textContent = absentTotal > 999 ? '999+' : absentTotal;
+}
+
+function renderLiveOpsBar(d){
+  const scans = d.scans||d.raw_log||[];
+  const today = (d.dates||[])[d.dates.length-1];
+  if(!today) return;
+  
+  const todayScans = scans.filter(s=>s.date===today);
+  const scannerStats={};
+  todayScans.forEach(s=>{
+    const sb = s.scanned_by_badge;
+    if(!scannerStats[sb]) scannerStats[sb] = {name:s.scanned_by_name, centre:s.scanned_by_centre, scans:0, last:''};
+    scannerStats[sb].scans++;
+    if(!scannerStats[sb].last || s.time > scannerStats[sb].last) scannerStats[sb].last = s.time;
+  });
+  
+  const activeScanners = Object.values(scannerStats).filter(s=>{
+    if(!s.last) return false;
+    const lastTime = new Date(`${today}T${s.last}`);
+    const now = new Date();
+    return (now - lastTime) < 30*60*1000;
+  });
+  
+  const hour = new Date().getHours();
+  const hourlyScans = todayScans.filter(s=>{
+    const scanHour = parseInt(s.time.split(':')[0]);
+    return scanHour === hour;
+  }).length;
+  
+  const presentToday = (d.headcount_per_day||[]).find(h=>h.date===today)?.total_present||0;
+  
+  const activeScanEl = document.getElementById('live-active-scanners');
+  const totalScansEl = document.getElementById('live-total-scans');
+  const hourlyScansEl = document.getElementById('live-hourly-scans');
+  const presentEl = document.getElementById('live-present');
+  
+  if(activeScanEl) activeScanEl.textContent = activeScanners.length;
+  if(totalScansEl) totalScansEl.textContent = todayScans.length;
+  if(hourlyScansEl) hourlyScansEl.textContent = hourlyScans;
+  if(presentEl) presentEl.textContent = presentToday;
+  
+  // Update scanner cards
+  const cardsHtml = Object.entries(scannerStats).map(([badge,s])=>{
+    const isActive = s.last && (new Date() - new Date(`${today}T${s.last}`)) < 30*60*1000;
+    return `<div class="scanner-card ${isActive?'':'scanner-inactive'}">
+      <div class="scanner-name">${s.name||badge}</div>
+      <div class="scanner-stats">${s.scans} scans</div>
+      <div class="scanner-last">${s.last?fmtTime(s.last):'No scans'}</div>
+    </div>`;
+  }).join('');
+  
+  const cardsEl = document.getElementById('scanner-cards');
+  if(cardsEl) cardsEl.innerHTML = cardsHtml || '<span style="opacity:0.6;font-size:11px">No scanner activity</span>';
 }
 
 function calculateAggregates(d){
@@ -1026,15 +1100,16 @@ function renderOverview(d, dates){
 
 // ── Scan Table ────────────────────────────────────────────────────────────────
 function renderScanTable(rows, dates){
-  const multiIn = DATA.multi_scan_flags?.flatMap(f=>f.times.map(t=>({badge:f.badge_no,type:'IN',time:t,date:f.date})))||[];
-  const multiOut = DATA.multi_scan_flags?.filter(f=>f.type==='OUT').flatMap(f=>f.times.map(t=>({badge:f.badge_no,type:'OUT',time:t,date:f.date})))||[];
-  const reEntry = DATA.re_entry_flags?.flatMap(f=>[{badge:f.badge_no,time:f.out_time,date:f.date},{badge:f.badge_no,time:f.second_in,date:f.date}])||[];
+  // Only flag EXTRA duplicate scans (skip first valid one), not all of them
+  const multiIn = DATA.multi_scan_flags?.filter(f=>f.type==='IN').flatMap(f=>f.times.slice(1).map(t=>({badge:f.badge_no,type:'IN',time:t,date:f.date})))||[];
+  const multiOut = DATA.multi_scan_flags?.filter(f=>f.type==='OUT').flatMap(f=>f.times.slice(1).map(t=>({badge:f.badge_no,type:'OUT',time:t,date:f.date})))||[];
+  // Only flag the SECOND IN time for re-entry, not the OUT (OUT is legitimate)
+  const reEntry = DATA.re_entry_flags?.map(f=>({badge:f.badge_no,time:f.second_in,date:f.date}))||[];
   
   const getHighlight = (s)=>{
-    const key = `${s.badge_no}|${s.date}|${s.time}`;
     const isMultiIn = multiIn.some(m=>m.badge===s.badge_no && m.date===s.date && m.time===s.time);
     const isMultiOut = multiOut.some(m=>m.badge===s.badge_no && m.date===s.date && m.time===s.time);
-    const isReEntry = reEntry.some(m=>m.badge===s.badge_no && m.date===s.date && m.time===m.time);
+    const isReEntry = reEntry.some(m=>m.badge===s.badge_no && m.date===s.date && m.time===s.time);
     if(isMultiIn) return 'multi-in';
     if(isMultiOut) return 'multi-out';
     if(isReEntry) return 're-entry';
@@ -1044,9 +1119,12 @@ function renderScanTable(rows, dates){
   const getWarning = (s)=>{
     const isMultiIn = multiIn.some(m=>m.badge===s.badge_no && m.date===s.date && m.time===s.time);
     const isMultiOut = multiOut.some(m=>m.badge===s.badge_no && m.date===s.date && m.time===s.time);
-    const isReEntry = reEntry.some(m=>m.badge===s.badge_no && m.date===s.date && m.time===m.time);
-    if(isMultiIn) return `<span class="scan-warning in">${multiIn.filter(m=>m.badge===s.badge_no && m.date===s.date).length}x IN</span>`;
-    if(isMultiOut) return `<span class="scan-warning out">${multiOut.filter(m=>m.badge===s.badge_no && m.date===s.date).length}x OUT</span>`;
+    const isReEntry = reEntry.some(m=>m.badge===s.badge_no && m.date===s.date && m.time===s.time);
+    // Count total issues for this badge/date, not just this specific row
+    const totalMultiIn = DATA.multi_scan_flags?.find(f=>f.badge_no===s.badge_no && f.date===s.date && f.type==='IN')?.count||0;
+    const totalMultiOut = DATA.multi_scan_flags?.find(f=>f.badge_no===s.badge_no && f.date===s.date && f.type==='OUT')?.count||0;
+    if(isMultiIn && totalMultiIn>1) return `<span class="scan-warning in">+${totalMultiIn-1} extra IN</span>`;
+    if(isMultiOut && totalMultiOut>1) return `<span class="scan-warning out">+${totalMultiOut-1} extra OUT</span>`;
     if(isReEntry) return `<span class="scan-warning re">↩️ RE-ENTRY</span>`;
     return '';
   };
@@ -1114,6 +1192,7 @@ function renderAttendanceTable(rows, dates){
       ${dates.map(dt=>{
         const info=s[dt];
         if(!info||info.status==='ABSENT')return`<td style="text-align:center"><span class="absent-cell">ABSENT</span></td>`;
+        if(info.status==='INVALID')return`<td style="text-align:center"><span style="background:#fee2e2;color:#dc2626;border-radius:4px;padding:3px 6px;font-size:10px;font-weight:700">⚠️ INVALID</span></td>`;
         return`<td style="text-align:center"><span class="present-cell">↓${fmtTime(info.first_in)||'—'}<br>↑${fmtTime(info.last_out)||'—'}</span></td>`;
       }).join('')}
     </tr>`).join('');
@@ -1339,14 +1418,14 @@ function renderAlerts(d){
   missingDepts.forEach(dept=>{const o=document.createElement('option');o.value=dept;o.textContent=dept;mdf.appendChild(o);});
 
   document.getElementById('missing-body').innerHTML=missing.map((m,i)=>`
-    <tr class="missing-row" data-name="${(m.sewadar_name||'').toLowerCase()}" data-dept="${(m.department||'').toLowerCase()}">
+    <tr class="missing-row" data-name="${(m.sewadar_name||'').toLowerCase()}" data-dept="${(m.department||'').toLowerCase()}" style="${m.is_orphaned?'background:#fee2e2;border-left:3px solid #dc2626':''}">
       <td class="sno">${i+1}</td>
       <td><span class="badge-tag">${m.badge_no||'—'}</span></td>
-      <td><div class="name-primary">${m.sewadar_name||'Unknown'}</div></td>
+      <td><div class="name-primary">${m.sewadar_name||'Unknown'}${m.is_orphaned?'<span style="font-size:9px;background:#dc2626;color:white;padding:2px 6px;border-radius:3px;margin-left:6px">OUT ONLY</span>':''}</div></td>
       <td>${m.centre?`<span class="centre-tag">${m.centre}</span>`:'—'}</td>
       <td>${m.department?`<span class="dept-tag">${m.department}</span>`:'—'}</td>
       <td>${m.date||'—'}</td>
-      <td style="font-weight:600;color:#15803d">${fmtTime(m.in_time)||'—'}</td>
+      <td style="font-weight:600;${m.is_orphaned?'color:#dc2626':'color:#15803d'}">${m.is_orphaned ? 'NO IN ⚠️' : (fmtTime(m.in_time)||'—')}</td>
     </tr>`).join('');
   document.getElementById('missing-count').textContent=missing.length+' records';
 
@@ -1870,8 +1949,8 @@ function downloadAlertsExcel(){
   ]);
   styleWS(ws1); XLSX.utils.book_append_sheet(wb,ws1,'Duplicates');
   const ws2=XLSX.utils.aoa_to_sheet([
-    ['Missing OUT Scans'],[''],['Badge','Name','Centre','Department','Date','IN Time'],
-    ...(DATA.missing_out||[]).map(m=>[m.badge_no,m.sewadar_name,m.centre,m.department,m.date,m.in_time])
+    ['Missing OUT Scans & Orphaned OUTs'],[''],['Badge','Name','Centre','Department','Date','Status','Time'],
+    ...(DATA.missing_out||[]).map(m=>[m.badge_no,m.sewadar_name,m.centre,m.department,m.date,m.is_orphaned?'OUT ONLY':'Missing OUT',m.in_time])
   ]);
   styleWS(ws2); XLSX.utils.book_append_sheet(wb,ws2,'Missing OUT');
   saveXL(wb,`Bhati-Alerts-${nowStamp()}.xlsx`);
@@ -2000,8 +2079,8 @@ function downloadReport(type){
     }
     if(miss.length){
       const ws2 = XLSX.utils.aoa_to_sheet([
-        ['Missing OUT Scans'],[''],['Badge','Name','Centre','Department','Date','IN Time'],
-        ...miss.map(m=>[m.badge_no,m.sewadar_name,m.centre,m.department,m.date,m.in_time])
+        ['Missing OUT Scans & Orphaned OUTs'],[''],['Badge','Name','Centre','Department','Date','Status','Time'],
+        ...miss.map(m=>[m.badge_no,m.sewadar_name,m.centre,m.department,m.date,m.is_orphaned?'OUT ONLY':'Missing OUT',m.in_time])
       ]);
       styleWS(ws2); XLSX.utils.book_append_sheet(wb,ws2,'Missing OUT');
     }
