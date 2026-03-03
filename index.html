@@ -213,7 +213,7 @@ td:last-child{border-right:none}
 /* Live Ops Bar */
 .live-ops-bar{background:linear-gradient(135deg,#0f172a,#1e293b);color:white;padding:14px 24px;display:flex;align-items:center;gap:28px;overflow-x:auto;flex-wrap:nowrap;min-height:70px;border-radius:12px;margin-bottom:20px;box-shadow:0 4px 12px rgba(0,0,0,.2)}
 .live-ops-section{flex-shrink:0}
-.live-ops-label{font-size:10px;text-transform:uppercase;letter-spacing:1px:opacity:.7;margin-bottom:6px}
+.live-ops-label{font-size:10px;text-transform:uppercase;letter-spacing:1px;opacity:.7;margin-bottom:6px}
 .live-ops-value{font-size:22px;font-weight:700;line-height:1}
 .scanner-card{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:8px 14px;display:inline-flex;flex-direction:column;margin-right:8px;min-width:110px;transition:all .15s}
 .scanner-card:hover{background:rgba(255,255,255,.15);transform:translateY(-2px)}
@@ -223,11 +223,60 @@ td:last-child{border-right:none}
 .scanner-inactive{opacity:.4}
 
 /* Hourly Chart */
+.heatmap-container{background:white;border:1px solid #e5e7eb;border-radius:12px;padding:16px;margin-bottom:20px}
+.heatmap-title{font-size:14px;font-weight:700;color:#1a3c6e;margin-bottom:12px}
+.heatmap-grid{display:grid;grid-template-columns:repeat(24,1fr);gap:3px}
+.heatmap-cell{aspect-ratio:1;border-radius:4px;cursor:pointer;transition:transform .1s;position:relative;min-width:20px}
+.heatmap-cell:hover{transform:scale(1.2);z-index:1}
+.heatmap-cell .heatmap-tooltip{position:absolute;bottom:100%;left:50%;transform:translateX(-50%);background:#1e293b;color:white;font-size:10px;padding:4px 8px;border-radius:4px;white-space:nowrap;display:none;z-index:10}
+.heatmap-cell:hover .heatmap-tooltip{display:block}
+.heatmap-label-row{display:flex;justify-content:space-between;margin-top:8px;font-size:9px;color:#64748b}
+.heatmap-hour-labels{display:flex;justify-content:space-between;font-size:8px;color:#94a3b8;margin-top:4px}
+.h-0{background:#f0fdf4}.h-1{background:#dcfce7}.h-2{background:#bbf7d0}.h-3{background:#86efac}.h-4{background:#4ade80}.h-5{background:#22c55e}.h-6{background:#16a34a}.h-7{background:#fcd34d}.h-8{background:#fbbf24}.h-9{background:#f59e0b}.h-10{background:#eab308}.h-11{background:#84cc16}.h-12{background:#10b981}.h-13{background:#14b8a6}.h-14{background:#06b6d4}.h-15{background:#0ea5e9}.h-16{background:#3b82f6}.h-17{background:#6366f1}.h-18{background:#8b5cf6}.h-19{background:#a855f7}.h-20{background:#d946ef}.h-21{background:#ec4899}.h-22{background:#f43f5e}.h-23{background:#fb7185}
+
 .hourly-chart{display:flex;align-items:flex-end;gap:6px;height:90px;padding:10px 0}
 .hourly-bar{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
 .hourly-fill{width:100%;background:linear-gradient(180deg,#10b981,#059669);border-radius:4px 4px 0 0;min-height:3px;transition:height .3s ease}
 .hourly-val{font-size:10px;font-weight:600}
 .hourly-lbl{font-size:9px;opacity:.7}
+
+/* Auto-refresh Toggle */
+.auto-refresh-toggle{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:8px;padding:6px 12px;cursor:pointer;transition:all .15s}
+.auto-refresh-toggle:hover{background:rgba(255,255,255,.25)}
+.auto-refresh-toggle.paused{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2)}
+.auto-refresh-toggle .toggle-icon{font-size:14px}
+.auto-refresh-toggle .toggle-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.auto-refresh-toggle.paused .toggle-label{opacity:.6}
+
+/* Date Range Picker */
+.date-range-wrap{display:flex;align-items:center;gap:10px}
+.date-range-select{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:8px;padding:6px 10px;font-family:'Inter',sans-serif;font-size:11px;color:white;outline:none;cursor:pointer;min-width:120px}
+.date-range-select option{color:#1a1a2e;background:white}
+
+/* Bulk Selection */
+.bulk-actions{display:none;align-items:center;gap:12px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:8px 14px;margin-bottom:12px}
+.bulk-actions.active{display:flex}
+.bulk-count{font-size:12px;font-weight:600;color:#1d4ed8}
+.bulk-btn{display:inline-flex;align-items:center;gap:4px;background:#2563a8;color:white;border:none;border-radius:6px;padding:5px 10px;font-size:11px;font-weight:600;cursor:pointer;transition:background .15s}
+.bulk-btn:hover{background:#1d4ed8}
+.bulk-btn.danger{background:#dc2626}
+.bulk-btn.danger:hover{background:#b91c1c}
+.checkbox-cell{width:30px;text-align:center}
+.row-checkbox{width:16px;height:16px;cursor:pointer;accent-color:#2563a8}
+
+/* Copy to Clipboard */
+.copy-btn{background:none;border:none;cursor:pointer;padding:2px 6px;border-radius:4px;color:#64748b;transition:all .15s;font-size:12px}
+.copy-btn:hover{background:#e2e8f0;color:#2563a8}
+.copy-btn.copied{color:#16a34a}
+.toast{position:fixed;bottom:20px;right:20px;background:#1e293b;color:white;padding:10px 16px;border-radius:8px;font-size:12px;z-index:1000;opacity:0;transition:opacity .3s;box-shadow:0 4px 12px rgba(0,0,0,.2)}
+.toast.show{opacity:1}
+
+/* Keyboard Shortcuts Hint */
+.kbd-hint{position:fixed;bottom:12px;left:12px;background:white;border:1px solid #e5e7eb;border-radius:6px;padding:6px 10px;font-size:10px;color:#64748b;display:flex;gap:8px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.kbd-hint kbd{background:#f1f5f9;border:1px solid #e2e8f0;border-radius:4px;padding:2px 5px;font-family:monospace;font-size:9px}
+
+/* Select All */
+.select-all-wrap{display:flex;align-items:center;gap:6px;font-size:11px;color:#64748b;margin-left:8px}
 
 /* Dept Expected vs Present */
 .dept-exp-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #f1f5f9}
@@ -303,12 +352,34 @@ td:last-child{border-right:none}
         <div class="updated-tag" id="last-updated">—</div>
         <div class="last-scan-tag" id="last-scan-tag"></div>
       </div>
+      <div class="date-range-wrap">
+        <select class="date-range-select" id="date-range-select" onchange="setDateRange(this.value)">
+          <option value="all">All Dates</option>
+          <option value="today">Today</option>
+          <option value="yesterday">Yesterday</option>
+          <option value="last3">Last 3 Days</option>
+          <option value="last7">Last 7 Days</option>
+        </select>
+      </div>
+      <div class="auto-refresh-toggle" id="auto-refresh-toggle" onclick="toggleAutoRefresh()">
+        <span class="toggle-icon">⏸️</span>
+        <span class="toggle-label">Auto</span>
+      </div>
       <div class="gsearch-wrap">
-        <input class="global-search" id="global-search" placeholder="🔍 Search any sewadar..." oninput="debouncedGlobalSearch()" onblur="setTimeout(()=>document.getElementById('gsearch-results').style.display='none',200)"/>
+        <input class="global-search" id="global-search" placeholder="🔍 Search... (Ctrl+K)" oninput="debouncedGlobalSearch()" onblur="setTimeout(()=>document.getElementById('gsearch-results').style.display='none',200)"/>
         <div class="gsearch-results" id="gsearch-results"></div>
       </div>
     </div>
   </header>
+
+  <!-- Toast Notification -->
+  <div class="toast" id="toast"></div>
+
+  <!-- Keyboard Shortcuts Hint -->
+  <div class="kbd-hint">
+    <span><kbd>Ctrl</kbd>+<kbd>K</kbd> Search</span>
+    <span><kbd>Esc</kbd> Close</span>
+  </div>
 
   <!-- Date filter bar -->
   <div class="date-filter-bar">
@@ -356,6 +427,14 @@ td:last-child{border-right:none}
           <div id="scanner-cards" style="display:flex;flex-wrap:wrap;gap:4px"></div>
         </div>
       </div>
+      
+      <div class="heatmap-container">
+        <div class="heatmap-title">📊 Peak Hours Heatmap <span style="font-size:11px;color:#64748b;font-weight:400;margin-left:8px">Scan intensity by hour across all dates</span></div>
+        <div class="heatmap-grid" id="heatmap-grid"></div>
+        <div class="heatmap-label-row"><span>Low</span><span>High</span></div>
+        <div class="heatmap-hour-labels"><span>12AM</span><span>6AM</span><span>12PM</span><span>6PM</span><span>11PM</span></div>
+      </div>
+      
       <div class="sec-head" style="margin-top:18px">Hourly Scan Rate <span>Scans per hour today</span></div>
       <div class="chart-box"><div class="hourly-chart" id="hourly-chart"></div></div>
       <div class="sec-head">Department Expected vs Present <span>Target headcount from registration</span></div>
@@ -382,22 +461,29 @@ td:last-child{border-right:none}
 
     <!-- SCAN DETAILS -->
     <div class="tab-content" id="tab-scans">
+      <div class="bulk-actions" id="bulk-actions">
+        <span class="bulk-count" id="bulk-count">0 selected</span>
+        <button class="bulk-btn" onclick="exportSelectedRows()">📥 Export Selected</button>
+        <button class="bulk-btn danger" onclick="clearSelection()">✕ Clear</button>
+      </div>
       <div class="toolbar">
-        <div id="scan-note" style="font-size:10px;color:#6b7280;display:none;margin-right:8px"></div>
+        <div id="scan-note" style="font-size:10px;color:#64748b;display:none;margin-right:8px"></div>
         <input class="search-box" id="scan-search" placeholder="Search name, badge, centre..." oninput="debouncedFilterScans()"/>
         <select class="filter-select" id="scan-type-filter" onchange="filterScans()"><option value="">All Types</option><option value="IN">IN only</option><option value="OUT">OUT only</option></select>
         <select class="filter-select" id="scan-dept-filter" onchange="filterScans()"><option value="">All Departments</option></select>
         <div class="count-badge" id="scan-count">0 records</div>
         <button class="dl-btn" onclick="downloadScansExcel()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
-          Download (filtered)
+          Download
         </button>
       </div>
       <div class="tbl-wrap">
         <table>
           <thead>
             <tr>
-              <th rowspan="2">#</th>
+              <th rowspan="2" class="checkbox-cell">
+                <input type="checkbox" id="select-all" onchange="toggleAllRows(this)" style="width:16px;height:16px;accent-color:#2563a8">
+              </th>
               <th colspan="4" style="text-align:center;border-right:2px solid rgba(255,255,255,.3)">SCANNED SEWADAR</th>
               <th colspan="3" style="text-align:center;border-right:2px solid rgba(255,255,255,.3)">SCAN DETAILS</th>
               <th colspan="3" style="text-align:center">SCANNED BY</th>
@@ -681,7 +767,170 @@ const DATA_URL = (window.location.hostname === 'localhost' || window.location.pr
 let DATA = null;
 let ACTIVE_DATE = 'all';
 let RENDER_PENDING = false;
-const SCAN_TABLE_MAX_ROWS = 2000; // show only latest N rows to keep UI snappy
+const SCAN_TABLE_MAX_ROWS = 2000;
+let AUTO_REFRESH = true;
+let AUTO_REFRESH_TIMER = null;
+let SELECTED_ROWS = new Set();
+
+// ── Date Range & Auto Refresh ─────────────────────────────────────────────────
+function setDateRange(range){
+  const dates = DATA?.dates || [];
+  if(!dates.length) return;
+  let selectedDates = [];
+  const today = dates[dates.length - 1];
+  
+  switch(range){
+    case 'today': selectedDates = [today]; break;
+    case 'yesterday': selectedDates = dates.length > 1 ? [dates[dates.length - 2]] : [today]; break;
+    case 'last3': selectedDates = dates.slice(-3); break;
+    case 'last7': selectedDates = dates.slice(-7); break;
+    default: selectedDates = dates;
+  }
+  
+  if(selectedDates.length === 1){
+    setDateFilter(selectedDates[0], document.querySelector('.date-btn'));
+  } else if(selectedDates.length > 1){
+    ACTIVE_DATE = 'all';
+    document.querySelectorAll('.date-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelector('.date-btn').classList.add('active');
+    document.getElementById('date-range-select').value = range;
+    applyDateFilterForDates(selectedDates);
+  }
+}
+
+function applyDateFilterForDates(dates){
+  if(!DATA) return;
+  renderOverview(DATA, dates);
+  renderScanTable(getFilteredScans(DATA.scans||DATA.raw_log||[], dates), dates);
+  renderAttendanceTable(DATA.sewadar_attendance||[], dates);
+  renderCentreCards(DATA.centre_summary||[], dates);
+  renderAbsent(DATA.absent_per_day||[], dates);
+}
+
+function toggleAutoRefresh(){
+  AUTO_REFRESH = !AUTO_REFRESH;
+  const toggle = document.getElementById('auto-refresh-toggle');
+  if(AUTO_REFRESH){
+    toggle.classList.remove('paused');
+    toggle.querySelector('.toggle-icon').textContent = '⏸️';
+    toggle.querySelector('.toggle-label').textContent = 'Auto';
+    startAutoRefresh();
+  } else {
+    toggle.classList.add('paused');
+    toggle.querySelector('.toggle-icon').textContent = '▶️';
+    toggle.querySelector('.toggle-label').textContent = 'Paused';
+    stopAutoRefresh();
+  }
+}
+
+function startAutoRefresh(){
+  if(AUTO_REFRESH_TIMER) clearInterval(AUTO_REFRESH_TIMER);
+  AUTO_REFRESH_TIMER = setInterval(() => loadData(true), 60000);
+}
+
+function stopAutoRefresh(){
+  if(AUTO_REFRESH_TIMER){ clearInterval(AUTO_REFRESH_TIMER); AUTO_REFRESH_TIMER = null; }
+}
+
+// ── Keyboard Shortcuts ───────────────────────────────────────────────────────
+document.addEventListener('keydown', function(e){
+  if((e.ctrlKey || e.metaKey) && e.key === 'k'){
+    e.preventDefault();
+    document.getElementById('global-search').focus();
+  }
+  if(e.key === 'Escape'){
+    document.getElementById('gsearch-results').style.display = 'none';
+    document.activeElement.blur();
+  }
+});
+
+// ── Copy to Clipboard ───────────────────────────────────────────────────────
+function copyToClipboard(text, btn){
+  navigator.clipboard.writeText(text).then(() => {
+    showToast('Copied: ' + text);
+    if(btn){
+      btn.classList.add('copied');
+      btn.textContent = '✓';
+      setTimeout(() => { btn.classList.remove('copied'); btn.innerHTML = '📋'; }, 1500);
+    }
+  });
+}
+
+function showToast(msg){
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2000);
+}
+
+// ── Bulk Selection ──────────────────────────────────────────────────────────
+function toggleRowSelection(checkbox, rowId){
+  if(checkbox.checked){
+    SELECTED_ROWS.add(rowId);
+  } else {
+    SELECTED_ROWS.delete(rowId);
+  }
+  updateBulkActions();
+}
+
+function toggleAllRows(selectAll){
+  const checkboxes = document.querySelectorAll('.row-checkbox');
+  checkboxes.forEach(cb => {
+    cb.checked = selectAll.checked;
+    const rowId = cb.dataset.id;
+    if(selectAll.checked){
+      SELECTED_ROWS.add(rowId);
+    } else {
+      SELECTED_ROWS.delete(rowId);
+    }
+  });
+  updateBulkActions();
+}
+
+function updateBulkActions(){
+  const bulkDiv = document.getElementById('bulk-actions');
+  const countSpan = document.getElementById('bulk-count');
+  if(SELECTED_ROWS.size > 0){
+    bulkDiv.classList.add('active');
+    countSpan.textContent = SELECTED_ROWS.size + ' selected';
+  } else {
+    bulkDiv.classList.remove('active');
+  }
+}
+
+function exportSelectedRows(){
+  const rows = document.querySelectorAll('#scan-body tr');
+  const selectedData = [];
+  rows.forEach(row => {
+    if(SELECTED_ROWS.has(row.dataset.id)){
+      const cells = row.querySelectorAll('td');
+      selectedData.push({
+        badge: cells[1]?.textContent?.trim(),
+        name: cells[2]?.textContent?.trim(),
+        centre: cells[3]?.textContent?.trim(),
+        dept: cells[4]?.textContent?.trim(),
+        type: cells[5]?.textContent?.trim(),
+        date: cells[6]?.textContent?.trim(),
+        time: cells[7]?.textContent?.trim()
+      });
+    }
+  });
+  if(selectedData.length){
+    const ws = XLSX.utils.json_to_sheet(selectedData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Selected");
+    XLSX.writeFile(wb, `selected_scans_${nowStamp()}.xlsx`);
+    showToast('Exported ' + selectedData.length + ' rows');
+  }
+  clearSelection();
+}
+
+function clearSelection(){
+  SELECTED_ROWS.clear();
+  document.querySelectorAll('.row-checkbox').forEach(cb => cb.checked = false);
+  document.getElementById('select-all').checked = false;
+  updateBulkActions();
+}
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 function fmtDate(d){ if(!d)return'—'; return new Date(d).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'2-digit'}); }
@@ -1189,12 +1438,15 @@ function renderScanTable(rows, dates){
     const warning = getWarning(s);
     const isUnknown = !s.sewadar_name || s.sewadar_name==='Unknown';
     const rowClass = hl + (isUnknown?' unknown-row':'');
+    const rowId = `${s.badge_no}-${s.date}-${s.time}`;
     tr.className = rowClass;
+    tr.dataset.id = rowId;
     tr.dataset.search = [s.badge_no,s.sewadar_name,s.sewadar_centre,s.department,s.scanned_by_name].join(' ').toLowerCase();
     tr.dataset.type = s.type||'';
     tr.dataset.dept = s.department||'';
-    tr.innerHTML = `<td class="sno">${i+1}</td>
-      <td>${s.badge_no?`<span class="badge-tag">${s.badge_no}</span>`:'—'}${isUnknown?'<span class="unknown-tag">UNKNOWN</span>':''}</td>
+    tr.innerHTML = `<td class="checkbox-cell"><input type="checkbox" class="row-checkbox" data-id="${rowId}" onchange="toggleRowSelection(this,'${rowId}')"></td>
+      <td class="sno">${i+1}</td>
+      <td>${s.badge_no?`<span class="badge-tag">${s.badge_no}</span><button class="copy-btn" onclick="copyToClipboard('${s.badge_no}',this)">📋</button>`:'—'}${isUnknown?'<span class="unknown-tag">UNKNOWN</span>':''}</td>
       <td><div class="name-primary">${s.sewadar_name||'Unknown'}${warning}</div><div class="name-sub">${s.satsang_point||''}</div></td>
       <td>${s.sewadar_centre?`<span class="centre-tag">${s.sewadar_centre}</span>`:'—'}</td>
       <td>${s.department?`<span class="dept-tag">${s.department}</span>`:'—'}</td>
@@ -1584,6 +1836,50 @@ function renderHourlyChart(d){
       <div class="hourly-fill" style="height:${(c/maxH)*100}%"></div>
       <div class="hourly-lbl">${h}:00</div>
     </div>`).join('');
+  
+  renderHeatmap(d);
+}
+
+function renderHeatmap(d){
+  const scans = d.scans||d.raw_log||[];
+  const dates = d.dates||[];
+  const hourlyByDate = {};
+  
+  dates.forEach(dt => hourlyByDate[dt] = Array(24).fill(0));
+  
+  scans.forEach(s=>{
+    if(hourlyByDate[s.date]){
+      const h = parseInt(s.time.split(':')[0]);
+      if(h>=0&&h<24) hourlyByDate[s.date][h]++;
+    }
+  });
+  
+  const hourlyTotals = Array(24).fill(0);
+  Object.values(hourlyByDate).forEach(hourly => {
+    hourly.forEach((c, h) => hourlyTotals[h] += c);
+  });
+  
+  const maxVal = Math.max(...hourlyTotals, 1);
+  const getColorClass = (val) => {
+    const ratio = val / maxVal;
+    if(ratio === 0) return 'h-0';
+    if(ratio < 0.1) return 'h-1';
+    if(ratio < 0.2) return 'h-2';
+    if(ratio < 0.3) return 'h-3';
+    if(ratio < 0.4) return 'h-4';
+    if(ratio < 0.5) return 'h-5';
+    if(ratio < 0.6) return 'h-6';
+    if(ratio < 0.7) return 'h-10';
+    if(ratio < 0.8) return 'h-15';
+    if(ratio < 0.9) return 'h-20';
+    return 'h-23';
+  };
+  
+  document.getElementById('heatmap-grid').innerHTML = hourlyTotals.map((c, h) => `
+    <div class="heatmap-cell ${getColorClass(c)}" title="${h}:00 - ${c} scans">
+      <span class="heatmap-tooltip">${h}:00 - ${c} scans</span>
+    </div>
+  `).join('');
 }
 
 function renderDeptExpectedVsPresent(d){
@@ -2200,8 +2496,7 @@ function downloadReport(type){
 
 // ── Init ──────────────────────────────────────────────────────────────────────
 loadData();
-// Auto-refresh every 60s, but only re-renders if data changed
-setInterval(() => loadData(true), 60*1000);
+startAutoRefresh();
 </script>
 </body>
 </html>
