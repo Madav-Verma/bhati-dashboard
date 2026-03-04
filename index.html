@@ -773,7 +773,7 @@ let CUSTOM_DATE_FROM = null;
 let CUSTOM_DATE_TO = null;
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
-function fmtDate(d){ if(!d)return'—'; return new Date(d).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'2-digit'}); }
+function fmtDate(d){ if(!d)return'—'; const[y,mo,dy]=(d+'').split('-'); if(dy){return new Date(+y,+mo-1,+dy).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'2-digit'});}return new Date(d).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'2-digit'}); }
 function fmtTime(t){ if(!t)return'—'; const [h,m]=t.split(':'); const hr=parseInt(h); const ampm=hr>=12?'PM':'AM'; const hr12=hr%12||12; return `${hr12}:${m||'00'} ${ampm}`; }
 function nowStamp(){ return new Date().toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}).replace(/ /g,'-'); }
 function debounce(fn, ms){
@@ -913,8 +913,11 @@ function incrementalRender(d){
   renderAttendanceTable(d.sewadar_attendance||[], dates);
   renderCentreCards(d.centre_summary||[], dates);
   renderAbsent(d.absent_per_day||[], dates);
-  const alertCount = (d.duplicate_flags||[]).length + (d.re_entry_flags||[]).length + (d.multi_scan_flags||[]).length + (d.missing_out||[]).length;
-  document.getElementById('alerts-badge').textContent = alertCount > 999 ? '999+' : alertCount;
+  renderAlertsForDates(d, dates);
+  renderLiveOps(d);
+  renderScannerPerformance(d);
+  populateFilters(d);
+  buildSearchIndex(d);
   const absentTotal = (d.absent_per_day||[]).reduce((a,b)=>a+b.absent_count,0);
   document.getElementById('absent-badge').textContent = absentTotal > 999 ? '999+' : absentTotal;
 }
@@ -959,6 +962,7 @@ function renderLiveOpsBar(d){
 }
 
 function calculateAggregates(d){
+  if(!d.scans&&d.raw_log)d.scans=d.raw_log; // normalize raw_log → scans
   const scans=d.scans||[];
   const dates=d.dates||[];
   const headcountPerDay=dates.map(date=>{
@@ -1056,6 +1060,8 @@ function calculateAggregates(d){
       }
     }
   });
+  // Preserve server's department_expected (official quotas); compute from scans only if not provided
+  const serverDeptExpected=d.department_expected||{};
   const deptBadges={};
   scans.forEach(s=>{
     if(s.department&&s.type==='IN'){
@@ -1063,8 +1069,8 @@ function calculateAggregates(d){
       deptBadges[s.department].add(s.badge_no);
     }
   });
-  const deptExpected={};
-  Object.entries(deptBadges).forEach(([dept,badges])=>{deptExpected[dept]=badges.size;});
+  // Use server quotas if available, else fallback to scan counts
+  const deptExpected=Object.keys(serverDeptExpected).length?serverDeptExpected:Object.fromEntries(Object.entries(deptBadges).map(([d,b])=>[d,b.size]));
   // Build sewadar_attendance from scans if not provided by server
   const sewadarMap={};
   scans.forEach(s=>{
@@ -1077,12 +1083,21 @@ function calculateAggregates(d){
     else if(s.type==='OUT'){if(!sewadarMap[badge][dt].last_out||s.time>sewadarMap[badge][dt].last_out)sewadarMap[badge][dt].last_out=s.time;}
   });
   const sewadarAttendance=Object.values(sewadarMap);
-  return{...d,headcount_per_day:headcountPerDay,gender_summary:genderSummary,centre_summary:centreSummary,duplicate_flags:duplicateFlags,missing_out:missingOut,orphaned_outs:orphanedOuts,re_entry_flags:reEntryFlags,multi_scan_flags:multiScanFlags,department_expected:deptExpected,sewadar_attendance:sewadarAttendance};
+  const total_sewadars=new Set(scans.map(s=>s.badge_no).filter(Boolean)).size;
+  // Build absent_per_day: sewadars in sewadar_attendance but not scanned on a given date
+  // Since we only have scanned data (no full registered list from server), absent = not-yet-scanned among those who scanned on ANY day
+  const allKnownBadges=Object.values(sewadarMap);
+  const absentPerDay=dates.map(date=>{
+    const scannedToday=new Set(scans.filter(s=>s.date===date&&s.type==='IN').map(s=>s.badge_no));
+    const absentList=allKnownBadges.filter(s=>!scannedToday.has(s.badge_no)).map(s=>({badge_no:s.badge_no,name:s.sewadar_name,centre:s.sewadar_centre,department:s.department,gender:s.gender}));
+    return{date,absent_count:absentList.length,absent:absentList};
+  });
+  return{...d,total_sewadars,headcount_per_day:headcountPerDay,gender_summary:genderSummary,centre_summary:centreSummary,duplicate_flags:duplicateFlags,missing_out:missingOut,orphaned_outs:orphanedOuts,re_entry_flags:reEntryFlags,multi_scan_flags:multiScanFlags,department_expected:deptExpected,sewadar_attendance:sewadarAttendance,absent_per_day:absentPerDay};
 }
 
 // ── Render all ────────────────────────────────────────────────────────────────
 function render(d){
-  document.getElementById('last-updated').textContent='Updated: '+d.last_updated;
+  if(d.last_updated)document.getElementById('last-updated').textContent='Updated: '+d.last_updated;
   if(d.last_scan_at)document.getElementById('last-scan-tag').textContent='Last scan: '+fmtTime(d.last_scan_at.slice(11,16));
 
   // Date filter buttons
@@ -1123,8 +1138,8 @@ function renderOverview(d, dates){
     {cls:'teal',label:'Missing OUT',val:(d.missing_out||[]).filter(m=>dates.includes(m.date)).length,sub:'IN but no OUT'},
   ].map(k=>`<div class="kpi ${k.cls}"><div class="kpi-label">${k.label}</div><div class="kpi-value">${k.val}</div><div class="kpi-sub">${k.sub}</div></div>`).join('');
 
-  if(d.dates&&d.dates.length)
-    document.getElementById('date-range-label').textContent=fmtDate(d.dates[0])+(d.dates.length>1?' – '+fmtDate(d.dates[d.dates.length-1]):'');
+  if(dates&&dates.length)
+    document.getElementById('date-range-label').textContent=fmtDate(dates[0])+(dates.length>1?' – '+fmtDate(dates[dates.length-1]):'');
 
   const gs=(d.gender_summary||[]).filter(g=>dates.includes(g.date));
   document.getElementById('gender-row').innerHTML=gs.map(g=>{
@@ -1544,7 +1559,8 @@ function filterAlertTable(type){
 
 function renderLiveOps(d){
   const scans=d.scans||d.raw_log||[];
-  const today=d.dates[d.dates.length-1];
+  const today=(d.dates&&d.dates.length)?d.dates[d.dates.length-1]:null;
+  if(!today){document.getElementById('scanner-cards').innerHTML='<span style="opacity:0.6;font-size:11px">No scan data yet</span>';return;}
   const todayScans=scans.filter(s=>s.date===today);
   const scannerStats={};
   todayScans.forEach(s=>{
@@ -1579,7 +1595,8 @@ function renderLiveOps(d){
 }
 
 function renderHourlyChart(d){
-  const today=d.dates[d.dates.length-1];
+  const today=(d.dates&&d.dates.length)?d.dates[d.dates.length-1]:null;
+  if(!today)return;
   const scans=(d.scans||d.raw_log||[]).filter(s=>s.date===today);
   const hourly=Array(24).fill(0);
   scans.forEach(s=>{const h=parseInt(s.time.split(':')[0]);if(h>=0&&h<24)hourly[h]++;});
@@ -1593,7 +1610,8 @@ function renderHourlyChart(d){
 }
 
 function renderDeptExpectedVsPresent(d){
-  const today=d.dates[d.dates.length-1];
+  const today=(d.dates&&d.dates.length)?d.dates[d.dates.length-1]:null;
+  if(!today)return;
   const deptExpected=d.department_expected||{};
   const deptPresent={};
   (d.scans||d.raw_log||[]).filter(s=>s.date===today&&s.type==='IN').forEach(s=>{
@@ -1616,7 +1634,8 @@ function renderDeptExpectedVsPresent(d){
 }
 
 function renderCentreTimeline(d){
-  const today=d.dates[d.dates.length-1];
+  const today=(d.dates&&d.dates.length)?d.dates[d.dates.length-1]:null;
+  if(!today)return;
   const scans=(d.scans||d.raw_log||[]).filter(s=>s.date===today);
   const centreFirstScan={};
   scans.forEach(s=>{if(!centreFirstScan[s.sewadar_centre]||s.time<centreFirstScan[s.sewadar_centre])centreFirstScan[s.sewadar_centre]=s.time;});
@@ -1720,7 +1739,8 @@ function populateFilters(d){
 function renderPrintRegister(){
   const deptFilter=document.getElementById('print-dept-filter').value;
   const centreFilter=document.getElementById('print-centre-filter').value;
-  const today=DATA.dates[DATA.dates.length-1];
+  const today=(DATA.dates&&DATA.dates.length)?DATA.dates[DATA.dates.length-1]:null;
+  if(!today){document.getElementById('print-register').innerHTML='<p style="color:#6b7280;padding:20px">No data available</p>';return;}
   let sewadars=DATA.sewadar_attendance||[];
   if(deptFilter)sewadars=sewadars.filter(s=>s.department===deptFilter);
   if(centreFilter)sewadars=sewadars.filter(s=>s.sewadar_centre===centreFilter);
@@ -1758,7 +1778,8 @@ function downloadPrintRegisterExcel(){
   if(!DATA)return;
   const deptFilter=document.getElementById('print-dept-filter').value;
   const centreFilter=document.getElementById('print-centre-filter').value;
-  const today=DATA.dates[DATA.dates.length-1];
+  const today=(DATA.dates&&DATA.dates.length)?DATA.dates[DATA.dates.length-1]:null;
+  if(!today){document.getElementById('print-register').innerHTML='<p style="color:#6b7280;padding:20px">No data available</p>';return;}
   let sewadars=DATA.sewadar_attendance||[];
   if(deptFilter)sewadars=sewadars.filter(s=>s.department===deptFilter);
   if(centreFilter)sewadars=sewadars.filter(s=>s.sewadar_centre===centreFilter);
@@ -1769,12 +1790,14 @@ function downloadPrintRegisterExcel(){
     ['Date',fmtDate(today)],[''],
     ['S.No.','Badge No.','Name','Centre','Department','Gender','IN Time','OUT Time','Status']
   ]);
-  sewadars.forEach((s,i)=>{
+  const rows=sewadars.map((s,i)=>{
     const info=s[today];
     const present=info&&info.status!=='ABSENT';
-    XLSX.utils.sheet_add_row(ws,[i+1,s.badge_no,s.sewadar_name,s.sewadar_centre,s.department,s.gender,info?fmtTime(info.first_in):'',info?fmtTime(info.last_out):'',present?'Present':'Absent']);
+    return[i+1,s.badge_no,s.sewadar_name,s.sewadar_centre,s.department,s.gender,info?fmtTime(info.first_in):'',info?fmtTime(info.last_out):'',present?'Present':'Absent'];
   });
-  styleWS(ws);XLSX.utils.book_append_sheet(wb,ws,'Attendance Register');
+  const wsData=[['Faridabad Area Bhati March 2026 — Attendance Register'],['Generated',new Date().toLocaleString('en-IN')],['Date',fmtDate(today)],[''],['S.No.','Badge No.','Name','Centre','Department','Gender','IN Time','OUT Time','Status'],...rows];
+  const wsFinal=XLSX.utils.aoa_to_sheet(wsData);
+  styleWS(wsFinal);XLSX.utils.book_append_sheet(wb,wsFinal,'Attendance Register');
   saveXL(wb,`Bhati-Attendance-Register-${nowStamp()}.xlsx`);
 }
 
