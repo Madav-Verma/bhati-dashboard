@@ -859,6 +859,8 @@ function applyDateFilter(){
   renderAttendanceTable(d.sewadar_attendance||[], dates);
   renderCentreCards(d.centre_summary||[], dates);
   renderAbsent(d.absent_per_day||[], dates);
+  // Re-render alerts filtered to active dates
+  renderAlertsForDates(d, dates);
 }
 
 function getFilteredScans(scans, dates){
@@ -1103,7 +1105,6 @@ function render(d){
   populateFilters(d);
   populateReportFilters();
   applyDateFilter();
-  renderAlerts(d);
   renderLiveOps(d);
   renderScannerPerformance(d);
   renderPrintRegister();
@@ -1230,11 +1231,13 @@ const debouncedFilterScans=debounce(filterScans,150);
 
 // ── Attendance ────────────────────────────────────────────────────────────────
 function renderAttendanceTable(rows, dates){
+  // Only show sewadars that have at least one scan on the active dates
+  const filteredRows = rows.filter(s => dates.some(dt => s[dt] && s[dt].status !== 'ABSENT'));
   document.getElementById('att-head').innerHTML=`<tr>
     <th>#</th><th>Badge No.</th><th>Name</th><th>Centre</th><th>Dept</th><th>Gender</th>
     ${dates.map(dt=>`<th style="text-align:center;min-width:88px">${fmtDate(dt)}</th>`).join('')}
   </tr>`;
-  document.getElementById('att-body').innerHTML=rows.map((s,i)=>`
+  document.getElementById('att-body').innerHTML=filteredRows.map((s,i)=>`
     <tr data-name="${(s.sewadar_name||'').toLowerCase()}" data-badge="${(s.badge_no||'').toLowerCase()}"
         data-centre="${(s.sewadar_centre||'').toLowerCase()}" data-dept="${(s.department||'').toLowerCase()}"
         data-gender="${(s.gender||'').toLowerCase()}">
@@ -1251,7 +1254,7 @@ function renderAttendanceTable(rows, dates){
         return`<td style="text-align:center"><span class="present-cell">↓${fmtTime(info.first_in)||'—'}<br>↑${fmtTime(info.last_out)||'—'}</span></td>`;
       }).join('')}
     </tr>`).join('');
-  document.getElementById('att-count').textContent=rows.length+' sewadars';
+  document.getElementById('att-count').textContent=filteredRows.length+' sewadars';
 }
 
 function filterAttendance(){
@@ -1392,6 +1395,19 @@ function filterAbsent(){
 const debouncedFilterAbsent=debounce(filterAbsent,150);
 
 // ── Alerts — fully redesigned, clean sections ─────────────────────────────────
+function renderAlertsForDates(d, dates){
+  // Re-filter all alert data to only the active dates, then render
+  const filtered = {
+    ...d,
+    missing_out: (d.missing_out||[]).filter(m=>dates.includes(m.date)),
+    orphaned_outs: (d.orphaned_outs||[]).filter(m=>dates.includes(m.date)),
+    duplicate_flags: (d.duplicate_flags||[]).filter(f=>dates.includes(f.date)),
+    multi_scan_flags: (d.multi_scan_flags||[]).filter(f=>dates.includes(f.date)),
+    re_entry_flags: (d.re_entry_flags||[]).filter(r=>dates.includes(r.date)),
+  };
+  renderAlerts(filtered);
+}
+
 function renderAlerts(d){
   const missingOut=d.missing_out||[];
   const orphanedOuts=d.orphaned_outs||[];
