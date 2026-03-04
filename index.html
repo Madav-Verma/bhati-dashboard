@@ -881,6 +881,11 @@ async function loadData(isAutoRefresh = false){
     let d = await res.json();
     const scanCount = (d.scans||d.raw_log||[]).length;
     if(isAutoRefresh && scanCount === LAST_SCAN_COUNT) return;
+    // Derive dates from scans if the server doesn't provide them
+    if(!d.dates || !d.dates.length) {
+      const allScans = d.scans || d.raw_log || [];
+      d.dates = [...new Set(allScans.map(s => s.date).filter(Boolean))].sort();
+    }
     if(!d.headcount_per_day && d.scans) d = calculateAggregates(d);
     const oldScanCount = LAST_SCAN_COUNT;
     DATA = d;
@@ -1058,7 +1063,19 @@ function calculateAggregates(d){
   });
   const deptExpected={};
   Object.entries(deptBadges).forEach(([dept,badges])=>{deptExpected[dept]=badges.size;});
-  return{...d,headcount_per_day:headcountPerDay,gender_summary:genderSummary,centre_summary:centreSummary,duplicate_flags:duplicateFlags,missing_out:missingOut,orphaned_outs:orphanedOuts,re_entry_flags:reEntryFlags,multi_scan_flags:multiScanFlags,department_expected:deptExpected};
+  // Build sewadar_attendance from scans if not provided by server
+  const sewadarMap={};
+  scans.forEach(s=>{
+    const badge=s.badge_no;
+    if(!badge)return;
+    if(!sewadarMap[badge])sewadarMap[badge]={badge_no:badge,sewadar_name:s.sewadar_name,sewadar_centre:s.sewadar_centre,department:s.department,gender:s.gender,satsang_point:s.satsang_point||''};
+    const dt=s.date;
+    if(!sewadarMap[badge][dt])sewadarMap[badge][dt]={status:'PRESENT',first_in:null,last_out:null};
+    if(s.type==='IN'){if(!sewadarMap[badge][dt].first_in||s.time<sewadarMap[badge][dt].first_in)sewadarMap[badge][dt].first_in=s.time;}
+    else if(s.type==='OUT'){if(!sewadarMap[badge][dt].last_out||s.time>sewadarMap[badge][dt].last_out)sewadarMap[badge][dt].last_out=s.time;}
+  });
+  const sewadarAttendance=Object.values(sewadarMap);
+  return{...d,headcount_per_day:headcountPerDay,gender_summary:genderSummary,centre_summary:centreSummary,duplicate_flags:duplicateFlags,missing_out:missingOut,orphaned_outs:orphanedOuts,re_entry_flags:reEntryFlags,multi_scan_flags:multiScanFlags,department_expected:deptExpected,sewadar_attendance:sewadarAttendance};
 }
 
 // ── Render all ────────────────────────────────────────────────────────────────
