@@ -888,7 +888,13 @@ async function loadData(isAutoRefresh = false){
       const allScans = d.scans || d.raw_log || [];
       d.dates = [...new Set(allScans.map(s => s.date).filter(Boolean))].sort();
     }
-    if(!d.headcount_per_day && d.scans) d = calculateAggregates(d);
+    // Run calculateAggregates if any derived field is missing.
+    // Server now sends all fields, but this fallback protects against
+    // old server versions or partial responses.
+    const needsAggregates = !d.sewadar_attendance || !d.duplicate_flags ||
+                            !d.multi_scan_flags || !d.missing_out ||
+                            !d.centre_summary || !d.absent_per_day;
+    if(needsAggregates && d.scans) d = calculateAggregates(d);
     const oldScanCount = LAST_SCAN_COUNT;
     DATA = d;
     LAST_SCAN_COUNT = scanCount;
@@ -1098,7 +1104,7 @@ function calculateAggregates(d){
 // ── Render all ────────────────────────────────────────────────────────────────
 function render(d){
   if(d.last_updated)document.getElementById('last-updated').textContent='Updated: '+d.last_updated;
-  if(d.last_scan_at)document.getElementById('last-scan-tag').textContent='Last scan: '+fmtTime(d.last_scan_at.slice(11,16));
+  if(d.last_scan_at){const lsRaw=String(d.last_scan_at);const lsTime=lsRaw.includes('T')?lsRaw.slice(11,16):lsRaw.slice(11,16);document.getElementById('last-scan-tag').textContent='Last scan: '+fmtTime(lsTime);}
 
   // Date filter buttons
   const btnContainer=document.getElementById('date-btns');
