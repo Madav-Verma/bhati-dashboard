@@ -91,7 +91,7 @@ main{padding:18px 24px}
 .dept-name{font-size:11px;font-weight:600;color:#374151}
 .dept-count{font-size:17px;font-weight:700;color:white;background:#2563a8;border-radius:6px;padding:2px 10px}
 
-/* ── NEW Alert Tabs ── */
+/* Alert Tabs */
 .alert-tab-bar{display:flex;gap:0;margin-bottom:16px;background:white;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.05);flex-wrap:wrap}
 .alert-tab{padding:10px 18px;font-size:12px;font-weight:600;color:#6b7280;cursor:pointer;border-right:1px solid #e5e7eb;transition:all .15s;display:flex;align-items:center;gap:6px;white-space:nowrap}
 .alert-tab:last-child{border-right:none}
@@ -290,6 +290,12 @@ td:last-child{border-right:none}
 .absent-group-head{background:#fee2e2;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #fecaca}
 .absent-group-title{font-size:13px;font-weight:700;color:#dc2626}
 .absent-group-count{font-size:12px;font-weight:600;color:#dc2626}
+
+/* Scan Pagination */
+#scan-pagination{display:flex;gap:6px;align-items:center;margin-top:10px;flex-wrap:wrap;font-size:12px}
+#scan-pagination button{padding:4px 10px;border:1px solid #d1d5db;border-radius:4px;cursor:pointer;background:white;font-family:'Inter',sans-serif;font-size:12px;transition:all .15s}
+#scan-pagination button:hover:not([disabled]){border-color:#2563a8;color:#2563a8}
+#scan-pagination button[disabled]{opacity:.4;cursor:default}
 </style>
 </head>
 <body>
@@ -428,6 +434,7 @@ td:last-child{border-right:none}
           <tbody id="scan-body"></tbody>
         </table>
       </div>
+      <div id="scan-pagination"></div>
     </div>
 
     <!-- ATTENDANCE MATRIX -->
@@ -487,12 +494,9 @@ td:last-child{border-right:none}
       <div class="scanner-perf-grid" id="scanner-perf-grid"></div>
     </div>
 
-    <!-- ALERTS — redesigned with clean tabs -->
+    <!-- ALERTS -->
     <div class="tab-content" id="tab-alerts">
-      <!-- Summary cards -->
       <div class="alert-summary-row" id="alert-summary-row"></div>
-
-      <!-- Alert type tabs -->
       <div class="alert-tab-bar">
         <div class="alert-tab active amber" onclick="switchAlertTab('missing-out',this)">
           ⬆️ Missing OUT <span class="alert-count-pill amber" id="acount-missing-out">0</span>
@@ -511,7 +515,6 @@ td:last-child{border-right:none}
         </div>
       </div>
 
-      <!-- Missing OUT Section — NOTE: these sewadars ARE PRESENT, just flagged for missing OUT -->
       <div class="alert-section active" id="alert-section-missing-out">
         <div class="toolbar" style="margin-bottom:10px">
           <input class="search-box" id="missing-out-search" placeholder="Search name, badge..." oninput="filterAlertTable('missing-out')" style="max-width:300px"/>
@@ -531,7 +534,6 @@ td:last-child{border-right:none}
         </div>
       </div>
 
-      <!-- Missing IN Section (orphaned OUTs) -->
       <div class="alert-section" id="alert-section-missing-in">
         <p style="font-size:12px;color:#6b7280;margin-bottom:10px">Sewadars who have an OUT scan but no corresponding IN scan on the same day.</p>
         <div class="toolbar" style="margin-bottom:10px">
@@ -547,7 +549,6 @@ td:last-child{border-right:none}
         </div>
       </div>
 
-      <!-- Duplicate INs Section -->
       <div class="alert-section" id="alert-section-dup-in">
         <p style="font-size:12px;color:#6b7280;margin-bottom:10px">Sewadars scanned IN more than once in the same day.</p>
         <div class="toolbar" style="margin-bottom:10px">
@@ -562,7 +563,6 @@ td:last-child{border-right:none}
         </div>
       </div>
 
-      <!-- Duplicate OUTs Section -->
       <div class="alert-section" id="alert-section-dup-out">
         <p style="font-size:12px;color:#6b7280;margin-bottom:10px">Sewadars scanned OUT more than once in the same day.</p>
         <div class="toolbar" style="margin-bottom:10px">
@@ -577,7 +577,6 @@ td:last-child{border-right:none}
         </div>
       </div>
 
-      <!-- Re-entries Section -->
       <div class="alert-section" id="alert-section-reentry">
         <p style="font-size:12px;color:#6b7280;margin-bottom:10px">Sewadars who scanned IN → OUT → IN again on the same day (returned after leaving).</p>
         <div class="toolbar" style="margin-bottom:10px">
@@ -593,172 +592,104 @@ td:last-child{border-right:none}
       </div>
     </div>
 
-  <!-- DOWNLOAD REPORTS -->
+    <!-- DOWNLOAD REPORTS -->
     <div class="tab-content" id="tab-reports">
       <div class="sec-head">📥 Download All Reports <span>Date-filtered Excel downloads</span></div>
-      
       <div class="reports-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-top:16px">
-        
+
         <div class="report-card" style="background:white;border:1px solid #e5e7eb;border-radius:8px;padding:16px">
-          <div class="report-card-title" style="font-size:14px;font-weight:700;color:#1a3c6e;margin-bottom:8px">📊 Overview Report</div>
-          <div class="report-card-desc" style="font-size:11px;color:#6b7280;margin-bottom:12px">Daily headcount, gender breakdown, department-wise stats</div>
-          <div class="report-filters" style="margin-bottom:12px">
-            <select class="filter-select" id="report-overview-date" style="width:100%;margin-bottom:8px">
-              <option value="all">All Dates</option>
-            </select>
-          </div>
+          <div style="font-size:14px;font-weight:700;color:#1a3c6e;margin-bottom:8px">📊 Overview Report</div>
+          <div style="font-size:11px;color:#6b7280;margin-bottom:12px">Daily headcount, gender breakdown, department-wise stats</div>
+          <select class="filter-select" id="report-overview-date" style="width:100%;margin-bottom:12px"><option value="all">All Dates</option></select>
           <button class="dl-btn" onclick="downloadReport('overview')" style="width:100%;justify-content:center">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
-            Download Excel
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>Download Excel
           </button>
         </div>
 
         <div class="report-card" style="background:white;border:1px solid #e5e7eb;border-radius:8px;padding:16px">
-          <div class="report-card-title" style="font-size:14px;font-weight:700;color:#1a3c6e;margin-bottom:8px">🔍 Scan Details</div>
-          <div class="report-card-desc" style="font-size:11px;color:#6b7280;margin-bottom:12px">All scan records with timestamps and scanner info</div>
-          <div class="report-filters" style="margin-bottom:12px">
-            <select class="filter-select" id="report-scans-date" style="width:100%;margin-bottom:8px">
-              <option value="all">All Dates</option>
-            </select>
-            <select class="filter-select" id="report-scans-type" style="width:100%">
-              <option value="">All Types</option>
-              <option value="IN">IN Only</option>
-              <option value="OUT">OUT Only</option>
-            </select>
-          </div>
+          <div style="font-size:14px;font-weight:700;color:#1a3c6e;margin-bottom:8px">🔍 Scan Details</div>
+          <div style="font-size:11px;color:#6b7280;margin-bottom:12px">All scan records with timestamps and scanner info</div>
+          <select class="filter-select" id="report-scans-date" style="width:100%;margin-bottom:8px"><option value="all">All Dates</option></select>
+          <select class="filter-select" id="report-scans-type" style="width:100%;margin-bottom:12px"><option value="">All Types</option><option value="IN">IN Only</option><option value="OUT">OUT Only</option></select>
           <button class="dl-btn" onclick="downloadReport('scans')" style="width:100%;justify-content:center">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
-            Download Excel
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>Download Excel
           </button>
         </div>
 
         <div class="report-card" style="background:white;border:1px solid #e5e7eb;border-radius:8px;padding:16px">
-          <div class="report-card-title" style="font-size:14px;font-weight:700;color:#1a3c6e;margin-bottom:8px">📅 Attendance Matrix</div>
-          <div class="report-card-desc" style="font-size:11px;color:#6b7280;margin-bottom:12px">Complete attendance for all sewadars by date</div>
-          <div class="report-filters" style="margin-bottom:12px">
-            <select class="filter-select" id="report-attendance-date" style="width:100%;margin-bottom:8px">
-              <option value="all">All Dates</option>
-            </select>
-            <select class="filter-select" id="report-attendance-centre" style="width:100%;margin-bottom:8px">
-              <option value="">All Centres</option>
-            </select>
-            <select class="filter-select" id="report-attendance-dept" style="width:100%">
-              <option value="">All Departments</option>
-            </select>
-          </div>
+          <div style="font-size:14px;font-weight:700;color:#1a3c6e;margin-bottom:8px">📅 Attendance Matrix</div>
+          <div style="font-size:11px;color:#6b7280;margin-bottom:12px">Complete attendance for all sewadars by date</div>
+          <select class="filter-select" id="report-attendance-date" style="width:100%;margin-bottom:8px"><option value="all">All Dates</option></select>
+          <select class="filter-select" id="report-attendance-centre" style="width:100%;margin-bottom:8px"><option value="">All Centres</option></select>
+          <select class="filter-select" id="report-attendance-dept" style="width:100%;margin-bottom:12px"><option value="">All Departments</option></select>
           <button class="dl-btn" onclick="downloadReport('attendance')" style="width:100%;justify-content:center">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
-            Download Excel
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>Download Excel
           </button>
         </div>
 
         <div class="report-card" style="background:white;border:1px solid #e5e7eb;border-radius:8px;padding:16px">
-          <div class="report-card-title" style="font-size:14px;font-weight:700;color:#1a3c6e;margin-bottom:8px">🏢 Centre Summary</div>
-          <div class="report-card-desc" style="font-size:11px;color:#6b7280;margin-bottom:12px">Per-centre attendance with expected vs present</div>
-          <div class="report-filters" style="margin-bottom:12px">
-            <select class="filter-select" id="report-centre-date" style="width:100%;margin-bottom:8px">
-              <option value="all">All Dates</option>
-            </select>
-            <select class="filter-select" id="report-centre-name" style="width:100%">
-              <option value="">All Centres</option>
-            </select>
-          </div>
+          <div style="font-size:14px;font-weight:700;color:#1a3c6e;margin-bottom:8px">🏢 Centre Summary</div>
+          <div style="font-size:11px;color:#6b7280;margin-bottom:12px">Per-centre attendance with expected vs present</div>
+          <select class="filter-select" id="report-centre-date" style="width:100%;margin-bottom:8px"><option value="all">All Dates</option></select>
+          <select class="filter-select" id="report-centre-name" style="width:100%;margin-bottom:12px"><option value="">All Centres</option></select>
           <button class="dl-btn" onclick="downloadReport('centre')" style="width:100%;justify-content:center">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
-            Download Excel
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>Download Excel
           </button>
         </div>
 
         <div class="report-card" style="background:white;border:1px solid #e5e7eb;border-radius:8px;padding:16px">
-          <div class="report-card-title" style="font-size:14px;font-weight:700;color:#dc2626;margin-bottom:8px">❌ Absent List</div>
-          <div class="report-card-desc" style="font-size:11px;color:#6b7280;margin-bottom:12px">Sewadars who did not scan on selected dates</div>
-          <div class="report-filters" style="margin-bottom:12px">
-            <select class="filter-select" id="report-absent-date" style="width:100%;margin-bottom:8px">
-              <option value="all">All Dates</option>
-            </select>
-            <select class="filter-select" id="report-absent-centre" style="width:100%;margin-bottom:8px">
-              <option value="">All Centres</option>
-            </select>
-            <select class="filter-select" id="report-absent-dept" style="width:100%">
-              <option value="">All Departments</option>
-            </select>
-          </div>
+          <div style="font-size:14px;font-weight:700;color:#dc2626;margin-bottom:8px">❌ Absent List</div>
+          <div style="font-size:11px;color:#6b7280;margin-bottom:12px">Sewadars who did not scan on selected dates</div>
+          <select class="filter-select" id="report-absent-date" style="width:100%;margin-bottom:8px"><option value="all">All Dates</option></select>
+          <select class="filter-select" id="report-absent-centre" style="width:100%;margin-bottom:8px"><option value="">All Centres</option></select>
+          <select class="filter-select" id="report-absent-dept" style="width:100%;margin-bottom:12px"><option value="">All Departments</option></select>
           <button class="dl-btn" onclick="downloadReport('absent')" style="width:100%;justify-content:center;background:#dc2626">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
-            Download Excel
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>Download Excel
           </button>
         </div>
 
         <div class="report-card" style="background:white;border:1px solid #e5e7eb;border-radius:8px;padding:16px">
-          <div class="report-card-title" style="font-size:14px;font-weight:700;color:#ea580c;margin-bottom:8px">⚠️ Alerts Report</div>
-          <div class="report-card-desc" style="font-size:11px;color:#6b7280;margin-bottom:12px">Duplicate IN/OUT, Missing IN/OUT, Re-entry alerts</div>
-          <div class="report-filters" style="margin-bottom:12px">
-            <select class="filter-select" id="report-alerts-date" style="width:100%;margin-bottom:8px">
-              <option value="all">All Dates</option>
-            </select>
-            <select class="filter-select" id="report-alerts-type" style="width:100%">
-              <option value="">All Alerts</option>
-              <option value="duplicate">Duplicate IN</option>
-              <option value="missing">Missing OUT</option>
-              <option value="reentry">Re-entry</option>
-              <option value="multi">Multi-scan</option>
-            </select>
-          </div>
+          <div style="font-size:14px;font-weight:700;color:#ea580c;margin-bottom:8px">⚠️ Alerts Report</div>
+          <div style="font-size:11px;color:#6b7280;margin-bottom:12px">Duplicate IN/OUT, Missing IN/OUT, Re-entry alerts</div>
+          <select class="filter-select" id="report-alerts-date" style="width:100%;margin-bottom:8px"><option value="all">All Dates</option></select>
+          <select class="filter-select" id="report-alerts-type" style="width:100%;margin-bottom:12px"><option value="">All Alerts</option><option value="duplicate">Duplicate IN</option><option value="missing">Missing OUT</option><option value="reentry">Re-entry</option><option value="multi">Multi-scan</option></select>
           <button class="dl-btn" onclick="downloadReport('alerts')" style="width:100%;justify-content:center;background:#ea580c">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
-            Download Excel
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>Download Excel
           </button>
         </div>
 
         <div class="report-card" style="background:white;border:1px solid #e5e7eb;border-radius:8px;padding:16px">
-          <div class="report-card-title" style="font-size:14px;font-weight:700;color:#7c3aed;margin-bottom:8px">📱 Scanner Performance</div>
-          <div class="report-card-desc" style="font-size:11px;color:#6b7280;margin-bottom:12px">Scanner-wise scan counts and performance metrics</div>
-          <div class="report-filters" style="margin-bottom:12px">
-            <select class="filter-select" id="report-scanner-date" style="width:100%;margin-bottom:8px">
-              <option value="all">All Dates</option>
-            </select>
-            <select class="filter-select" id="report-scanner-centre" style="width:100%">
-              <option value="">All Centres</option>
-            </select>
-          </div>
+          <div style="font-size:14px;font-weight:700;color:#7c3aed;margin-bottom:8px">📱 Scanner Performance</div>
+          <div style="font-size:11px;color:#6b7280;margin-bottom:12px">Scanner-wise scan counts and performance metrics</div>
+          <select class="filter-select" id="report-scanner-date" style="width:100%;margin-bottom:8px"><option value="all">All Dates</option></select>
+          <select class="filter-select" id="report-scanner-centre" style="width:100%;margin-bottom:12px"><option value="">All Centres</option></select>
           <button class="dl-btn" onclick="downloadReport('scanner')" style="width:100%;justify-content:center;background:#7c3aed">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
-            Download Excel
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>Download Excel
           </button>
         </div>
 
         <div class="report-card" style="background:white;border:1px solid #e5e7eb;border-radius:8px;padding:16px;border-top:3px solid #1a3c6e">
-          <div class="report-card-title" style="font-size:14px;font-weight:700;color:#1a3c6e;margin-bottom:8px">🔲 Centre × Department Pivot Matrix</div>
-          <div class="report-card-desc" style="font-size:11px;color:#6b7280;margin-bottom:12px">Rows: Centres · Columns: Departments · Values: Sewadars present. One sheet per day.</div>
-          <div class="report-filters" style="margin-bottom:12px">
-            <select class="filter-select" id="report-pivot-date" style="width:100%">
-              <option value="all">All Dates (one sheet each)</option>
-            </select>
-          </div>
+          <div style="font-size:14px;font-weight:700;color:#1a3c6e;margin-bottom:8px">🔲 Centre × Department Pivot Matrix</div>
+          <div style="font-size:11px;color:#6b7280;margin-bottom:12px">Rows: Centres · Columns: Departments · Values: Sewadars present. One sheet per day.</div>
+          <select class="filter-select" id="report-pivot-date" style="width:100%;margin-bottom:12px"><option value="all">All Dates (one sheet each)</option></select>
           <button class="dl-btn" onclick="downloadReport('pivot')" style="width:100%;justify-content:center;background:#1a3c6e">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
-            Download Pivot Matrix
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>Download Pivot Matrix
           </button>
         </div>
 
         <div class="report-card" style="background:white;border:1px solid #e5e7eb;border-radius:8px;padding:16px">
-          <div class="report-card-title" style="font-size:14px;font-weight:700;color:#0891b2;margin-bottom:8px">👥 Gender Report</div>
-          <div class="report-card-desc" style="font-size:11px;color:#6b7280;margin-bottom:12px">Male/Female breakdown by date</div>
-          <div class="report-filters" style="margin-bottom:12px">
-            <select class="filter-select" id="report-gender-date" style="width:100%">
-              <option value="all">All Dates</option>
-            </select>
-          </div>
+          <div style="font-size:14px;font-weight:700;color:#0891b2;margin-bottom:8px">👥 Gender Report</div>
+          <div style="font-size:11px;color:#6b7280;margin-bottom:12px">Male/Female breakdown by date</div>
+          <select class="filter-select" id="report-gender-date" style="width:100%;margin-bottom:12px"><option value="all">All Dates</option></select>
           <button class="dl-btn" onclick="downloadReport('gender')" style="width:100%;justify-content:center;background:#0891b2">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
-            Download Excel
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>Download Excel
           </button>
         </div>
 
       </div>
     </div>
 
-  <!-- PRINT REGISTER -->
+    <!-- PRINT REGISTER -->
     <div class="tab-content" id="tab-print">
       <div class="toolbar">
         <select class="filter-select" id="print-dept-filter" onchange="renderPrintRegister()"><option value="">All Departments</option></select>
@@ -780,39 +711,27 @@ td:last-child{border-right:none}
 
 <script>
 // ── Config ────────────────────────────────────────────────────────────────────
-const RAILWAY_URL = 'https://bhati-server-production.up.railway.app//data.json'; // ← update this after deploy
+const RAILWAY_URL = 'https://bhati-server-production.up.railway.app//data.json';
 const DATA_URL = (window.location.hostname === 'localhost' || window.location.protocol === 'file:')
-  ? 'data.json'
-  : RAILWAY_URL;
+  ? 'data.json' : RAILWAY_URL;
 
 let DATA = null;
 let ACTIVE_DATE = 'all';
 let CUSTOM_DATE_FROM = null;
 let CUSTOM_DATE_TO = null;
 
+// ── Scan pagination state ─────────────────────────────────────────────────────
+const SCAN_PAGE_SIZE = 200;
+let _scanAllRows = [];      // full sorted dataset for current date filter
+let _filteredScanRows = []; // subset after search/type/dept filters
+let _scanPage = 0;
+
 // ── Helpers ───────────────────────────────────────────────────────────────────
-function fmtDate(d){ if(!d)return'—'; const[y,mo,dy]=(d+'').split('-'); if(dy){return new Date(+y,+mo-1,+dy).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'2-digit'});}return new Date(d).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'2-digit'}); }
-function fmtTime(t){ if(!t)return'—'; const [h,m]=t.split(':'); const hr=parseInt(h); const ampm=hr>=12?'PM':'AM'; const hr12=hr%12||12; return `${hr12}:${m||'00'} ${ampm}`; }
-function nowStamp(){ 
-  const d=new Date();
-  const dd=String(d.getDate()).padStart(2,'0');
-  const mm=String(d.getMonth()+1).padStart(2,'0');
-  const yy=d.getFullYear();
-  const hh=String(d.getHours()).padStart(2,'0');
-  const min=String(d.getMinutes()).padStart(2,'0');
-  return `${dd}-${mm}-${yy}_${hh}h${min}m`;
-}
-function reportName(type, extra){
-  const stamp=nowStamp();
-  const dates=getActiveDates();
-  const dateRange=dates.length===1?dates[0]:(dates.length>1?`${dates[0]}_to_${dates[dates.length-1]}`:'AllDates');
-  const base=`BhatiPh2_${type}_${dateRange}`;
-  return extra?`${base}_${extra}_${stamp}.xlsx`:`${base}_${stamp}.xlsx`;
-}
-function debounce(fn, ms){
-  let t;
-  return function(...a){ clearTimeout(t); t = setTimeout(()=>fn.apply(this,a), ms); };
-}
+function fmtDate(d){if(!d)return'—';const[y,mo,dy]=(d+'').split('-');if(dy){return new Date(+y,+mo-1,+dy).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'2-digit'});}return new Date(d).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'2-digit'});}
+function fmtTime(t){if(!t)return'—';const[h,m]=t.split(':');const hr=parseInt(h);const ampm=hr>=12?'PM':'AM';const hr12=hr%12||12;return`${hr12}:${m||'00'} ${ampm}`;}
+function nowStamp(){const d=new Date();const dd=String(d.getDate()).padStart(2,'0');const mm=String(d.getMonth()+1).padStart(2,'0');const yy=d.getFullYear();const hh=String(d.getHours()).padStart(2,'0');const min=String(d.getMinutes()).padStart(2,'0');return`${dd}-${mm}-${yy}_${hh}h${min}m`;}
+function reportName(type,extra){const stamp=nowStamp();const dates=getActiveDates();const dateRange=dates.length===1?dates[0]:(dates.length>1?`${dates[0]}_to_${dates[dates.length-1]}`:'AllDates');const base=`BhatiPh2_${type}_${dateRange}`;return extra?`${base}_${extra}_${stamp}.xlsx`:`${base}_${stamp}.xlsx`;}
+function debounce(fn,ms){let t;return function(...a){clearTimeout(t);t=setTimeout(()=>fn.apply(this,a),ms);};}
 
 function switchTab(name){
   ['overview','liveops','scans','attendance','centres','absent','scanners','alerts','reports','print'].forEach((n,i)=>{
@@ -821,316 +740,131 @@ function switchTab(name){
   });
 }
 
-function switchAlertTab(name, btn){
+function switchAlertTab(name,btn){
   document.querySelectorAll('.alert-tab').forEach(t=>t.classList.remove('active','red','amber','blue','purple','green'));
   document.querySelectorAll('.alert-section').forEach(s=>s.classList.remove('active'));
-  const colorMap = {'missing-out':'amber','missing-in':'green','dup-in':'red','dup-out':'blue','reentry':'purple'};
-  btn.classList.add('active', colorMap[name]||'');
-  const sec = document.getElementById('alert-section-'+name);
-  if(sec) sec.classList.add('active');
+  const colorMap={'missing-out':'amber','missing-in':'green','dup-in':'red','dup-out':'blue','reentry':'purple'};
+  btn.classList.add('active',colorMap[name]||'');
+  const sec=document.getElementById('alert-section-'+name);
+  if(sec)sec.classList.add('active');
 }
 
 function getActiveDates(){
-  if(CUSTOM_DATE_FROM && CUSTOM_DATE_TO && DATA){
-    return (DATA.dates||[]).filter(d=>d>=CUSTOM_DATE_FROM && d<=CUSTOM_DATE_TO);
-  }
-  return ACTIVE_DATE==='all' ? (DATA?DATA.dates:[]) : [ACTIVE_DATE];
+  if(CUSTOM_DATE_FROM&&CUSTOM_DATE_TO&&DATA){return(DATA.dates||[]).filter(d=>d>=CUSTOM_DATE_FROM&&d<=CUSTOM_DATE_TO);}
+  return ACTIVE_DATE==='all'?(DATA?DATA.dates:[]):[ACTIVE_DATE];
 }
 
-function setDateFilter(date, btn){
-  ACTIVE_DATE = date;
-  CUSTOM_DATE_FROM = null;
-  CUSTOM_DATE_TO = null;
-  document.getElementById('date-from').value = '';
-  document.getElementById('date-to').value = '';
+function setDateFilter(date,btn){
+  ACTIVE_DATE=date;CUSTOM_DATE_FROM=null;CUSTOM_DATE_TO=null;
+  document.getElementById('date-from').value='';document.getElementById('date-to').value='';
   document.querySelectorAll('.date-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  updateDateActiveTag();
-  if(DATA) applyDateFilter();
+  btn.classList.add('active');updateDateActiveTag();if(DATA)applyDateFilter();
 }
 
 function applyCustomDateRange(){
-  const from = document.getElementById('date-from').value;
-  const to = document.getElementById('date-to').value;
-  if(!from && !to){ clearCustomDateRange(); return; }
-  CUSTOM_DATE_FROM = from || null;
-  CUSTOM_DATE_TO = to || null;
-  ACTIVE_DATE = 'all';
+  const from=document.getElementById('date-from').value;const to=document.getElementById('date-to').value;
+  if(!from&&!to){clearCustomDateRange();return;}
+  CUSTOM_DATE_FROM=from||null;CUSTOM_DATE_TO=to||null;ACTIVE_DATE='all';
   document.querySelectorAll('.date-btn').forEach(b=>b.classList.remove('active'));
-  updateDateActiveTag();
-  if(DATA) applyDateFilter();
+  updateDateActiveTag();if(DATA)applyDateFilter();
 }
 
 function clearCustomDateRange(){
-  CUSTOM_DATE_FROM = null;
-  CUSTOM_DATE_TO = null;
-  document.getElementById('date-from').value = '';
-  document.getElementById('date-to').value = '';
-  const allBtn = document.querySelector('.date-btn');
-  if(allBtn){ allBtn.classList.add('active'); ACTIVE_DATE='all'; }
-  updateDateActiveTag();
-  if(DATA) applyDateFilter();
+  CUSTOM_DATE_FROM=null;CUSTOM_DATE_TO=null;
+  document.getElementById('date-from').value='';document.getElementById('date-to').value='';
+  const allBtn=document.querySelector('.date-btn');if(allBtn){allBtn.classList.add('active');ACTIVE_DATE='all';}
+  updateDateActiveTag();if(DATA)applyDateFilter();
 }
 
 function updateDateActiveTag(){
-  const tag = document.getElementById('date-active-tag');
-  if(CUSTOM_DATE_FROM || CUSTOM_DATE_TO){
-    const from = CUSTOM_DATE_FROM ? fmtDate(CUSTOM_DATE_FROM) : '…';
-    const to = CUSTOM_DATE_TO ? fmtDate(CUSTOM_DATE_TO) : '…';
-    tag.textContent = `Showing: ${from} → ${to}`;
-    tag.style.display = 'inline-block';
-  } else {
-    tag.style.display = 'none';
-  }
+  const tag=document.getElementById('date-active-tag');
+  if(CUSTOM_DATE_FROM||CUSTOM_DATE_TO){const from=CUSTOM_DATE_FROM?fmtDate(CUSTOM_DATE_FROM):'…';const to=CUSTOM_DATE_TO?fmtDate(CUSTOM_DATE_TO):'…';tag.textContent=`Showing: ${from} → ${to}`;tag.style.display='inline-block';}
+  else{tag.style.display='none';}
 }
 
 function applyDateFilter(){
-  const d = DATA;
-  const dates = getActiveDates();
-  renderOverview(d, dates);
-  renderScanTable(getFilteredScans(d.scans||d.raw_log||[], dates), dates);
-  renderAttendanceTable(d.sewadar_attendance||[], dates);
-  renderCentreCards(d.centre_summary||[], dates);
-  renderAbsent(d.absent_per_day||[], dates);
-  // Re-render alerts filtered to active dates
-  renderAlertsForDates(d, dates);
+  const d=DATA;const dates=getActiveDates();
+  renderOverview(d,dates);
+  renderScanTable(getFilteredScans(d.scans||d.raw_log||[],dates),dates);
+  renderAttendanceTable(d.sewadar_attendance||[],dates);
+  renderCentreCards(d.centre_summary||[],dates);
+  renderAbsent(d.absent_per_day||[],dates);
+  renderAlertsForDates(d,dates);
 }
 
-function getFilteredScans(scans, dates){
-  if(dates.length === (DATA?DATA.dates:[]).length && !CUSTOM_DATE_FROM) return scans;
+function getFilteredScans(scans,dates){
+  if(dates.length===(DATA?DATA.dates:[]).length&&!CUSTOM_DATE_FROM)return scans;
   return scans.filter(s=>dates.includes(s.date));
 }
 
 // ── Load ──────────────────────────────────────────────────────────────────────
-let LAST_SCAN_COUNT = 0;
+let LAST_SCAN_COUNT=0;
 
-async function loadData(isAutoRefresh = false){
+async function loadData(isAutoRefresh=false){
   try{
-    let url = DATA_URL;
-    let res = await fetch(url+'?t='+Date.now());
-    if(!res.ok && url === 'data.json'){
-      url = RAILWAY_URL;
-      res = await fetch(url+'?t='+Date.now());
-    }
-    if(!res.ok) throw new Error('Failed to fetch data');
-    let d = await res.json();
-    const scanCount = (d.scans||d.raw_log||[]).length;
-    if(isAutoRefresh && scanCount === LAST_SCAN_COUNT) return;
-    // Derive dates from scans if the server doesn't provide them
-    if(!d.dates || !d.dates.length) {
-      const allScans = d.scans || d.raw_log || [];
-      d.dates = [...new Set(allScans.map(s => s.date).filter(Boolean))].sort();
-    }
-    // Run calculateAggregates if any derived field is missing.
-    // Server now sends all fields, but this fallback protects against
-    // old server versions or partial responses.
-    const needsAggregates = !d.sewadar_attendance || !d.duplicate_flags ||
-                            !d.multi_scan_flags || !d.missing_out ||
-                            !d.centre_summary || !d.absent_per_day;
-    if(needsAggregates && d.scans) d = calculateAggregates(d);
-    const oldScanCount = LAST_SCAN_COUNT;
-    DATA = d;
-    LAST_SCAN_COUNT = scanCount;
+    let url=DATA_URL;
+    let res=await fetch(url+'?t='+Date.now());
+    if(!res.ok&&url==='data.json'){url=RAILWAY_URL;res=await fetch(url+'?t='+Date.now());}
+    if(!res.ok)throw new Error('Failed to fetch data');
+    let d=await res.json();
+    const scanCount=(d.scans||d.raw_log||[]).length;
+    if(isAutoRefresh&&scanCount===LAST_SCAN_COUNT)return;
+    if(!d.dates||!d.dates.length){const allScans=d.scans||d.raw_log||[];d.dates=[...new Set(allScans.map(s=>s.date).filter(Boolean))].sort();}
+    const needsAggregates=!d.sewadar_attendance||!d.duplicate_flags||!d.multi_scan_flags||!d.missing_out||!d.centre_summary||!d.absent_per_day;
+    if(needsAggregates&&d.scans)d=calculateAggregates(d);
+    const oldScanCount=LAST_SCAN_COUNT;
+    DATA=d;LAST_SCAN_COUNT=scanCount;
     document.getElementById('loading').style.display='none';
     document.getElementById('dashboard').style.display='block';
-    if(oldScanCount === 0){ render(DATA); }
-    else { incrementalRender(DATA); }
-    document.getElementById('last-updated').textContent = 'Updated: '+new Date().toLocaleTimeString('en-IN');
+    if(oldScanCount===0){render(DATA);}else{incrementalRender(DATA);}
+    document.getElementById('last-updated').textContent='Updated: '+new Date().toLocaleTimeString('en-IN');
   }catch(e){
-    console.error('Load error:', e);
-    if(!DATA){
-      document.getElementById('loading').style.display='none';
-      document.getElementById('error-msg').style.display='block';
-    }
+    console.error('Load error:',e);
+    if(!DATA){document.getElementById('loading').style.display='none';document.getElementById('error-msg').style.display='block';}
   }
 }
 
 function incrementalRender(d){
-  const dates = getActiveDates();
-  renderOverview(d, dates);
-  renderScanTable(getFilteredScans(d.scans||d.raw_log||[], dates), dates);
-  renderAttendanceTable(d.sewadar_attendance||[], dates);
-  renderCentreCards(d.centre_summary||[], dates);
-  renderAbsent(d.absent_per_day||[], dates);
-  renderAlertsForDates(d, dates);
-  renderLiveOps(d);
-  renderScannerPerformance(d);
-  populateFilters(d);
-  buildSearchIndex(d);
-  const absentTotal = (d.absent_per_day||[]).reduce((a,b)=>a+b.absent_count,0);
-  document.getElementById('absent-badge').textContent = absentTotal > 999 ? '999+' : absentTotal;
-}
-
-function renderLiveOpsBar(d){
-  const scans = d.scans||d.raw_log||[];
-  const today = (d.dates||[])[d.dates.length-1];
-  if(!today) return;
-  const todayScans = scans.filter(s=>s.date===today);
-  const scannerStats={};
-  todayScans.forEach(s=>{
-    const sb=s.scanned_by_badge;
-    if(!scannerStats[sb])scannerStats[sb]={name:s.scanned_by_name,centre:s.scanned_by_centre,scans:0,last:''};
-    scannerStats[sb].scans++;
-    if(!scannerStats[sb].last||s.time>scannerStats[sb].last)scannerStats[sb].last=s.time;
-  });
-  const activeScanners=Object.values(scannerStats).filter(s=>{
-    if(!s.last)return false;
-    return (new Date()-new Date(`${today}T${s.last}`))<30*60*1000;
-  });
-  const hour=new Date().getHours();
-  const hourlyScans=todayScans.filter(s=>parseInt(s.time.split(':')[0])===hour).length;
-  const presentToday=(d.headcount_per_day||[]).find(h=>h.date===today)?.total_present||0;
-  const activeScanEl=document.getElementById('live-active-scanners');
-  const totalScansEl=document.getElementById('live-total-scans');
-  const hourlyScansEl=document.getElementById('live-hourly-scans');
-  const presentEl=document.getElementById('live-present');
-  if(activeScanEl)activeScanEl.textContent=activeScanners.length;
-  if(totalScansEl)totalScansEl.textContent=todayScans.length;
-  if(hourlyScansEl)hourlyScansEl.textContent=hourlyScans;
-  if(presentEl)presentEl.textContent=presentToday;
-  const cardsHtml=Object.entries(scannerStats).map(([badge,s])=>{
-    const isActive=s.last&&(new Date()-new Date(`${today}T${s.last}`))<30*60*1000;
-    return`<div class="scanner-card ${isActive?'':'scanner-inactive'}">
-      <div class="scanner-name">${s.name||badge}</div>
-      <div class="scanner-stats">${s.scans} scans</div>
-      <div class="scanner-last">${s.last?fmtTime(s.last):'No scans'}</div>
-    </div>`;
-  }).join('');
-  const cardsEl=document.getElementById('scanner-cards');
-  if(cardsEl)cardsEl.innerHTML=cardsHtml||'<span style="opacity:0.6;font-size:11px">No scanner activity</span>';
+  const dates=getActiveDates();
+  renderOverview(d,dates);
+  renderScanTable(getFilteredScans(d.scans||d.raw_log||[],dates),dates);
+  renderAttendanceTable(d.sewadar_attendance||[],dates);
+  renderCentreCards(d.centre_summary||[],dates);
+  renderAbsent(d.absent_per_day||[],dates);
+  renderAlertsForDates(d,dates);
+  renderLiveOps(d);renderScannerPerformance(d);populateFilters(d);buildSearchIndex(d);
+  const absentTotal=(d.absent_per_day||[]).reduce((a,b)=>a+b.absent_count,0);
+  document.getElementById('absent-badge').textContent=absentTotal>999?'999+':absentTotal;
 }
 
 function calculateAggregates(d){
-  if(!d.scans&&d.raw_log)d.scans=d.raw_log; // normalize raw_log → scans
-  const scans=d.scans||[];
-  const dates=d.dates||[];
-  const headcountPerDay=dates.map(date=>{
-    const ds=scans.filter(s=>s.date===date);
-    return{date,total_present:new Set(ds.filter(s=>s.type==='IN').map(s=>s.badge_no)).size,total_in:ds.filter(s=>s.type==='IN').length,total_out:ds.filter(s=>s.type==='OUT').length};
-  });
-  const genderSummary=dates.map(date=>{
-    const uniqueBadges=new Map();
-    scans.filter(s=>s.date===date&&s.type==='IN').forEach(s=>{if(!uniqueBadges.has(s.badge_no))uniqueBadges.set(s.badge_no,s);});
-    let male=0,female=0;
-    uniqueBadges.forEach(s=>{if(s.gender==='M')male++;else if(s.gender==='F')female++;});
-    return{date,male,female};
-  });
+  if(!d.scans&&d.raw_log)d.scans=d.raw_log;
+  const scans=d.scans||[];const dates=d.dates||[];
+  const headcountPerDay=dates.map(date=>{const ds=scans.filter(s=>s.date===date);return{date,total_present:new Set(ds.filter(s=>s.type==='IN').map(s=>s.badge_no)).size,total_in:ds.filter(s=>s.type==='IN').length,total_out:ds.filter(s=>s.type==='OUT').length};});
+  const genderSummary=dates.map(date=>{const uniqueBadges=new Map();scans.filter(s=>s.date===date&&s.type==='IN').forEach(s=>{if(!uniqueBadges.has(s.badge_no))uniqueBadges.set(s.badge_no,s);});let male=0,female=0;uniqueBadges.forEach(s=>{if(s.gender==='M')male++;else if(s.gender==='F')female++;});return{date,male,female};});
   const centreMap={};
-  scans.forEach(s=>{
-    const c=s.sewadar_centre||'Unknown';
-    if(!centreMap[c])centreMap[c]={centre:c,dates:{},total_sewadars:new Set()};
-    if(!centreMap[c].dates[s.date])centreMap[c].dates[s.date]={present:0,in_count:0,out_count:0};
-    if(s.type==='IN'){centreMap[c].dates[s.date].in_count++;centreMap[c].total_sewadars.add(s.badge_no);}
-    else centreMap[c].dates[s.date].out_count++;
-  });
-  const centreSummary=Object.values(centreMap).map(c=>{
-    c.total_sewadars=c.total_sewadars.size;
-    dates.forEach(dt=>{
-      if(!c.dates[dt])c.dates[dt]={present:0,in_count:0,out_count:0};
-      c.dates[dt].present=new Set(scans.filter(s=>s.sewadar_centre===c.centre&&s.date===dt&&s.type==='IN').map(s=>s.badge_no)).size;
-    });
-    return c;
-  });
-  const duplicateFlags=[];
-  const multiScanFlags=[];
-  const badgeDayIn={};
-  const badgeDayScans={};
-  scans.filter(s=>s.type==='IN').forEach(s=>{
-    const key=s.badge_no+'|'+s.date;
-    if(!badgeDayIn[key])badgeDayIn[key]=[];
-    badgeDayIn[key].push(s.time);
-  });
-  Object.entries(badgeDayIn).forEach(([key,times])=>{
-    if(times.length>1){
-      const[badge_no,date]=key.split('|');
-      const sw=scans.find(s=>s.badge_no===badge_no&&s.date===date);
-      duplicateFlags.push({badge_no,sewadar_name:sw?.sewadar_name||'Unknown',date,in_count:times.length,times:times.sort()});
-    }
-  });
-  scans.forEach(s=>{
-    const key=s.badge_no+'|'+s.date;
-    if(!badgeDayScans[key])badgeDayScans[key]=[];
-    badgeDayScans[key].push(s);
-  });
-  Object.entries(badgeDayScans).forEach(([key,ds])=>{
-    const inCount=ds.filter(s=>s.type==='IN').length;
-    const outCount=ds.filter(s=>s.type==='OUT').length;
-    const[badge_no,date]=key.split('|');
-    const sw=ds[0];
-    if(inCount>1)multiScanFlags.push({badge_no,date,type:'IN',count:inCount,times:ds.filter(s=>s.type==='IN').map(s=>s.time).sort(),sewadar_name:sw?.sewadar_name});
-    if(outCount>1)multiScanFlags.push({badge_no,date,type:'OUT',count:outCount,times:ds.filter(s=>s.type==='OUT').map(s=>s.time).sort(),sewadar_name:sw?.sewadar_name});
-  });
-  const missingOut=[];
-  const orphanedOuts=[];
-  const hasIn=new Set();
-  const hasOut=new Set();
-  scans.forEach(s=>{
-    const key=s.badge_no+'|'+s.date;
-    if(s.type==='IN')hasIn.add(key);
-    else if(s.type==='OUT')hasOut.add(key);
-  });
-  hasIn.forEach(key=>{
-    if(!hasOut.has(key)){
-      const[badge_no,date]=key.split('|');
-      const scan=scans.find(s=>s.badge_no===badge_no&&s.date===date&&s.type==='IN');
-      if(scan)missingOut.push({badge_no,sewadar_name:scan.sewadar_name,centre:scan.sewadar_centre,department:scan.department,date,in_time:scan.time});
-    }
-  });
-  hasOut.forEach(key=>{
-    if(!hasIn.has(key)){
-      const[badge_no,date]=key.split('|');
-      const scan=scans.find(s=>s.badge_no===badge_no&&s.date===date&&s.type==='OUT');
-      if(scan)orphanedOuts.push({badge_no,sewadar_name:scan.sewadar_name,centre:scan.sewadar_centre,department:scan.department,date,out_time:scan.time});
-    }
-  });
-  const reEntryFlags=[];
-  const processedReentry=new Set();
-  scans.forEach(s=>{
-    if(s.type==='IN'){
-      const badge=s.badge_no,date=s.date,rkey=badge+'|'+date;
-      if(processedReentry.has(rkey))return;
-      const dayScans=scans.filter(sc=>sc.badge_no===badge&&sc.date===date).sort((a,b)=>a.time.localeCompare(b.time));
-      for(let i=0;i<dayScans.length-2;i++){
-        if(dayScans[i].type==='IN'&&dayScans[i+1].type==='OUT'&&dayScans[i+2].type==='IN'){
-          reEntryFlags.push({badge_no:badge,sewadar_name:dayScans[i].sewadar_name,date,first_in:dayScans[i].time,out_time:dayScans[i+1].time,second_in:dayScans[i+2].time});
-          processedReentry.add(rkey);
-          break;
-        }
-      }
-    }
-  });
-  // Preserve server's department_expected (official quotas); compute from scans only if not provided
-  const serverDeptExpected=d.department_expected||{};
-  const deptBadges={};
-  scans.forEach(s=>{
-    if(s.department&&s.type==='IN'){
-      if(!deptBadges[s.department])deptBadges[s.department]=new Set();
-      deptBadges[s.department].add(s.badge_no);
-    }
-  });
-  // Use server quotas if available, else fallback to scan counts
+  scans.forEach(s=>{const c=s.sewadar_centre||'Unknown';if(!centreMap[c])centreMap[c]={centre:c,dates:{},total_sewadars:new Set()};if(!centreMap[c].dates[s.date])centreMap[c].dates[s.date]={present:0,in_count:0,out_count:0};if(s.type==='IN'){centreMap[c].dates[s.date].in_count++;centreMap[c].total_sewadars.add(s.badge_no);}else centreMap[c].dates[s.date].out_count++;});
+  const centreSummary=Object.values(centreMap).map(c=>{c.total_sewadars=c.total_sewadars.size;dates.forEach(dt=>{if(!c.dates[dt])c.dates[dt]={present:0,in_count:0,out_count:0};c.dates[dt].present=new Set(scans.filter(s=>s.sewadar_centre===c.centre&&s.date===dt&&s.type==='IN').map(s=>s.badge_no)).size;});return c;});
+  const duplicateFlags=[];const multiScanFlags=[];const badgeDayIn={};const badgeDayScans={};
+  scans.filter(s=>s.type==='IN').forEach(s=>{const key=s.badge_no+'|'+s.date;if(!badgeDayIn[key])badgeDayIn[key]=[];badgeDayIn[key].push(s.time);});
+  Object.entries(badgeDayIn).forEach(([key,times])=>{if(times.length>1){const[badge_no,date]=key.split('|');const sw=scans.find(s=>s.badge_no===badge_no&&s.date===date);duplicateFlags.push({badge_no,sewadar_name:sw?.sewadar_name||'Unknown',date,in_count:times.length,times:times.sort()});}});
+  scans.forEach(s=>{const key=s.badge_no+'|'+s.date;if(!badgeDayScans[key])badgeDayScans[key]=[];badgeDayScans[key].push(s);});
+  Object.entries(badgeDayScans).forEach(([key,ds])=>{const inCount=ds.filter(s=>s.type==='IN').length;const outCount=ds.filter(s=>s.type==='OUT').length;const[badge_no,date]=key.split('|');const sw=ds[0];if(inCount>1)multiScanFlags.push({badge_no,date,type:'IN',count:inCount,times:ds.filter(s=>s.type==='IN').map(s=>s.time).sort(),sewadar_name:sw?.sewadar_name});if(outCount>1)multiScanFlags.push({badge_no,date,type:'OUT',count:outCount,times:ds.filter(s=>s.type==='OUT').map(s=>s.time).sort(),sewadar_name:sw?.sewadar_name});});
+  const missingOut=[];const orphanedOuts=[];const hasIn=new Set();const hasOut=new Set();
+  scans.forEach(s=>{const key=s.badge_no+'|'+s.date;if(s.type==='IN')hasIn.add(key);else if(s.type==='OUT')hasOut.add(key);});
+  hasIn.forEach(key=>{if(!hasOut.has(key)){const[badge_no,date]=key.split('|');const scan=scans.find(s=>s.badge_no===badge_no&&s.date===date&&s.type==='IN');if(scan)missingOut.push({badge_no,sewadar_name:scan.sewadar_name,centre:scan.sewadar_centre,department:scan.department,date,in_time:scan.time});}});
+  hasOut.forEach(key=>{if(!hasIn.has(key)){const[badge_no,date]=key.split('|');const scan=scans.find(s=>s.badge_no===badge_no&&s.date===date&&s.type==='OUT');if(scan)orphanedOuts.push({badge_no,sewadar_name:scan.sewadar_name,centre:scan.sewadar_centre,department:scan.department,date,out_time:scan.time});}});
+  const reEntryFlags=[];const processedReentry=new Set();
+  scans.forEach(s=>{if(s.type==='IN'){const badge=s.badge_no,date=s.date,rkey=badge+'|'+date;if(processedReentry.has(rkey))return;const dayScans=scans.filter(sc=>sc.badge_no===badge&&sc.date===date).sort((a,b)=>a.time.localeCompare(b.time));for(let i=0;i<dayScans.length-2;i++){if(dayScans[i].type==='IN'&&dayScans[i+1].type==='OUT'&&dayScans[i+2].type==='IN'){reEntryFlags.push({badge_no:badge,sewadar_name:dayScans[i].sewadar_name,date,first_in:dayScans[i].time,out_time:dayScans[i+1].time,second_in:dayScans[i+2].time});processedReentry.add(rkey);break;}}}});
+  const serverDeptExpected=d.department_expected||{};const deptBadges={};
+  scans.forEach(s=>{if(s.department&&s.type==='IN'){if(!deptBadges[s.department])deptBadges[s.department]=new Set();deptBadges[s.department].add(s.badge_no);}});
   const deptExpected=Object.keys(serverDeptExpected).length?serverDeptExpected:Object.fromEntries(Object.entries(deptBadges).map(([d,b])=>[d,b.size]));
-  // Build sewadar_attendance from scans if not provided by server
   const sewadarMap={};
-  scans.forEach(s=>{
-    const badge=s.badge_no;
-    if(!badge)return;
-    if(!sewadarMap[badge])sewadarMap[badge]={badge_no:badge,sewadar_name:s.sewadar_name,sewadar_centre:s.sewadar_centre,department:s.department,gender:s.gender,satsang_point:s.satsang_point||''};
-    const dt=s.date;
-    if(!sewadarMap[badge][dt])sewadarMap[badge][dt]={status:'PRESENT',first_in:null,last_out:null};
-    if(s.type==='IN'){if(!sewadarMap[badge][dt].first_in||s.time<sewadarMap[badge][dt].first_in)sewadarMap[badge][dt].first_in=s.time;}
-    else if(s.type==='OUT'){if(!sewadarMap[badge][dt].last_out||s.time>sewadarMap[badge][dt].last_out)sewadarMap[badge][dt].last_out=s.time;}
-  });
+  scans.forEach(s=>{const badge=s.badge_no;if(!badge)return;if(!sewadarMap[badge])sewadarMap[badge]={badge_no:badge,sewadar_name:s.sewadar_name,sewadar_centre:s.sewadar_centre,department:s.department,gender:s.gender,satsang_point:s.satsang_point||''};const dt=s.date;if(!sewadarMap[badge][dt])sewadarMap[badge][dt]={status:'PRESENT',first_in:null,last_out:null};if(s.type==='IN'){if(!sewadarMap[badge][dt].first_in||s.time<sewadarMap[badge][dt].first_in)sewadarMap[badge][dt].first_in=s.time;}else if(s.type==='OUT'){if(!sewadarMap[badge][dt].last_out||s.time>sewadarMap[badge][dt].last_out)sewadarMap[badge][dt].last_out=s.time;}});
   const sewadarAttendance=Object.values(sewadarMap);
   const total_sewadars=new Set(scans.map(s=>s.badge_no).filter(Boolean)).size;
-  // Build absent_per_day: sewadars in sewadar_attendance but not scanned on a given date
-  // Since we only have scanned data (no full registered list from server), absent = not-yet-scanned among those who scanned on ANY day
   const allKnownBadges=Object.values(sewadarMap);
-  const absentPerDay=dates.map(date=>{
-    const scannedToday=new Set(scans.filter(s=>s.date===date&&s.type==='IN').map(s=>s.badge_no));
-    const absentList=allKnownBadges.filter(s=>!scannedToday.has(s.badge_no)).map(s=>({badge_no:s.badge_no,name:s.sewadar_name,centre:s.sewadar_centre,department:s.department,gender:s.gender}));
-    return{date,absent_count:absentList.length,absent:absentList};
-  });
+  const absentPerDay=dates.map(date=>{const scannedToday=new Set(scans.filter(s=>s.date===date&&s.type==='IN').map(s=>s.badge_no));const absentList=allKnownBadges.filter(s=>!scannedToday.has(s.badge_no)).map(s=>({badge_no:s.badge_no,name:s.sewadar_name,centre:s.sewadar_centre,department:s.department,gender:s.gender}));return{date,absent_count:absentList.length,absent:absentList};});
   return{...d,total_sewadars,headcount_per_day:headcountPerDay,gender_summary:genderSummary,centre_summary:centreSummary,duplicate_flags:duplicateFlags,missing_out:missingOut,orphaned_outs:orphanedOuts,re_entry_flags:reEntryFlags,multi_scan_flags:multiScanFlags,department_expected:deptExpected,sewadar_attendance:sewadarAttendance,absent_per_day:absentPerDay};
 }
 
@@ -1138,257 +872,199 @@ function calculateAggregates(d){
 function render(d){
   if(d.last_updated)document.getElementById('last-updated').textContent='Updated: '+d.last_updated;
   if(d.last_scan_at){const lsRaw=String(d.last_scan_at);const lsTime=lsRaw.includes('T')?lsRaw.slice(11,16):lsRaw.slice(11,16);document.getElementById('last-scan-tag').textContent='Last scan: '+fmtTime(lsTime);}
-
-  // Date filter buttons
   const btnContainer=document.getElementById('date-btns');
   btnContainer.innerHTML=(d.dates||[]).map(dt=>`<button class="date-btn" onclick="setDateFilter('${dt}',this)">${fmtDate(dt)}</button>`).join('');
-
-  // Pre-fill date picker min/max
-  if(d.dates&&d.dates.length){
-    document.getElementById('date-from').min=d.dates[0];
-    document.getElementById('date-from').max=d.dates[d.dates.length-1];
-    document.getElementById('date-to').min=d.dates[0];
-    document.getElementById('date-to').max=d.dates[d.dates.length-1];
-  }
-
+  if(d.dates&&d.dates.length){document.getElementById('date-from').min=d.dates[0];document.getElementById('date-from').max=d.dates[d.dates.length-1];document.getElementById('date-to').min=d.dates[0];document.getElementById('date-to').max=d.dates[d.dates.length-1];}
   const alertCount=(d.duplicate_flags||[]).length+(d.re_entry_flags||[]).length+(d.multi_scan_flags||[]).length+(d.missing_out||[]).length;
   document.getElementById('alerts-badge').textContent=alertCount>999?'999+':alertCount;
   const absentTotal=(d.absent_per_day||[]).reduce((a,b)=>a+b.absent_count,0);
   document.getElementById('absent-badge').textContent=absentTotal>999?'999+':absentTotal;
-
-  populateFilters(d);
-  populateReportFilters();
-  applyDateFilter();
-  renderLiveOps(d);
-  renderScannerPerformance(d);
-  renderPrintRegister();
-  buildSearchIndex(d);
+  populateFilters(d);populateReportFilters();applyDateFilter();renderLiveOps(d);renderScannerPerformance(d);renderPrintRegister();buildSearchIndex(d);
 }
 
-function renderOverview(d, dates){
+function renderOverview(d,dates){
   const hpd=(d.headcount_per_day||[]).filter(h=>dates.includes(h.date));
   const peak=hpd.reduce((a,b)=>a.total_present>b.total_present?a:b,{total_present:0,date:''});
   document.getElementById('kpi-row').innerHTML=[
-    {cls:'blue', label:'Total Sewadars',val:d.total_sewadars,sub:'scanned at least once'},
+    {cls:'blue',label:'Total Sewadars',val:d.total_sewadars,sub:'scanned at least once'},
     {cls:'green',label:'Registered',val:d.total_registered||0,sub:'in Sewadar_Details.xlsx'},
     {cls:'orange',label:'Total Scans',val:hpd.reduce((a,b)=>a+b.total_in+b.total_out,0),sub:'IN + OUT'},
     {cls:'purple',label:'Peak Day',val:peak.total_present,sub:fmtDate(peak.date)},
     {cls:'red',label:'Absent Today',val:(d.absent_per_day||[]).find(a=>a.date===dates[dates.length-1])?.absent_count||0,sub:'not scanned IN today'},
     {cls:'teal',label:'Missing OUT',val:(d.missing_out||[]).filter(m=>dates.includes(m.date)).length,sub:'IN but no OUT'},
   ].map(k=>`<div class="kpi ${k.cls}"><div class="kpi-label">${k.label}</div><div class="kpi-value">${k.val}</div><div class="kpi-sub">${k.sub}</div></div>`).join('');
-
-  if(dates&&dates.length)
-    document.getElementById('date-range-label').textContent=fmtDate(dates[0])+(dates.length>1?' – '+fmtDate(dates[dates.length-1]):'');
-
+  if(dates&&dates.length)document.getElementById('date-range-label').textContent=fmtDate(dates[0])+(dates.length>1?' – '+fmtDate(dates[dates.length-1]):'');
   const gs=(d.gender_summary||[]).filter(g=>dates.includes(g.date));
-  document.getElementById('gender-row').innerHTML=gs.map(g=>{
-    const tot=g.male+g.female||1;
-    return`<div class="gender-card">
-      <div class="gender-label">${fmtDate(g.date)}</div>
-      <div class="gender-split">
-        <div><div class="gender-m">${g.male}</div><div class="gender-sub">Male</div></div>
-        <div class="gender-divider">|</div>
-        <div><div class="gender-f">${g.female}</div><div class="gender-sub">Female</div></div>
-      </div>
-      <div class="gender-bar-wrap"><div class="gender-bar-m" style="width:${Math.round(g.male/tot*100)}%"></div></div>
-    </div>`;
-  }).join('');
-
+  document.getElementById('gender-row').innerHTML=gs.map(g=>{const tot=g.male+g.female||1;return`<div class="gender-card"><div class="gender-label">${fmtDate(g.date)}</div><div class="gender-split"><div><div class="gender-m">${g.male}</div><div class="gender-sub">Male</div></div><div class="gender-divider">|</div><div><div class="gender-f">${g.female}</div><div class="gender-sub">Female</div></div></div><div class="gender-bar-wrap"><div class="gender-bar-m" style="width:${Math.round(g.male/tot*100)}%"></div></div></div>`;}).join('');
   const maxH=Math.max(...hpd.map(h=>h.total_present),1);
-  document.getElementById('bar-chart').innerHTML=hpd.map(h=>`
-    <div class="bar-col">
-      <div class="bar-val">${h.total_present}</div>
-      <div class="bar-fill" style="height:${Math.max((h.total_present/maxH)*100,3)}%" title="${fmtDate(h.date)}: ${h.total_present} present"></div>
-      <div class="bar-lbl">${fmtDate(h.date)}</div>
-    </div>`).join('');
-
-  // Render arrival wave chart
-  renderArrivalChart(d.arrival_slots||{}, dates);
+  document.getElementById('bar-chart').innerHTML=hpd.map(h=>`<div class="bar-col"><div class="bar-val">${h.total_present}</div><div class="bar-fill" style="height:${Math.max((h.total_present/maxH)*100,3)}%" title="${fmtDate(h.date)}: ${h.total_present} present"></div><div class="bar-lbl">${fmtDate(h.date)}</div></div>`).join('');
+  renderArrivalChart(d.arrival_slots||{},dates);
   const allScans=d.scans||d.raw_log||[];
   const scans=ACTIVE_DATE==='all'&&!CUSTOM_DATE_FROM?allScans:allScans.filter(s=>dates.includes(s.date));
   const deptMap={};
   scans.forEach(s=>{if(s.department){if(!deptMap[s.department])deptMap[s.department]=new Set();deptMap[s.department].add(s.badge_no);}});
-  renderDeptCompletion(d.dept_completion||{}, dates);
+  renderDeptCompletion(d.dept_completion||{},dates);
   document.getElementById('dept-grid').innerHTML=Object.entries(deptMap).sort((a,b)=>b[1].size-a[1].size).map(([dept,badges])=>`<div class="dept-card"><div class="dept-name">${dept}</div><div class="dept-count">${badges.size}</div></div>`).join('');
 }
 
-// ── Department Completion % ──────────────────────────────────────────────────
-function renderDeptCompletion(deptCompletion, dates){
-  const el=document.getElementById('dept-completion-grid');
-  if(!el) return;
-  // Merge across active dates
+function renderDeptCompletion(deptCompletion,dates){
+  const el=document.getElementById('dept-completion-grid');if(!el)return;
   const merged={};
-  dates.forEach(date=>{
-    const day=deptCompletion[date]||{};
-    Object.entries(day).forEach(([dept,v])=>{
-      if(!merged[dept])merged[dept]={expected:v.expected,present:0};
-      merged[dept].present+=v.present;
-    });
-  });
+  dates.forEach(date=>{const day=deptCompletion[date]||{};Object.entries(day).forEach(([dept,v])=>{if(!merged[dept])merged[dept]={expected:v.expected,present:0};merged[dept].present+=v.present;});});
   const sorted=Object.entries(merged).sort((a,b)=>b[1].present-a[1].present);
   if(!sorted.length){el.innerHTML='';return;}
-  el.innerHTML=sorted.map(([dept,v])=>{
-    const pct=v.expected?Math.round(v.present/v.expected*100):0;
-    const cls=pct<50?'#dc2626':pct<80?'#f59e0b':'#16a34a';
-    return`<div style="background:white;border:1px solid #e5e7eb;border-radius:8px;padding:10px 14px;box-shadow:0 1px 3px rgba(0,0,0,.04)">
-      <div style="font-size:11px;font-weight:600;color:#374151;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${dept}</div>
-      <div style="display:flex;align-items:center;gap:8px">
-        <div style="flex:1;height:8px;background:#f3f4f6;border-radius:4px;overflow:hidden">
-          <div style="height:100%;background:${cls};width:${Math.min(pct,100)}%;border-radius:4px;transition:width .3s"></div>
-        </div>
-        <span style="font-size:11px;font-weight:700;color:${cls};min-width:38px;text-align:right">${pct}%</span>
-      </div>
-      <div style="font-size:10px;color:#9ca3af;margin-top:3px">${v.present} present / ${v.expected} expected</div>
-    </div>`;
-  }).join('');
+  el.innerHTML=sorted.map(([dept,v])=>{const pct=v.expected?Math.round(v.present/v.expected*100):0;const cls=pct<50?'#dc2626':pct<80?'#f59e0b':'#16a34a';return`<div style="background:white;border:1px solid #e5e7eb;border-radius:8px;padding:10px 14px;box-shadow:0 1px 3px rgba(0,0,0,.04)"><div style="font-size:11px;font-weight:600;color:#374151;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${dept}</div><div style="display:flex;align-items:center;gap:8px"><div style="flex:1;height:8px;background:#f3f4f6;border-radius:4px;overflow:hidden"><div style="height:100%;background:${cls};width:${Math.min(pct,100)}%;border-radius:4px;transition:width .3s"></div></div><span style="font-size:11px;font-weight:700;color:${cls};min-width:38px;text-align:right">${pct}%</span></div><div style="font-size:10px;color:#9ca3af;margin-top:3px">${v.present} present / ${v.expected} expected</div></div>`;}).join('');
 }
 
-// ── Arrival Wave Chart ────────────────────────────────────────────────────────
-function renderArrivalChart(arrivalSlots, dates){
-  const wrap = document.getElementById('arrival-chart-wrap');
-  if(!wrap) return;
-  // Merge slots across active dates
+function renderArrivalChart(arrivalSlots,dates){
+  const wrap=document.getElementById('arrival-chart-wrap');if(!wrap)return;
   const merged={};
-  dates.forEach(date=>{
-    const slots=arrivalSlots[date]||{};
-    Object.entries(slots).forEach(([slot,count])=>{
-      merged[slot]=(merged[slot]||0)+count;
-    });
-  });
+  dates.forEach(date=>{const slots=arrivalSlots[date]||{};Object.entries(slots).forEach(([slot,count])=>{merged[slot]=(merged[slot]||0)+count;});});
   const sorted=Object.entries(merged).sort((a,b)=>a[0].localeCompare(b[0]));
   if(!sorted.length){wrap.innerHTML='<p style="color:#9ca3af;font-size:12px;padding:10px">No arrival data yet.</p>';return;}
   const maxV=Math.max(...sorted.map(s=>s[1]),1);
-  wrap.innerHTML=`<div style="display:flex;align-items:flex-end;gap:6px;height:120px;padding:8px 0;min-width:${sorted.length*40}px">
-    ${sorted.map(([slot,count])=>`
-      <div style="flex:0 0 36px;display:flex;flex-direction:column;align-items:center;gap:2px;height:100%;justify-content:flex-end">
-        <div style="font-size:10px;font-weight:700;color:#1a3c6e">${count}</div>
-        <div style="width:100%;border-radius:3px 3px 0 0;background:linear-gradient(180deg,#60a5fa,#1d4ed8);min-height:3px;height:${Math.max((count/maxV)*80,3)}px" title="${slot}: ${count} INs"></div>
-        <div style="font-size:9px;color:#6b7280;transform:rotate(-45deg);transform-origin:center;white-space:nowrap;margin-top:4px">${slot}</div>
-      </div>`).join('')}
-  </div>`;
+  wrap.innerHTML=`<div style="display:flex;align-items:flex-end;gap:6px;height:120px;padding:8px 0;min-width:${sorted.length*40}px">${sorted.map(([slot,count])=>`<div style="flex:0 0 36px;display:flex;flex-direction:column;align-items:center;gap:2px;height:100%;justify-content:flex-end"><div style="font-size:10px;font-weight:700;color:#1a3c6e">${count}</div><div style="width:100%;border-radius:3px 3px 0 0;background:linear-gradient(180deg,#60a5fa,#1d4ed8);min-height:3px;height:${Math.max((count/maxV)*80,3)}px" title="${slot}: ${count} INs"></div><div style="font-size:9px;color:#6b7280;transform:rotate(-45deg);transform-origin:center;white-space:nowrap;margin-top:4px">${slot}</div></div>`).join('')}</div>`;
 }
 
-// ── Scan Table — Virtual pagination for performance (Phase 2) ───────────────
-const SCAN_PAGE_SIZE = 200;
-let _scanAllRows = [];
-let _scanPage = 0;
-
-function renderScanTable(rows, dates){
-  _scanAllRows = [...rows].sort((a,b)=>{
-    const dc=(b.date||'').localeCompare(a.date||'');
-    return dc!==0?dc:(b.time||'').localeCompare(a.time||'');
+// ── SCAN TABLE — fixed filter-across-pagination ───────────────────────────────
+function renderScanTable(rows, dates) {
+  _scanAllRows = [...rows].sort((a, b) => {
+    const dc = (b.date || '').localeCompare(a.date || '');
+    return dc !== 0 ? dc : (b.time || '').localeCompare(a.time || '');
   });
   _scanPage = 0;
+  // Reset filter inputs when date changes, then reapply
+  _applyAndRenderScans();
+}
+
+// Called whenever a filter input changes
+function filterScans() {
+  _scanPage = 0;
+  _applyAndRenderScans();
+}
+const debouncedFilterScans = debounce(filterScans, 150);
+
+// Core: filter full dataset, then render current page
+function _applyAndRenderScans() {
+  const q = document.getElementById('scan-search').value.toLowerCase();
+  const type = document.getElementById('scan-type-filter').value;
+  const dept = document.getElementById('scan-dept-filter').value;
+
+  _filteredScanRows = _scanAllRows.filter(s => {
+    const searchStr = [s.badge_no, s.sewadar_name, s.sewadar_centre, s.department, s.scanned_by_name]
+      .join(' ').toLowerCase();
+    return (!q || searchStr.includes(q))
+      && (!type || s.type === type)
+      && (!dept || s.department === dept);
+  });
+
   _renderScanPage();
 }
 
-function _renderScanPage(){
-  const rows=_scanAllRows;
-  // Sort by date desc, then time desc — latest scans on top
-  const start=_scanPage*SCAN_PAGE_SIZE;
-  const sorted=rows.slice(start,start+SCAN_PAGE_SIZE);
+function _renderScanPage() {
+  const rows = _filteredScanRows;
+  const start = _scanPage * SCAN_PAGE_SIZE;
+  const pageRows = rows.slice(start, start + SCAN_PAGE_SIZE);
 
-  const multiIn=DATA.multi_scan_flags?.filter(f=>f.type==='IN').flatMap(f=>f.times.slice(1).map(t=>({badge:f.badge_no,type:'IN',time:t,date:f.date})))||[];
-  const multiOut=DATA.multi_scan_flags?.filter(f=>f.type==='OUT').flatMap(f=>f.times.slice(1).map(t=>({badge:f.badge_no,type:'OUT',time:t,date:f.date})))||[];
-  const reEntry=DATA.re_entry_flags?.map(f=>({badge:f.badge_no,time:f.second_in,date:f.date}))||[];
+  const multiIn = DATA.multi_scan_flags?.filter(f => f.type === 'IN')
+    .flatMap(f => f.times.slice(1).map(t => ({ badge: f.badge_no, time: t, date: f.date }))) || [];
+  const multiOut = DATA.multi_scan_flags?.filter(f => f.type === 'OUT')
+    .flatMap(f => f.times.slice(1).map(t => ({ badge: f.badge_no, time: t, date: f.date }))) || [];
+  const reEntry = DATA.re_entry_flags?.map(f => ({ badge: f.badge_no, time: f.second_in, date: f.date })) || [];
 
-  const getHighlight=(s)=>{
-    if(multiIn.some(m=>m.badge===s.badge_no&&m.date===s.date&&m.time===s.time))return'multi-in';
-    if(multiOut.some(m=>m.badge===s.badge_no&&m.date===s.date&&m.time===s.time))return'multi-out';
-    if(reEntry.some(m=>m.badge===s.badge_no&&m.date===s.date&&m.time===s.time))return're-entry';
-    return'';
-  };
-  const getWarning=(s)=>{
-    const isMultiIn=multiIn.some(m=>m.badge===s.badge_no&&m.date===s.date&&m.time===s.time);
-    const isMultiOut=multiOut.some(m=>m.badge===s.badge_no&&m.date===s.date&&m.time===s.time);
-    const isReEntry=reEntry.some(m=>m.badge===s.badge_no&&m.date===s.date&&m.time===s.time);
-    const tmi=DATA.multi_scan_flags?.find(f=>f.badge_no===s.badge_no&&f.date===s.date&&f.type==='IN')?.count||0;
-    const tmo=DATA.multi_scan_flags?.find(f=>f.badge_no===s.badge_no&&f.date===s.date&&f.type==='OUT')?.count||0;
-    if(isMultiIn&&tmi>1)return`<span class="scan-warning in">+${tmi-1} extra IN</span>`;
-    if(isMultiOut&&tmo>1)return`<span class="scan-warning out">+${tmo-1} extra OUT</span>`;
-    if(isReEntry)return`<span class="scan-warning re">↩️ RE-ENTRY</span>`;
-    return'';
+  const getHighlight = s => {
+    if (multiIn.some(m => m.badge === s.badge_no && m.date === s.date && m.time === s.time)) return 'multi-in';
+    if (multiOut.some(m => m.badge === s.badge_no && m.date === s.date && m.time === s.time)) return 'multi-out';
+    if (reEntry.some(m => m.badge === s.badge_no && m.date === s.date && m.time === s.time)) return 're-entry';
+    return '';
   };
 
-  const fragment=document.createDocumentFragment();
-  sorted.forEach((s,i)=>{
-    const tr=document.createElement('tr');
-    const hl=getHighlight(s);
-    const warning=getWarning(s);
-    const isUnknown=!s.sewadar_name||s.sewadar_name==='Unknown';
-    tr.className=hl+(isUnknown?' unknown-row':'');
-    tr.dataset.search=[s.badge_no,s.sewadar_name,s.sewadar_centre,s.department,s.scanned_by_name].join(' ').toLowerCase();
-    tr.dataset.type=s.type||'';
-    tr.dataset.dept=s.department||'';
-    tr.innerHTML=`<td class="sno">${i+1}</td>
-      <td>${s.badge_no?`<span class="badge-tag">${s.badge_no}</span>`:'—'}${isUnknown?'<span class="unknown-tag">UNKNOWN</span>':''}</td>
-      <td><div class="name-primary">${s.sewadar_name||'Unknown'}${warning}</div><div class="name-sub">${s.satsang_point||''}</div></td>
-      <td>${s.sewadar_centre?`<span class="centre-tag">${s.sewadar_centre}</span>`:'—'}</td>
-      <td>${s.department?`<span class="dept-tag">${s.department}</span>`:'—'}</td>
-      <td><span class="${s.type==='IN'?'type-in':'type-out'}">${s.type||'—'}</span></td>
-      <td style="color:#374151">${s.date||'—'}</td>
-      <td style="font-weight:600;color:${s.type==='IN'?'#15803d':'#dc2626'}">${fmtTime(s.time)||'—'}</td>
-      <td><span class="badge-tag">${s.scanned_by_badge||'—'}</span></td>
-      <td><div class="name-primary">${s.scanned_by_name||'—'}</div></td>
-      <td>${s.scanned_by_centre?`<span class="centre-tag">${s.scanned_by_centre}</span>`:'—'}</td>`;
+  const getWarning = s => {
+    const isMultiIn = multiIn.some(m => m.badge === s.badge_no && m.date === s.date && m.time === s.time);
+    const isMultiOut = multiOut.some(m => m.badge === s.badge_no && m.date === s.date && m.time === s.time);
+    const isReEntry = reEntry.some(m => m.badge === s.badge_no && m.date === s.date && m.time === s.time);
+    const tmi = DATA.multi_scan_flags?.find(f => f.badge_no === s.badge_no && f.date === s.date && f.type === 'IN')?.count || 0;
+    const tmo = DATA.multi_scan_flags?.find(f => f.badge_no === s.badge_no && f.date === s.date && f.type === 'OUT')?.count || 0;
+    if (isMultiIn && tmi > 1) return `<span class="scan-warning in">+${tmi - 1} extra IN</span>`;
+    if (isMultiOut && tmo > 1) return `<span class="scan-warning out">+${tmo - 1} extra OUT</span>`;
+    if (isReEntry) return `<span class="scan-warning re">↩️ RE-ENTRY</span>`;
+    return '';
+  };
+
+  const fragment = document.createDocumentFragment();
+  pageRows.forEach((s, i) => {
+    const tr = document.createElement('tr');
+    const hl = getHighlight(s);
+    const warning = getWarning(s);
+    const isUnknown = !s.sewadar_name || s.sewadar_name === 'Unknown';
+    tr.className = hl + (isUnknown ? ' unknown-row' : '');
+    tr.innerHTML = `<td class="sno">${start + i + 1}</td>
+      <td>${s.badge_no ? `<span class="badge-tag">${s.badge_no}</span>` : '—'}${isUnknown ? '<span class="unknown-tag">UNKNOWN</span>' : ''}</td>
+      <td><div class="name-primary">${s.sewadar_name || 'Unknown'}${warning}</div><div class="name-sub">${s.satsang_point || ''}</div></td>
+      <td>${s.sewadar_centre ? `<span class="centre-tag">${s.sewadar_centre}</span>` : '—'}</td>
+      <td>${s.department ? `<span class="dept-tag">${s.department}</span>` : '—'}</td>
+      <td><span class="${s.type === 'IN' ? 'type-in' : 'type-out'}">${s.type || '—'}</span></td>
+      <td style="color:#374151">${s.date || '—'}</td>
+      <td style="font-weight:600;color:${s.type === 'IN' ? '#15803d' : '#dc2626'}">${fmtTime(s.time) || '—'}</td>
+      <td><span class="badge-tag">${s.scanned_by_badge || '—'}</span></td>
+      <td><div class="name-primary">${s.scanned_by_name || '—'}</div></td>
+      <td>${s.scanned_by_centre ? `<span class="centre-tag">${s.scanned_by_centre}</span>` : '—'}</td>`;
     fragment.appendChild(tr);
   });
-  const scanBody=document.getElementById('scan-body');
-  scanBody.innerHTML='';
-  scanBody.appendChild(fragment);
-  const total=rows.length;
-  const showing=Math.min((_scanPage+1)*SCAN_PAGE_SIZE,total);
-  document.getElementById('scan-count').textContent=`${showing} / ${total} records`;
-  // Pagination controls
-  let pgEl=document.getElementById('scan-pagination');
-  if(!pgEl){pgEl=document.createElement('div');pgEl.id='scan-pagination';pgEl.style.cssText='display:flex;gap:8px;align-items:center;margin-top:8px;font-size:12px';document.getElementById('tab-scans').appendChild(pgEl);}
-  const pages=Math.ceil(total/SCAN_PAGE_SIZE);
-  pgEl.innerHTML=total<=SCAN_PAGE_SIZE?'':
-    `<button onclick="_scanPage=Math.max(0,_scanPage-1);_renderScanPage()" style="padding:4px 10px;border:1px solid #d1d5db;border-radius:4px;cursor:pointer;background:white" ${_scanPage===0?'disabled':''}>‹ Prev</button>
-     <span style="color:#6b7280">Page ${_scanPage+1} of ${pages}</span>
-     <button onclick="_scanPage=Math.min(${pages-1},_scanPage+1);_renderScanPage()" style="padding:4px 10px;border:1px solid #d1d5db;border-radius:4px;cursor:pointer;background:white" ${_scanPage>=pages-1?'disabled':''}>Next ›</button>
-     <span style="color:#9ca3af;font-size:11px">(${total} total)</span>`;
-}
 
-function filterScans(){
-  const q=document.getElementById('scan-search').value.toLowerCase();
-  const type=document.getElementById('scan-type-filter').value;
-  const dept=document.getElementById('scan-dept-filter').value;
-  let vis=0;
-  document.querySelectorAll('#scan-body tr').forEach(row=>{
-    const ok=(!q||row.dataset.search.includes(q))&&(!type||row.dataset.type===type)&&(!dept||row.dataset.dept===dept);
-    row.style.display=ok?'':'none';
-    if(ok)vis++;
-  });
-  document.getElementById('scan-count').textContent=vis+' records';
+  const scanBody = document.getElementById('scan-body');
+  scanBody.innerHTML = '';
+  scanBody.appendChild(fragment);
+
+  // Update count badge — shows match count vs total
+  const total = rows.length;
+  const allTotal = _scanAllRows.length;
+  const showing = Math.min((_scanPage + 1) * SCAN_PAGE_SIZE, total);
+  document.getElementById('scan-count').textContent = total < allTotal
+    ? `${total} matches of ${allTotal} total`
+    : `${showing} / ${total} records`;
+
+  // Pagination controls
+  const pgEl = document.getElementById('scan-pagination');
+  const pages = Math.ceil(total / SCAN_PAGE_SIZE);
+  if (total <= SCAN_PAGE_SIZE) { pgEl.innerHTML = ''; return; }
+
+  // Show up to 7 page number buttons centered on current page
+  const maxBtns = 7;
+  let startPg = Math.max(0, _scanPage - Math.floor(maxBtns / 2));
+  let endPg = Math.min(pages - 1, startPg + maxBtns - 1);
+  if (endPg - startPg < maxBtns - 1) startPg = Math.max(0, endPg - maxBtns + 1);
+
+  const pageBtns = [];
+  for (let p = startPg; p <= endPg; p++) {
+    const active = p === _scanPage;
+    pageBtns.push(`<button onclick="_scanPage=${p};_renderScanPage()"
+      style="padding:4px 10px;border:1px solid ${active?'#2563a8':'#d1d5db'};border-radius:4px;
+      cursor:pointer;background:${active?'#2563a8':'white'};color:${active?'white':'#374151'};
+      font-weight:${active?'700':'400'};font-family:Inter,sans-serif;font-size:12px">${p + 1}</button>`);
+  }
+
+  pgEl.innerHTML = `
+    <button onclick="_scanPage=Math.max(0,_scanPage-1);_renderScanPage()" ${_scanPage===0?'disabled':''}>‹ Prev</button>
+    ${startPg > 0 ? '<span style="color:#9ca3af">…</span>' : ''}
+    ${pageBtns.join('')}
+    ${endPg < pages-1 ? '<span style="color:#9ca3af">…</span>' : ''}
+    <button onclick="_scanPage=Math.min(${pages-1},_scanPage+1);_renderScanPage()" ${_scanPage>=pages-1?'disabled':''}>Next ›</button>
+    <span style="color:#9ca3af;font-size:11px">${total} records · ${pages} pages</span>`;
 }
-const debouncedFilterScans=debounce(filterScans,150);
 
 // ── Attendance ────────────────────────────────────────────────────────────────
-function renderAttendanceTable(rows, dates){
-  // Only show sewadars that have at least one scan on the active dates
-  const filteredRows = rows.filter(s => dates.some(dt => s[dt] && s[dt].status !== 'ABSENT'));
-  document.getElementById('att-head').innerHTML=`<tr>
-    <th>#</th><th>Badge No.</th><th>Name</th><th>Centre</th><th>Dept</th><th>Gender</th>
-    ${dates.map(dt=>`<th style="text-align:center;min-width:88px">${fmtDate(dt)}</th>`).join('')}
-  </tr>`;
-  document.getElementById('att-body').innerHTML=filteredRows.map((s,i)=>`
-    <tr data-name="${(s.sewadar_name||'').toLowerCase()}" data-badge="${(s.badge_no||'').toLowerCase()}"
-        data-centre="${(s.sewadar_centre||'').toLowerCase()}" data-dept="${(s.department||'').toLowerCase()}"
-        data-gender="${(s.gender||'').toLowerCase()}">
-      <td class="sno">${i+1}</td>
-      <td><span class="badge-tag">${s.badge_no||'—'}</span></td>
-      <td><div class="name-primary">${s.sewadar_name||'Unknown'}</div><div class="name-sub">${s.satsang_point||''}</div></td>
-      <td>${s.sewadar_centre?`<span class="centre-tag">${s.sewadar_centre}</span>`:'—'}</td>
-      <td>${s.department?`<span class="dept-tag">${s.department}</span>`:'—'}</td>
-      <td style="text-align:center;font-weight:600;color:${s.gender==='M'?'#2563a8':'#db2777'}">${s.gender||'—'}</td>
-      ${dates.map(dt=>{
-        const info=s[dt];
-        if(!info||info.status==='ABSENT')return`<td style="text-align:center"><span class="absent-cell">ABSENT</span></td>`;
-        if(info.status==='INVALID')return`<td style="text-align:center"><span style="background:#fee2e2;color:#dc2626;border-radius:4px;padding:3px 6px;font-size:10px;font-weight:700">⚠️ INVALID</span></td>`;
-        return`<td style="text-align:center"><span class="present-cell">↓${fmtTime(info.first_in)||'—'}<br>↑${fmtTime(info.last_out)||'—'}</span></td>`;
-      }).join('')}
-    </tr>`).join('');
+function renderAttendanceTable(rows,dates){
+  const filteredRows=rows.filter(s=>dates.some(dt=>s[dt]&&s[dt].status!=='ABSENT'));
+  document.getElementById('att-head').innerHTML=`<tr><th>#</th><th>Badge No.</th><th>Name</th><th>Centre</th><th>Dept</th><th>Gender</th>${dates.map(dt=>`<th style="text-align:center;min-width:88px">${fmtDate(dt)}</th>`).join('')}</tr>`;
+  document.getElementById('att-body').innerHTML=filteredRows.map((s,i)=>`<tr data-name="${(s.sewadar_name||'').toLowerCase()}" data-badge="${(s.badge_no||'').toLowerCase()}" data-centre="${(s.sewadar_centre||'').toLowerCase()}" data-dept="${(s.department||'').toLowerCase()}" data-gender="${(s.gender||'').toLowerCase()}">
+    <td class="sno">${i+1}</td><td><span class="badge-tag">${s.badge_no||'—'}</span></td>
+    <td><div class="name-primary">${s.sewadar_name||'Unknown'}</div><div class="name-sub">${s.satsang_point||''}</div></td>
+    <td>${s.sewadar_centre?`<span class="centre-tag">${s.sewadar_centre}</span>`:'—'}</td>
+    <td>${s.department?`<span class="dept-tag">${s.department}</span>`:'—'}</td>
+    <td style="text-align:center;font-weight:600;color:${s.gender==='M'?'#2563a8':'#db2777'}">${s.gender||'—'}</td>
+    ${dates.map(dt=>{const info=s[dt];if(!info||info.status==='ABSENT')return`<td style="text-align:center"><span class="absent-cell">ABSENT</span></td>`;if(info.status==='INVALID')return`<td style="text-align:center"><span style="background:#fee2e2;color:#dc2626;border-radius:4px;padding:3px 6px;font-size:10px;font-weight:700">⚠️ INVALID</span></td>`;return`<td style="text-align:center"><span class="present-cell">↓${fmtTime(info.first_in)||'—'}<br>↑${fmtTime(info.last_out)||'—'}</span></td>`;}).join('')}
+  </tr>`).join('');
   document.getElementById('att-count').textContent=filteredRows.length+' sewadars';
 }
 
@@ -1400,53 +1076,38 @@ function filterAttendance(){
   let vis=0;
   document.querySelectorAll('#att-body tr').forEach(row=>{
     const ok=(!q||(row.dataset.name+row.dataset.badge).includes(q))&&(!centre||row.dataset.centre===centre)&&(!dept||row.dataset.dept===dept)&&(!gender||row.dataset.gender===gender);
-    row.style.display=ok?'':'none';
-    if(ok)vis++;
+    row.style.display=ok?'':'none';if(ok)vis++;
   });
   document.getElementById('att-count').textContent=vis+' sewadars';
 }
 const debouncedFilterAttendance=debounce(filterAttendance,150);
 
 // ── Centre Cards ──────────────────────────────────────────────────────────────
-function renderCentreCards(centres, dates){
+function renderCentreCards(centres,dates){
   const maxP=Math.max(...centres.map(c=>Math.max(...dates.map(d=>c.dates[d]?.present||0))),1);
   document.getElementById('centre-count').textContent=centres.length+' centres';
   document.getElementById('centre-cards').innerHTML=centres.map(c=>{
     const pct=c.expected?Math.round((c.total_sewadars/c.expected)*100):0;
-    // FIX: removed stray closing brace } from meta text
     return`<div class="centre-card" data-name="${c.centre.toLowerCase()}">
       <div class="centre-card-head">
         <div class="centre-card-title">${c.centre}</div>
         <div class="centre-card-meta">${c.total_sewadars} scanned${c.expected?' / '+c.expected+' expected ('+pct+'%)':''}</div>
         ${c.expected?`<div class="expected-bar"><div class="expected-fill" style="width:${Math.min(pct,100)}%"></div></div>`:''}
       </div>
-      ${dates.map(dt=>{
-        const info=c.dates[dt]||{present:0,in_count:0,out_count:0};
-        const barW=Math.round((info.present/maxP)*100);
-        return`<div class="centre-date-row">
-          <div class="cdr-date">${fmtDate(dt)}</div>
-          <div class="cdr-bar-wrap"><div class="cdr-bar" style="width:${barW}%"></div></div>
-          <div class="cdr-present">${info.present} <span style="font-size:10px;color:#6b7280;font-weight:400">(↓${info.in_count||0} ↑${info.out_count||0})</span></div>
-        </div>`;
-      }).join('')}
+      ${dates.map(dt=>{const info=c.dates[dt]||{present:0,in_count:0,out_count:0};const barW=Math.round((info.present/maxP)*100);return`<div class="centre-date-row"><div class="cdr-date">${fmtDate(dt)}</div><div class="cdr-bar-wrap"><div class="cdr-bar" style="width:${barW}%"></div></div><div class="cdr-present">${info.present} <span style="font-size:10px;color:#6b7280;font-weight:400">(↓${info.in_count||0} ↑${info.out_count||0})</span></div></div>`;}).join('')}
     </div>`;
   }).join('');
 }
 
 function filterCentres(){
-  const q=document.getElementById('centre-search').value.toLowerCase();
-  let vis=0;
-  document.querySelectorAll('.centre-card').forEach(c=>{
-    const ok=!q||c.dataset.name.includes(q);
-    c.style.display=ok?'':'none';
-    if(ok)vis++;
-  });
+  const q=document.getElementById('centre-search').value.toLowerCase();let vis=0;
+  document.querySelectorAll('.centre-card').forEach(c=>{const ok=!q||c.dataset.name.includes(q);c.style.display=ok?'':'none';if(ok)vis++;});
   document.getElementById('centre-count').textContent=vis+' centres';
 }
 const debouncedFilterCentres=debounce(filterCentres,150);
 
 // ── Absent ────────────────────────────────────────────────────────────────────
-function renderAbsent(absentPerDay, dates){
+function renderAbsent(absentPerDay,dates){
   const filtered=absentPerDay.filter(a=>dates.includes(a.date));
   const content=document.getElementById('absent-content');
   if(!filtered.length){content.innerHTML='<p style="color:#6b7280;padding:20px">No data yet.</p>';return;}
@@ -1467,27 +1128,7 @@ function renderAbsent(absentPerDay, dates){
     html=filtered.map(day=>{
       const dayAbsent=(day.absent||[]).filter(a=>(!centreFilter||(a.centre||'').toLowerCase()===centreFilter)&&(!deptFilter||(a.department||'').toLowerCase()===deptFilter));
       if(!dayAbsent.length)return'';
-      return`<div class="absent-date-section">
-        <div class="absent-date-head">
-          <div class="absent-date-title">❌ ${fmtDate(day.date)}</div>
-          <div class="absent-date-count">${dayAbsent.length} absent out of ${DATA.total_registered||0}</div>
-        </div>
-        <div class="tbl-wrap" style="border-radius:0 0 8px 8px;max-height:300px">
-          <table>
-            <thead><tr><th>#</th><th>Badge No.</th><th>Name</th><th>Centre</th><th>Department</th><th>Gender</th></tr></thead>
-            <tbody>${dayAbsent.map((s,i)=>`
-              <tr class="absent-row" data-name="${(s.name||'').toLowerCase()}" data-centre="${(s.centre||'').toLowerCase()}" data-dept="${(s.department||'').toLowerCase()}">
-                <td class="sno">${i+1}</td>
-                <td><span class="badge-tag">${s.badge_no||'—'}</span></td>
-                <td><div class="name-primary">${s.name||'Unknown'}</div></td>
-                <td>${s.centre?`<span class="centre-tag">${s.centre}</span>`:'—'}</td>
-                <td>${s.department?`<span class="dept-tag">${s.department}</span>`:'—'}</td>
-                <td style="font-weight:600;color:${s.gender==='M'?'#2563a8':'#db2777'}">${s.gender||'—'}</td>
-              </tr>`).join('')}
-            </tbody>
-          </table>
-        </div>
-      </div>`;
+      return`<div class="absent-date-section"><div class="absent-date-head"><div class="absent-date-title">❌ ${fmtDate(day.date)}</div><div class="absent-date-count">${dayAbsent.length} absent out of ${DATA.total_registered||0}</div></div><div class="tbl-wrap" style="border-radius:0 0 8px 8px;max-height:300px"><table><thead><tr><th>#</th><th>Badge No.</th><th>Name</th><th>Centre</th><th>Department</th><th>Gender</th></tr></thead><tbody>${dayAbsent.map((s,i)=>`<tr class="absent-row" data-name="${(s.name||'').toLowerCase()}" data-centre="${(s.centre||'').toLowerCase()}" data-dept="${(s.department||'').toLowerCase()}"><td class="sno">${i+1}</td><td><span class="badge-tag">${s.badge_no||'—'}</span></td><td><div class="name-primary">${s.name||'Unknown'}</div></td><td>${s.centre?`<span class="centre-tag">${s.centre}</span>`:'—'}</td><td>${s.department?`<span class="dept-tag">${s.department}</span>`:'—'}</td><td style="font-weight:600;color:${s.gender==='M'?'#2563a8':'#db2777'}">${s.gender||'—'}</td></tr>`).join('')}</tbody></table></div></div>`;
     }).join('');
   }else if(groupBy==='centre'){
     const centreGroups={};
@@ -1495,9 +1136,7 @@ function renderAbsent(absentPerDay, dates){
     Object.entries(centreGroups).sort((a,b)=>b[1].length-a[1].length).forEach(([centre,rows])=>{
       const fr=rows.filter(a=>(!deptFilter||(a.department||'').toLowerCase()===deptFilter));
       if(!fr.length)return;
-      html+=`<div class="absent-group-card"><div class="absent-group-head"><span class="absent-group-title">🏢 ${centre}</span><span class="absent-group-count">${fr.length} absent</span></div>
-        <table class="missing-dept-table"><thead><tr><th>#</th><th>Badge</th><th>Name</th><th>Department</th><th>Date</th></tr></thead>
-        <tbody>${fr.map((s,i)=>`<tr class="absent-row" data-name="${(s.name||'').toLowerCase()}" data-centre="${(s.centre||'').toLowerCase()}" data-dept="${(s.department||'').toLowerCase()}"><td>${i+1}</td><td><span class="badge-tag">${s.badge_no||'—'}</span></td><td>${s.name||'Unknown'}</td><td>${s.department||'—'}</td><td>${s.date||'—'}</td></tr>`).join('')}</tbody></table></div>`;
+      html+=`<div class="absent-group-card"><div class="absent-group-head"><span class="absent-group-title">🏢 ${centre}</span><span class="absent-group-count">${fr.length} absent</span></div><table class="missing-dept-table"><thead><tr><th>#</th><th>Badge</th><th>Name</th><th>Department</th><th>Date</th></tr></thead><tbody>${fr.map((s,i)=>`<tr class="absent-row" data-name="${(s.name||'').toLowerCase()}" data-centre="${(s.centre||'').toLowerCase()}" data-dept="${(s.department||'').toLowerCase()}"><td>${i+1}</td><td><span class="badge-tag">${s.badge_no||'—'}</span></td><td>${s.name||'Unknown'}</td><td>${s.department||'—'}</td><td>${s.date||'—'}</td></tr>`).join('')}</tbody></table></div>`;
     });
   }else if(groupBy==='dept'){
     const deptGroups={};
@@ -1505,9 +1144,7 @@ function renderAbsent(absentPerDay, dates){
     Object.entries(deptGroups).sort((a,b)=>b[1].length-a[1].length).forEach(([dept,rows])=>{
       const fr=rows.filter(a=>(!centreFilter||(a.centre||'').toLowerCase()===centreFilter));
       if(!fr.length)return;
-      html+=`<div class="absent-group-card"><div class="absent-group-head"><span class="absent-group-title">📋 ${dept}</span><span class="absent-group-count">${fr.length} absent</span></div>
-        <table class="missing-dept-table"><thead><tr><th>#</th><th>Badge</th><th>Name</th><th>Centre</th><th>Date</th></tr></thead>
-        <tbody>${fr.map((s,i)=>`<tr class="absent-row" data-name="${(s.name||'').toLowerCase()}" data-centre="${(s.centre||'').toLowerCase()}" data-dept="${(s.department||'').toLowerCase()}"><td>${i+1}</td><td><span class="badge-tag">${s.badge_no||'—'}</span></td><td>${s.name||'Unknown'}</td><td>${s.centre||'—'}</td><td>${s.date||'—'}</td></tr>`).join('')}</tbody></table></div>`;
+      html+=`<div class="absent-group-card"><div class="absent-group-head"><span class="absent-group-title">📋 ${dept}</span><span class="absent-group-count">${fr.length} absent</span></div><table class="missing-dept-table"><thead><tr><th>#</th><th>Badge</th><th>Name</th><th>Centre</th><th>Date</th></tr></thead><tbody>${fr.map((s,i)=>`<tr class="absent-row" data-name="${(s.name||'').toLowerCase()}" data-centre="${(s.centre||'').toLowerCase()}" data-dept="${(s.department||'').toLowerCase()}"><td>${i+1}</td><td><span class="badge-tag">${s.badge_no||'—'}</span></td><td>${s.name||'Unknown'}</td><td>${s.centre||'—'}</td><td>${s.date||'—'}</td></tr>`).join('')}</tbody></table></div>`;
     });
   }
   content.innerHTML=html||'<p style="color:#6b7280;padding:20px">No data matches the filter.</p>';
@@ -1522,323 +1159,121 @@ function filterAbsent(){
   let vis=0;
   document.querySelectorAll('.absent-row').forEach(row=>{
     const ok=(!q||row.dataset.name.includes(q))&&(!centre||row.dataset.centre===centre)&&(!dept||row.dataset.dept===dept);
-    row.style.display=ok?'':'none';
-    if(ok)vis++;
+    row.style.display=ok?'':'none';if(ok)vis++;
   });
   document.getElementById('absent-count').textContent=vis+' absent';
 }
 const debouncedFilterAbsent=debounce(filterAbsent,150);
 
-// ── Alerts — fully redesigned, clean sections ─────────────────────────────────
-function renderAlertsForDates(d, dates){
-  // Re-filter all alert data to only the active dates, then render
-  const filtered = {
-    ...d,
-    missing_out: (d.missing_out||[]).filter(m=>dates.includes(m.date)),
-    orphaned_outs: (d.orphaned_outs||[]).filter(m=>dates.includes(m.date)),
-    duplicate_flags: (d.duplicate_flags||[]).filter(f=>dates.includes(f.date)),
-    multi_scan_flags: (d.multi_scan_flags||[]).filter(f=>dates.includes(f.date)),
-    re_entry_flags: (d.re_entry_flags||[]).filter(r=>dates.includes(r.date)),
-  };
+// ── Alerts ────────────────────────────────────────────────────────────────────
+function renderAlertsForDates(d,dates){
+  const filtered={...d,missing_out:(d.missing_out||[]).filter(m=>dates.includes(m.date)),orphaned_outs:(d.orphaned_outs||[]).filter(m=>dates.includes(m.date)),duplicate_flags:(d.duplicate_flags||[]).filter(f=>dates.includes(f.date)),multi_scan_flags:(d.multi_scan_flags||[]).filter(f=>dates.includes(f.date)),re_entry_flags:(d.re_entry_flags||[]).filter(r=>dates.includes(r.date))};
   renderAlerts(filtered);
 }
 
 function renderAlerts(d){
-  const missingOut=d.missing_out||[];
-  const orphanedOuts=d.orphaned_outs||[];
-  const dupIn=(d.duplicate_flags||[]).filter(f=>f.type!=='OUT'&&f.in_count>1||(f.times&&f.times.length>1));
-  const multiScan=d.multi_scan_flags||[];
-  const dupInData=multiScan.filter(f=>f.type==='IN');
-  const dupOutData=multiScan.filter(f=>f.type==='OUT');
-  const reEntry=d.re_entry_flags||[];
-
-  // Merge duplicate_flags into dupInData if multiScan is empty
+  const missingOut=d.missing_out||[];const orphanedOuts=d.orphaned_outs||[];
+  const multiScan=d.multi_scan_flags||[];const dupInData=multiScan.filter(f=>f.type==='IN');const dupOutData=multiScan.filter(f=>f.type==='OUT');
   const dupInFinal=dupInData.length?dupInData:(d.duplicate_flags||[]);
-  
+  const reEntry=d.re_entry_flags||[];
   const totalAlerts=missingOut.length+orphanedOuts.length+dupInFinal.length+dupOutData.length+reEntry.length;
   document.getElementById('alerts-badge').textContent=totalAlerts>999?'999+':totalAlerts;
-
-  // Summary cards
   document.getElementById('alert-summary-row').innerHTML=[
     {cls:'amber',label:'Missing OUT',val:missingOut.length,sub:'has IN, no OUT',tab:'missing-out'},
     {cls:'green',label:'Missing IN',val:orphanedOuts.length,sub:'has OUT, no IN',tab:'missing-in'},
     {cls:'red',label:'Duplicate INs',val:dupInFinal.length,sub:'scanned IN 2+ times',tab:'dup-in'},
     {cls:'blue',label:'Duplicate OUTs',val:dupOutData.length,sub:'scanned OUT 2+ times',tab:'dup-out'},
     {cls:'purple',label:'Re-entries',val:reEntry.length,sub:'IN → OUT → IN again',tab:'reentry'},
-  ].map(c=>`<div class="alert-summary-card ${c.cls}" onclick="switchAlertTab('${c.tab}',document.querySelector('[onclick*=\\'${c.tab}\\']'))">
-    <div class="asc-label">${c.label}</div>
-    <div class="asc-val ${c.cls}">${c.val}</div>
-    <div class="asc-sub">${c.sub}</div>
-  </div>`).join('');
-
-  // Update pill counts
+  ].map(c=>`<div class="alert-summary-card ${c.cls}" onclick="switchAlertTab('${c.tab}',document.querySelector('[onclick*=\\'${c.tab}\\']'))"><div class="asc-label">${c.label}</div><div class="asc-val ${c.cls}">${c.val}</div><div class="asc-sub">${c.sub}</div></div>`).join('');
   document.getElementById('acount-missing-out').textContent=missingOut.length;
   document.getElementById('acount-missing-in').textContent=orphanedOuts.length;
   document.getElementById('acount-dup-in').textContent=dupInFinal.length;
   document.getElementById('acount-dup-out').textContent=dupOutData.length;
   document.getElementById('acount-reentry').textContent=reEntry.length;
-
-  // Populate dept/centre filters for missing-out
-  const moDeptsEl=document.getElementById('missing-out-dept');
-  const moCentresEl=document.getElementById('missing-out-centre');
+  const moDeptsEl=document.getElementById('missing-out-dept');const moCentresEl=document.getElementById('missing-out-centre');
   const moDepts=[...new Set(missingOut.map(m=>m.department).filter(Boolean))].sort();
   const moCentres=[...new Set(missingOut.map(m=>m.centre).filter(Boolean))].sort();
-  while(moDeptsEl.options.length>1)moDeptsEl.remove(1);
-  moDepts.forEach(d=>{const o=document.createElement('option');o.value=d;o.textContent=d;moDeptsEl.appendChild(o);});
-  while(moCentresEl.options.length>1)moCentresEl.remove(1);
-  moCentres.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;moCentresEl.appendChild(o);});
-
-  // Populate dept for missing-in
-  const miDeptEl=document.getElementById('missing-in-dept');
-  const miDepts=[...new Set(orphanedOuts.map(m=>m.department).filter(Boolean))].sort();
-  while(miDeptEl.options.length>1)miDeptEl.remove(1);
-  miDepts.forEach(d=>{const o=document.createElement('option');o.value=d;o.textContent=d;miDeptEl.appendChild(o);});
-
-  // Missing OUT table
-  document.getElementById('missing-out-body').innerHTML=missingOut.map((m,i)=>`
-    <tr class="alert-row-missing-out" data-search="${(m.sewadar_name||'').toLowerCase()} ${(m.badge_no||'').toLowerCase()}" data-dept="${(m.department||'').toLowerCase()}" data-centre="${(m.centre||'').toLowerCase()}">
-      <td class="sno">${i+1}</td>
-      <td><span class="badge-tag">${m.badge_no||'—'}</span></td>
-      <td><div class="name-primary">${m.sewadar_name||'Unknown'}</div></td>
-      <td>${m.centre?`<span class="centre-tag">${m.centre}</span>`:'—'}</td>
-      <td>${m.department?`<span class="dept-tag">${m.department}</span>`:'—'}</td>
-      <td>${m.date||'—'}</td>
-      <td style="color:#16a34a;font-weight:600">${fmtTime(m.first_in||m.in_time)||'—'}</td>
-      <td style="color:#2563a8;font-weight:600">${fmtTime(m.last_in)||'—'}</td>
-      <td><span style="background:#dcfce7;color:#15803d;border-radius:4px;padding:2px 8px;font-size:10px;font-weight:700">✅ PRESENT</span></td>
-    </tr>`).join('');
+  while(moDeptsEl.options.length>1)moDeptsEl.remove(1);moDepts.forEach(d=>{const o=document.createElement('option');o.value=d;o.textContent=d;moDeptsEl.appendChild(o);});
+  while(moCentresEl.options.length>1)moCentresEl.remove(1);moCentres.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;moCentresEl.appendChild(o);});
+  const miDeptEl=document.getElementById('missing-in-dept');const miDepts=[...new Set(orphanedOuts.map(m=>m.department).filter(Boolean))].sort();
+  while(miDeptEl.options.length>1)miDeptEl.remove(1);miDepts.forEach(d=>{const o=document.createElement('option');o.value=d;o.textContent=d;miDeptEl.appendChild(o);});
+  document.getElementById('missing-out-body').innerHTML=missingOut.map((m,i)=>`<tr class="alert-row-missing-out" data-search="${(m.sewadar_name||'').toLowerCase()} ${(m.badge_no||'').toLowerCase()}" data-dept="${(m.department||'').toLowerCase()}" data-centre="${(m.centre||'').toLowerCase()}"><td class="sno">${i+1}</td><td><span class="badge-tag">${m.badge_no||'—'}</span></td><td><div class="name-primary">${m.sewadar_name||'Unknown'}</div></td><td>${m.centre?`<span class="centre-tag">${m.centre}</span>`:'—'}</td><td>${m.department?`<span class="dept-tag">${m.department}</span>`:'—'}</td><td>${m.date||'—'}</td><td style="color:#16a34a;font-weight:600">${fmtTime(m.first_in||m.in_time)||'—'}</td><td style="color:#2563a8;font-weight:600">${fmtTime(m.last_in)||'—'}</td><td><span style="background:#dcfce7;color:#15803d;border-radius:4px;padding:2px 8px;font-size:10px;font-weight:700">✅ PRESENT</span></td></tr>`).join('');
   document.getElementById('missing-out-count').textContent=missingOut.length+' records';
-
-  // Missing IN (orphaned OUTs) table
-  document.getElementById('missing-in-body').innerHTML=orphanedOuts.map((m,i)=>`
-    <tr class="alert-row-missing-in" data-search="${(m.sewadar_name||'').toLowerCase()} ${(m.badge_no||'').toLowerCase()}" data-dept="${(m.department||'').toLowerCase()}">
-      <td class="sno">${i+1}</td>
-      <td><span class="badge-tag">${m.badge_no||'—'}</span></td>
-      <td><div class="name-primary">${m.sewadar_name||'Unknown'}</div></td>
-      <td>${m.centre?`<span class="centre-tag">${m.centre}</span>`:'—'}</td>
-      <td>${m.department?`<span class="dept-tag">${m.department}</span>`:'—'}</td>
-      <td>${m.date||'—'}</td>
-      <td style="color:#dc2626;font-weight:600">${fmtTime(m.out_time)||'—'}</td>
-    </tr>`).join('');
+  document.getElementById('missing-in-body').innerHTML=orphanedOuts.map((m,i)=>`<tr class="alert-row-missing-in" data-search="${(m.sewadar_name||'').toLowerCase()} ${(m.badge_no||'').toLowerCase()}" data-dept="${(m.department||'').toLowerCase()}"><td class="sno">${i+1}</td><td><span class="badge-tag">${m.badge_no||'—'}</span></td><td><div class="name-primary">${m.sewadar_name||'Unknown'}</div></td><td>${m.centre?`<span class="centre-tag">${m.centre}</span>`:'—'}</td><td>${m.department?`<span class="dept-tag">${m.department}</span>`:'—'}</td><td>${m.date||'—'}</td><td style="color:#dc2626;font-weight:600">${fmtTime(m.out_time)||'—'}</td></tr>`).join('');
   document.getElementById('missing-in-count').textContent=orphanedOuts.length+' records';
-
-  // Duplicate INs table
-  document.getElementById('dup-in-body').innerHTML=dupInFinal.map((f,i)=>`
-    <tr class="alert-row-dup-in" data-search="${(f.sewadar_name||'').toLowerCase()} ${(f.badge_no||'').toLowerCase()}">
-      <td class="sno">${i+1}</td>
-      <td><span class="badge-tag">${f.badge_no||'—'}</span></td>
-      <td><div class="name-primary">${f.sewadar_name||'Unknown'}</div></td>
-      <td>${f.date||'—'}</td>
-      <td style="font-weight:700;color:#dc2626">${f.in_count||f.count||'—'}</td>
-      <td style="font-size:11px;color:#6b7280">${(f.times||[]).map(t=>fmtTime(t)).join(' · ')}</td>
-    </tr>`).join('');
+  document.getElementById('dup-in-body').innerHTML=dupInFinal.map((f,i)=>`<tr class="alert-row-dup-in" data-search="${(f.sewadar_name||'').toLowerCase()} ${(f.badge_no||'').toLowerCase()}"><td class="sno">${i+1}</td><td><span class="badge-tag">${f.badge_no||'—'}</span></td><td><div class="name-primary">${f.sewadar_name||'Unknown'}</div></td><td>${f.date||'—'}</td><td style="font-weight:700;color:#dc2626">${f.in_count||f.count||'—'}</td><td style="font-size:11px;color:#6b7280">${(f.times||[]).map(t=>fmtTime(t)).join(' · ')}</td></tr>`).join('');
   document.getElementById('dup-in-count').textContent=dupInFinal.length+' records';
-
-  // Duplicate OUTs table
-  document.getElementById('dup-out-body').innerHTML=dupOutData.map((f,i)=>`
-    <tr class="alert-row-dup-out" data-search="${(f.sewadar_name||'').toLowerCase()} ${(f.badge_no||'').toLowerCase()}">
-      <td class="sno">${i+1}</td>
-      <td><span class="badge-tag">${f.badge_no||'—'}</span></td>
-      <td><div class="name-primary">${f.sewadar_name||'Unknown'}</div></td>
-      <td>${f.date||'—'}</td>
-      <td style="font-weight:700;color:#2563a8">${f.count||'—'}</td>
-      <td style="font-size:11px;color:#6b7280">${(f.times||[]).map(t=>fmtTime(t)).join(' · ')}</td>
-    </tr>`).join('');
+  document.getElementById('dup-out-body').innerHTML=dupOutData.map((f,i)=>`<tr class="alert-row-dup-out" data-search="${(f.sewadar_name||'').toLowerCase()} ${(f.badge_no||'').toLowerCase()}"><td class="sno">${i+1}</td><td><span class="badge-tag">${f.badge_no||'—'}</span></td><td><div class="name-primary">${f.sewadar_name||'Unknown'}</div></td><td>${f.date||'—'}</td><td style="font-weight:700;color:#2563a8">${f.count||'—'}</td><td style="font-size:11px;color:#6b7280">${(f.times||[]).map(t=>fmtTime(t)).join(' · ')}</td></tr>`).join('');
   document.getElementById('dup-out-count').textContent=dupOutData.length+' records';
-
-  // Re-entries table
-  document.getElementById('reentry-body').innerHTML=reEntry.map((r,i)=>`
-    <tr class="alert-row-reentry" data-search="${(r.sewadar_name||'').toLowerCase()} ${(r.badge_no||'').toLowerCase()}">
-      <td class="sno">${i+1}</td>
-      <td><span class="badge-tag">${r.badge_no||'—'}</span></td>
-      <td><div class="name-primary">${r.sewadar_name||'Unknown'}</div></td>
-      <td>${r.date||'—'}</td>
-      <td style="color:#16a34a;font-weight:600">${fmtTime(r.first_in)||'—'}</td>
-      <td style="color:#dc2626;font-weight:600">${fmtTime(r.out_time)||'—'}</td>
-      <td style="color:#7c3aed;font-weight:700">${fmtTime(r.second_in)||'—'}</td>
-    </tr>`).join('');
+  document.getElementById('reentry-body').innerHTML=reEntry.map((r,i)=>`<tr class="alert-row-reentry" data-search="${(r.sewadar_name||'').toLowerCase()} ${(r.badge_no||'').toLowerCase()}"><td class="sno">${i+1}</td><td><span class="badge-tag">${r.badge_no||'—'}</span></td><td><div class="name-primary">${r.sewadar_name||'Unknown'}</div></td><td>${r.date||'—'}</td><td style="color:#16a34a;font-weight:600">${fmtTime(r.first_in)||'—'}</td><td style="color:#dc2626;font-weight:600">${fmtTime(r.out_time)||'—'}</td><td style="color:#7c3aed;font-weight:700">${fmtTime(r.second_in)||'—'}</td></tr>`).join('');
   document.getElementById('reentry-count').textContent=reEntry.length+' records';
 }
 
-// Generic filter for alert tables
 function filterAlertTable(type){
-  const searchEl=document.getElementById(type+'-search');
-  const deptEl=document.getElementById(type+'-dept');
-  const centreEl=document.getElementById(type+'-centre');
-  const q=(searchEl?.value||'').toLowerCase();
-  const dept=(deptEl?.value||'').toLowerCase();
-  const centre=(centreEl?.value||'').toLowerCase();
-  const className='alert-row-'+type;
-  let vis=0;
-  document.querySelectorAll('.'+className).forEach(row=>{
-    const ok=(!q||row.dataset.search.includes(q))&&(!dept||row.dataset.dept===dept)&&(!centre||row.dataset.centre===centre);
-    row.style.display=ok?'':'none';
-    if(ok)vis++;
-  });
-  const countEl=document.getElementById(type+'-count');
-  if(countEl)countEl.textContent=vis+' records';
+  const searchEl=document.getElementById(type+'-search');const deptEl=document.getElementById(type+'-dept');const centreEl=document.getElementById(type+'-centre');
+  const q=(searchEl?.value||'').toLowerCase();const dept=(deptEl?.value||'').toLowerCase();const centre=(centreEl?.value||'').toLowerCase();
+  const className='alert-row-'+type;let vis=0;
+  document.querySelectorAll('.'+className).forEach(row=>{const ok=(!q||row.dataset.search.includes(q))&&(!dept||row.dataset.dept===dept)&&(!centre||row.dataset.centre===centre);row.style.display=ok?'':'none';if(ok)vis++;});
+  const countEl=document.getElementById(type+'-count');if(countEl)countEl.textContent=vis+' records';
 }
 
+// ── Live Ops ──────────────────────────────────────────────────────────────────
 function renderLiveOps(d){
-  const scans=d.scans||d.raw_log||[];
-  const today=(d.dates&&d.dates.length)?d.dates[d.dates.length-1]:null;
+  const scans=d.scans||d.raw_log||[];const today=(d.dates&&d.dates.length)?d.dates[d.dates.length-1]:null;
   if(!today){document.getElementById('scanner-cards').innerHTML='<span style="opacity:0.6;font-size:11px">No scan data yet</span>';return;}
-  const todayScans=scans.filter(s=>s.date===today);
-  const scannerStats={};
-  todayScans.forEach(s=>{
-    const sb=s.scanned_by_badge;
-    if(!scannerStats[sb])scannerStats[sb]={name:s.scanned_by_name,centre:s.scanned_by_centre,scans:0,last:''};
-    scannerStats[sb].scans++;
-    if(!scannerStats[sb].last||s.time>scannerStats[sb].last)scannerStats[sb].last=s.time;
-  });
-  const activeScanners=Object.values(scannerStats).filter(s=>{
-    if(!s.last)return false;
-    return(new Date()-new Date(`${today}T${s.last}`))<30*60*1000;
-  });
-  const hour=new Date().getHours();
-  const hourlyScans=todayScans.filter(s=>parseInt(s.time.split(':')[0])===hour).length;
+  const todayScans=scans.filter(s=>s.date===today);const scannerStats={};
+  todayScans.forEach(s=>{const sb=s.scanned_by_badge;if(!scannerStats[sb])scannerStats[sb]={name:s.scanned_by_name,centre:s.scanned_by_centre,scans:0,last:''};scannerStats[sb].scans++;if(!scannerStats[sb].last||s.time>scannerStats[sb].last)scannerStats[sb].last=s.time;});
+  const activeScanners=Object.values(scannerStats).filter(s=>{if(!s.last)return false;return(new Date()-new Date(`${today}T${s.last}`))<30*60*1000;});
+  const hour=new Date().getHours();const hourlyScans=todayScans.filter(s=>parseInt(s.time.split(':')[0])===hour).length;
   const presentToday=(d.headcount_per_day||[]).find(h=>h.date===today)?.total_present||0;
   document.getElementById('live-active-scanners').textContent=activeScanners.length;
   document.getElementById('live-total-scans').textContent=todayScans.length;
   document.getElementById('live-hourly-scans').textContent=hourlyScans;
   document.getElementById('live-present').textContent=presentToday;
-  const cardsHtml=Object.entries(scannerStats).map(([badge,s])=>{
-    const isActive=s.last&&(new Date()-new Date(`${today}T${s.last}`))<30*60*1000;
-    return`<div class="scanner-card ${isActive?'':'scanner-inactive'}">
-      <div class="scanner-name">${s.name||badge}</div>
-      <div class="scanner-stats">${s.scans} scans</div>
-      <div class="scanner-last">${s.last?fmtTime(s.last):'No scans'}</div>
-    </div>`;
-  }).join('');
-  document.getElementById('scanner-cards').innerHTML=cardsHtml||'<span style="opacity:0.6;font-size:11px">No scanner activity</span>';
-  renderHourlyChart(d);
-  renderDeptExpectedVsPresent(d);
-  renderCentreTimeline(d);
+  document.getElementById('scanner-cards').innerHTML=Object.entries(scannerStats).map(([badge,s])=>{const isActive=s.last&&(new Date()-new Date(`${today}T${s.last}`))<30*60*1000;return`<div class="scanner-card ${isActive?'':'scanner-inactive'}"><div class="scanner-name">${s.name||badge}</div><div class="scanner-stats">${s.scans} scans</div><div class="scanner-last">${s.last?fmtTime(s.last):'No scans'}</div></div>`;}).join('')||'<span style="opacity:0.6;font-size:11px">No scanner activity</span>';
+  renderHourlyChart(d);renderDeptExpectedVsPresent(d);renderCentreTimeline(d);
 }
 
 function renderHourlyChart(d){
-  const today=(d.dates&&d.dates.length)?d.dates[d.dates.length-1]:null;
-  if(!today)return;
-  const scans=(d.scans||d.raw_log||[]).filter(s=>s.date===today);
-  const hourly=Array(24).fill(0);
+  const today=(d.dates&&d.dates.length)?d.dates[d.dates.length-1]:null;if(!today)return;
+  const scans=(d.scans||d.raw_log||[]).filter(s=>s.date===today);const hourly=Array(24).fill(0);
   scans.forEach(s=>{const h=parseInt(s.time.split(':')[0]);if(h>=0&&h<24)hourly[h]++;});
   const maxH=Math.max(...hourly,1);
-  document.getElementById('hourly-chart').innerHTML=hourly.map((c,h)=>`
-    <div class="hourly-bar">
-      <div class="hourly-val">${c}</div>
-      <div class="hourly-fill" style="height:${(c/maxH)*100}%"></div>
-      <div class="hourly-lbl">${h}:00</div>
-    </div>`).join('');
+  document.getElementById('hourly-chart').innerHTML=hourly.map((c,h)=>`<div class="hourly-bar"><div class="hourly-val">${c}</div><div class="hourly-fill" style="height:${(c/maxH)*100}%"></div><div class="hourly-lbl">${h}:00</div></div>`).join('');
 }
 
 function renderDeptExpectedVsPresent(d){
-  const today=(d.dates&&d.dates.length)?d.dates[d.dates.length-1]:null;
-  if(!today)return;
-  const deptExpected=d.department_expected||{};
-  const deptPresent={};
-  (d.scans||d.raw_log||[]).filter(s=>s.date===today&&s.type==='IN').forEach(s=>{
-    if(!deptPresent[s.department])deptPresent[s.department]=new Set();
-    deptPresent[s.department].add(s.badge_no);
-  });
+  const today=(d.dates&&d.dates.length)?d.dates[d.dates.length-1]:null;if(!today)return;
+  const deptExpected=d.department_expected||{};const deptPresent={};
+  (d.scans||d.raw_log||[]).filter(s=>s.date===today&&s.type==='IN').forEach(s=>{if(!deptPresent[s.department])deptPresent[s.department]=new Set();deptPresent[s.department].add(s.badge_no);});
   const depts=Object.keys(deptExpected);
-  document.getElementById('dept-exp-chart').innerHTML=depts.length?depts.map(dept=>{
-    const exp=deptExpected[dept]||0;
-    const pres=deptPresent[dept]?.size||0;
-    const pct=exp?Math.round((pres/exp)*100):0;
-    const fillClass=pct<50?'low':pct<80?'mid':'';
-    return`<div class="dept-exp-row">
-      <div class="dept-exp-name">${dept}</div>
-      <div class="dept-exp-bar"><div class="dept-exp-fill ${fillClass}" style="width:${Math.min(pct,100)}%"></div></div>
-      <div class="dept-exp-pct">${pct}%</div>
-      <div class="dept-exp-nums">${pres} / ${exp}</div>
-    </div>`;
-  }).join(''):'<p style="color:#6b7280;padding:10px">No expected headcount data available</p>';
+  document.getElementById('dept-exp-chart').innerHTML=depts.length?depts.map(dept=>{const exp=deptExpected[dept]||0;const pres=deptPresent[dept]?.size||0;const pct=exp?Math.round((pres/exp)*100):0;const fillClass=pct<50?'low':pct<80?'mid':'';return`<div class="dept-exp-row"><div class="dept-exp-name">${dept}</div><div class="dept-exp-bar"><div class="dept-exp-fill ${fillClass}" style="width:${Math.min(pct,100)}%"></div></div><div class="dept-exp-pct">${pct}%</div><div class="dept-exp-nums">${pres} / ${exp}</div></div>`;}).join(''):'<p style="color:#6b7280;padding:10px">No expected headcount data available</p>';
 }
 
 function renderCentreTimeline(d){
-  const today=(d.dates&&d.dates.length)?d.dates[d.dates.length-1]:null;
-  if(!today)return;
-  const scans=(d.scans||d.raw_log||[]).filter(s=>s.date===today);
-  const centreFirstScan={};
+  const today=(d.dates&&d.dates.length)?d.dates[d.dates.length-1]:null;if(!today)return;
+  const scans=(d.scans||d.raw_log||[]).filter(s=>s.date===today);const centreFirstScan={};
   scans.forEach(s=>{if(!centreFirstScan[s.sewadar_centre]||s.time<centreFirstScan[s.sewadar_centre])centreFirstScan[s.sewadar_centre]=s.time;});
   const centres=Object.keys(centreFirstScan).sort();
-  document.getElementById('centre-timeline').innerHTML=centres.length?`<div class="centre-timeline">${centres.map(c=>{
-    const first=centreFirstScan[c];
-    const hour=parseInt(first.split(':')[0]);
-    const pos=Math.min((hour/12)*100,100);
-    return`<div class="timeline-row">
-      <div class="timeline-centre">${c}</div>
-      <div class="timeline-bars"><div class="timeline-bar" style="width:${pos}%"><span class="tooltip">First scan: ${fmtTime(first)}</span></div></div>
-      <div class="timeline-time">${fmtTime(first)}</div>
-    </div>`;
-  }).join('')}</div>`:'<p style="color:#6b7280;padding:10px">No centre timeline data</p>';
+  document.getElementById('centre-timeline').innerHTML=centres.length?`<div class="centre-timeline">${centres.map(c=>{const first=centreFirstScan[c];const hour=parseInt(first.split(':')[0]);const pos=Math.min((hour/12)*100,100);return`<div class="timeline-row"><div class="timeline-centre">${c}</div><div class="timeline-bars"><div class="timeline-bar" style="width:${pos}%"><span class="tooltip">First scan: ${fmtTime(first)}</span></div></div><div class="timeline-time">${fmtTime(first)}</div></div>`;}).join('')}</div>`:'<p style="color:#6b7280;padding:10px">No centre timeline data</p>';
 }
 
+// ── Scanner Performance ───────────────────────────────────────────────────────
 function renderScannerPerformance(d){
-  const scans=d.scans||d.raw_log||[];
-  const scannerStats={};
-  scans.forEach(s=>{
-    const sb=s.scanned_by_badge;
-    if(!sb)return;
-    if(!scannerStats[sb])scannerStats[sb]={name:s.scanned_by_name,centre:s.scanned_by_centre,scans:[],last:''};
-    scannerStats[sb].scans.push(s);
-    if(!scannerStats[sb].last||s.time>scannerStats[sb].last)scannerStats[sb].last=s.time;
-  });
-  const list=Object.entries(scannerStats).map(([badge,s])=>{
-    const uniqueSewadars=new Set(s.scans.map(sc=>sc.badge_no)).size;
-    const times=s.scans.map(sc=>sc.time).sort();
-    let avgGap=0;
-    if(times.length>1){
-      const gaps=[];
-      for(let i=1;i<times.length;i++){
-        const t1=new Date(`2000-01-01T${times[i-1]}`);
-        const t2=new Date(`2000-01-01T${times[i]}`);
-        gaps.push((t2-t1)/60000);
-      }
-      avgGap=Math.round(gaps.reduce((a,b)=>a+b,0)/gaps.length);
-    }
-    return{badge,name:s.name,centre:s.centre,totalScans:s.scans.length,uniqueSewadars,avgGap,last:s.last,isSlow:avgGap>10};
-  }).sort((a,b)=>b.totalScans-a.totalScans);
-
+  const scans=d.scans||d.raw_log||[];const scannerStats={};
+  scans.forEach(s=>{const sb=s.scanned_by_badge;if(!sb)return;if(!scannerStats[sb])scannerStats[sb]={name:s.scanned_by_name,centre:s.scanned_by_centre,scans:[],last:''};scannerStats[sb].scans.push(s);if(!scannerStats[sb].last||s.time>scannerStats[sb].last)scannerStats[sb].last=s.time;});
+  const list=Object.entries(scannerStats).map(([badge,s])=>{const uniqueSewadars=new Set(s.scans.map(sc=>sc.badge_no)).size;const times=s.scans.map(sc=>sc.time).sort();let avgGap=0;if(times.length>1){const gaps=[];for(let i=1;i<times.length;i++){const t1=new Date(`2000-01-01T${times[i-1]}`);const t2=new Date(`2000-01-01T${times[i]}`);gaps.push((t2-t1)/60000);}avgGap=Math.round(gaps.reduce((a,b)=>a+b,0)/gaps.length);}return{badge,name:s.name,centre:s.centre,totalScans:s.scans.length,uniqueSewadars,avgGap,last:s.last,isSlow:avgGap>10};}).sort((a,b)=>b.totalScans-a.totalScans);
   document.getElementById('scanner-count').textContent=list.length+' scanners';
   document.getElementById('scanner-badge').textContent=list.length;
-  document.getElementById('scanner-perf-grid').innerHTML=list.map(s=>`
-    <div class="scanner-perf-card" data-centre="${(s.centre||'').toLowerCase()}">
-      <div class="scanner-perf-header">
-        <div class="scanner-perf-name">${s.name||s.badge}</div>
-        <div class="scanner-perf-badge">${s.badge}</div>
-      </div>
-      <div class="scanner-perf-stats">
-        <div class="scanner-perf-stat">
-          <div class="scanner-perf-stat-label">Total Scans</div>
-          <div class="scanner-perf-stat-val">${s.totalScans}</div>
-        </div>
-        <div class="scanner-perf-stat">
-          <div class="scanner-perf-stat-label">Unique Sewadars</div>
-          <div class="scanner-perf-stat-val">${s.uniqueSewadars}</div>
-        </div>
-      </div>
-      <div class="scanner-perf-last">
-        Avg gap: <span class="${s.isSlow?'scanner-perf-slow':'scanner-perf-active'}">${s.avgGap||0} min</span> • Last: ${s.last?fmtTime(s.last):'—'}
-      </div>
-    </div>`).join('');
-
+  document.getElementById('scanner-perf-grid').innerHTML=list.map(s=>`<div class="scanner-perf-card" data-centre="${(s.centre||'').toLowerCase()}"><div class="scanner-perf-header"><div class="scanner-perf-name">${s.name||s.badge}</div><div class="scanner-perf-badge">${s.badge}</div></div><div class="scanner-perf-stats"><div class="scanner-perf-stat"><div class="scanner-perf-stat-label">Total Scans</div><div class="scanner-perf-stat-val">${s.totalScans}</div></div><div class="scanner-perf-stat"><div class="scanner-perf-stat-label">Unique Sewadars</div><div class="scanner-perf-stat-val">${s.uniqueSewadars}</div></div></div><div class="scanner-perf-last">Avg gap: <span class="${s.isSlow?'scanner-perf-slow':'scanner-perf-active'}">${s.avgGap||0} min</span> • Last: ${s.last?fmtTime(s.last):'—'}</div></div>`).join('');
   const centres=[...new Set(list.map(s=>s.centre).filter(Boolean))].sort();
-  const scf=document.getElementById('scanner-centre-filter');
-  while(scf.options.length>1)scf.remove(1);
+  const scf=document.getElementById('scanner-centre-filter');while(scf.options.length>1)scf.remove(1);
   centres.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;scf.appendChild(o);});
 }
 
 function filterScanners(){
-  const q=document.getElementById('scanner-search').value.toLowerCase();
-  const centre=document.getElementById('scanner-centre-filter').value.toLowerCase();
-  let vis=0;
-  document.querySelectorAll('.scanner-perf-card').forEach(card=>{
-    const name=card.querySelector('.scanner-perf-name').textContent.toLowerCase();
-    const ok=(!q||name.includes(q))&&(!centre||card.dataset.centre===centre);
-    card.style.display=ok?'':'none';
-    if(ok)vis++;
-  });
+  const q=document.getElementById('scanner-search').value.toLowerCase();const centre=document.getElementById('scanner-centre-filter').value.toLowerCase();let vis=0;
+  document.querySelectorAll('.scanner-perf-card').forEach(card=>{const name=card.querySelector('.scanner-perf-name').textContent.toLowerCase();const ok=(!q||name.includes(q))&&(!centre||card.dataset.centre===centre);card.style.display=ok?'':'none';if(ok)vis++;});
   document.getElementById('scanner-count').textContent=vis+' scanners';
 }
 const debouncedFilterScanners=debounce(filterScanners,150);
@@ -1846,10 +1281,8 @@ const debouncedFilterScanners=debounce(filterScanners,150);
 // ── Populate filters ──────────────────────────────────────────────────────────
 function populateFilters(d){
   const scanDepts=[...new Set((d.scans||d.raw_log||[]).map(s=>s.department).filter(Boolean))].sort();
-  const sdp=document.getElementById('scan-dept-filter');
-  while(sdp.options.length>1)sdp.remove(1);
+  const sdp=document.getElementById('scan-dept-filter');while(sdp.options.length>1)sdp.remove(1);
   scanDepts.forEach(dep=>{const o=document.createElement('option');o.value=dep;o.textContent=dep;sdp.appendChild(o);});
-
   const attCentres=[...new Set((d.sewadar_attendance||[]).map(s=>s.sewadar_centre).filter(Boolean))].sort();
   const attDepts=[...new Set((d.sewadar_attendance||[]).map(s=>s.department).filter(Boolean))].sort();
   const acf=document.getElementById('att-centre-filter');while(acf.options.length>1)acf.remove(1);
@@ -1858,124 +1291,64 @@ function populateFilters(d){
   attDepts.forEach(dp=>{const o=document.createElement('option');o.value=dp;o.textContent=dp;adf.appendChild(o);});
 }
 
+// ── Print Register ────────────────────────────────────────────────────────────
 function renderPrintRegister(){
-  const deptFilter=document.getElementById('print-dept-filter').value;
-  const centreFilter=document.getElementById('print-centre-filter').value;
+  const deptFilter=document.getElementById('print-dept-filter').value;const centreFilter=document.getElementById('print-centre-filter').value;
   const today=(DATA.dates&&DATA.dates.length)?DATA.dates[DATA.dates.length-1]:null;
   if(!today){document.getElementById('print-register').innerHTML='<p style="color:#6b7280;padding:20px">No data available</p>';return;}
   let sewadars=DATA.sewadar_attendance||[];
   if(deptFilter)sewadars=sewadars.filter(s=>s.department===deptFilter);
   if(centreFilter)sewadars=sewadars.filter(s=>s.sewadar_centre===centreFilter);
   const depts=[...new Set(sewadars.map(s=>s.department).filter(Boolean))].sort();
-  let html=`<div class="print-header">
-    <div class="print-title">Faridabad Area Bhati March 2026 Phase 2 — Attendance Register</div>
-    <div class="print-sub">Generated: ${new Date().toLocaleString('en-IN')} | Date: ${fmtDate(today)}</div>
-  </div>`;
-  depts.forEach(dept=>{
-    const deptSewadars=sewadars.filter(s=>s.department===dept);
-    html+=`<div class="print-dept">
-      <div class="print-dept-title">${dept} (${deptSewadars.length} sewadars)</div>
-      <table class="print-table">
-        <thead><tr><th>S.No.</th><th>Badge No.</th><th>Name</th><th>Centre</th><th>IN Time</th><th>OUT Time</th><th>Present</th><th>Signature</th></tr></thead>
-        <tbody>${deptSewadars.map((s,i)=>{
-          const info=s[today];
-          const present=info&&info.status!=='ABSENT';
-          return`<tr><td>${i+1}</td><td>${s.badge_no||''}</td><td>${s.sewadar_name||''}</td><td>${s.sewadar_centre||''}</td><td>${info?fmtTime(info.first_in):''}</td><td>${info?fmtTime(info.last_out):''}</td><td style="text-align:center">${present?'✓':''}</td><td><span class="print-check"></span></td></tr>`;
-        }).join('')}</tbody>
-      </table>
-    </div>`;
-  });
+  let html=`<div class="print-header"><div class="print-title">Faridabad Area Bhati March 2026 Phase 2 — Attendance Register</div><div class="print-sub">Generated: ${new Date().toLocaleString('en-IN')} | Date: ${fmtDate(today)}</div></div>`;
+  depts.forEach(dept=>{const deptSewadars=sewadars.filter(s=>s.department===dept);html+=`<div class="print-dept"><div class="print-dept-title">${dept} (${deptSewadars.length} sewadars)</div><table class="print-table"><thead><tr><th>S.No.</th><th>Badge No.</th><th>Name</th><th>Centre</th><th>IN Time</th><th>OUT Time</th><th>Present</th><th>Signature</th></tr></thead><tbody>${deptSewadars.map((s,i)=>{const info=s[today];const present=info&&info.status!=='ABSENT';return`<tr><td>${i+1}</td><td>${s.badge_no||''}</td><td>${s.sewadar_name||''}</td><td>${s.sewadar_centre||''}</td><td>${info?fmtTime(info.first_in):''}</td><td>${info?fmtTime(info.last_out):''}</td><td style="text-align:center">${present?'✓':''}</td><td><span class="print-check"></span></td></tr>`;}).join('')}</tbody></table></div>`;});
   document.getElementById('print-register').innerHTML=html;
   const allDepts=[...new Set((DATA.sewadar_attendance||[]).map(s=>s.department).filter(Boolean))].sort();
-  const pdf=document.getElementById('print-dept-filter');
-  while(pdf.options.length>1)pdf.remove(1);
+  const pdf=document.getElementById('print-dept-filter');while(pdf.options.length>1)pdf.remove(1);
   allDepts.forEach(d=>{const o=document.createElement('option');o.value=d;o.textContent=d;pdf.appendChild(o);});
   const allCentres=[...new Set((DATA.sewadar_attendance||[]).map(s=>s.sewadar_centre).filter(Boolean))].sort();
-  const pcf=document.getElementById('print-centre-filter');
-  while(pcf.options.length>1)pcf.remove(1);
+  const pcf=document.getElementById('print-centre-filter');while(pcf.options.length>1)pcf.remove(1);
   allCentres.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;pcf.appendChild(o);});
 }
 
 function downloadPrintRegisterExcel(){
   if(!DATA)return;
-  const deptFilter=document.getElementById('print-dept-filter').value;
-  const centreFilter=document.getElementById('print-centre-filter').value;
-  const today=(DATA.dates&&DATA.dates.length)?DATA.dates[DATA.dates.length-1]:null;
-  if(!today){document.getElementById('print-register').innerHTML='<p style="color:#6b7280;padding:20px">No data available</p>';return;}
+  const deptFilter=document.getElementById('print-dept-filter').value;const centreFilter=document.getElementById('print-centre-filter').value;
+  const today=(DATA.dates&&DATA.dates.length)?DATA.dates[DATA.dates.length-1]:null;if(!today)return;
   let sewadars=DATA.sewadar_attendance||[];
   if(deptFilter)sewadars=sewadars.filter(s=>s.department===deptFilter);
   if(centreFilter)sewadars=sewadars.filter(s=>s.sewadar_centre===centreFilter);
   const wb=XLSX.utils.book_new();
-  const ws=XLSX.utils.aoa_to_sheet([
-    ['Faridabad Area Bhati March 2026 Phase 2 — Attendance Register'],
-    ['Generated',new Date().toLocaleString('en-IN')],
-    ['Date',fmtDate(today)],[''],
-    ['S.No.','Badge No.','Name','Centre','Department','Gender','IN Time','OUT Time','Status']
-  ]);
-  const rows=sewadars.map((s,i)=>{
-    const info=s[today];
-    const present=info&&info.status!=='ABSENT';
-    return[i+1,s.badge_no,s.sewadar_name,s.sewadar_centre,s.department,s.gender,info?fmtTime(info.first_in):'',info?fmtTime(info.last_out):'',present?'Present':'Absent'];
-  });
-  const wsData=[['Faridabad Area Bhati March 2026 Phase 2 — Attendance Register'],['Generated',new Date().toLocaleString('en-IN')],['Date',fmtDate(today)],[''],['S.No.','Badge No.','Name','Centre','Department','Gender','IN Time','OUT Time','Status'],...rows];
-  const wsFinal=XLSX.utils.aoa_to_sheet(wsData);
-  styleWS(wsFinal);XLSX.utils.book_append_sheet(wb,wsFinal,'Attendance Register');
+  const wsData=[['Faridabad Area Bhati March 2026 Phase 2 — Attendance Register'],['Generated',new Date().toLocaleString('en-IN')],['Date',fmtDate(today)],[''],['S.No.','Badge No.','Name','Centre','Department','Gender','IN Time','OUT Time','Status'],...sewadars.map((s,i)=>{const info=s[today];const present=info&&info.status!=='ABSENT';return[i+1,s.badge_no,s.sewadar_name,s.sewadar_centre,s.department,s.gender,info?fmtTime(info.first_in):'',info?fmtTime(info.last_out):'',present?'Present':'Absent'];})];
+  const wsFinal=XLSX.utils.aoa_to_sheet(wsData);styleWS(wsFinal);XLSX.utils.book_append_sheet(wb,wsFinal,'Attendance Register');
   saveXL(wb,reportName('PrintRegister_AttendanceSheet'));
 }
 
 // ── Global Search ─────────────────────────────────────────────────────────────
 let searchIndex=[];
-function buildSearchIndex(d){
-  searchIndex=(d.sewadar_attendance||[]).map(s=>({
-    badge:s.badge_no,name:s.sewadar_name,centre:s.sewadar_centre,dept:s.department,
-    key:(s.badge_no+' '+s.sewadar_name+' '+s.sewadar_centre).toLowerCase()
-  }));
-}
+function buildSearchIndex(d){searchIndex=(d.sewadar_attendance||[]).map(s=>({badge:s.badge_no,name:s.sewadar_name,centre:s.sewadar_centre,dept:s.department,key:(s.badge_no+' '+s.sewadar_name+' '+s.sewadar_centre).toLowerCase()}));}
 
 function globalSearch(){
-  const q=document.getElementById('global-search').value.toLowerCase().trim();
-  const box=document.getElementById('gsearch-results');
+  const q=document.getElementById('global-search').value.toLowerCase().trim();const box=document.getElementById('gsearch-results');
   if(q.length<2){box.style.display='none';return;}
   const results=searchIndex.filter(s=>s.key.includes(q)).slice(0,8);
   if(!results.length){box.style.display='none';return;}
-  box.innerHTML=results.map(r=>`
-    <div class="gsearch-item" onclick="jumpToSewadar('${r.badge}')">
-      <div class="gsearch-name">${r.name} <span class="badge-tag" style="font-size:10px">${r.badge}</span></div>
-      <div class="gsearch-meta">${r.centre} • ${r.dept}</div>
-    </div>`).join('');
+  box.innerHTML=results.map(r=>`<div class="gsearch-item" onclick="jumpToSewadar('${r.badge}')"><div class="gsearch-name">${r.name} <span class="badge-tag" style="font-size:10px">${r.badge}</span></div><div class="gsearch-meta">${r.centre} • ${r.dept}</div></div>`).join('');
   box.style.display='block';
 }
 const debouncedGlobalSearch=debounce(globalSearch,150);
 
 function jumpToSewadar(badge){
-  document.getElementById('gsearch-results').style.display='none';
-  document.getElementById('global-search').value='';
-  switchTab('attendance');
-  document.getElementById('att-search').value=badge;
-  filterAttendance();
+  document.getElementById('gsearch-results').style.display='none';document.getElementById('global-search').value='';
+  switchTab('attendance');document.getElementById('att-search').value=badge;filterAttendance();
 }
 
 // ── Excel Downloads ───────────────────────────────────────────────────────────
-function styleWS(ws){
-  const range=XLSX.utils.decode_range(ws['!ref']);
-  const cols=[];
-  for(let C=range.s.c;C<=range.e.c;C++){
-    let w=10;
-    for(let R=range.s.r;R<=range.e.r;R++){
-      const cell=ws[XLSX.utils.encode_cell({r:R,c:C})];
-      if(cell&&cell.v)w=Math.min(Math.max(w,String(cell.v).length+2),40);
-    }
-    cols.push({wch:w});
-  }
-  ws['!cols']=cols;return ws;
-}
-
+function styleWS(ws){const range=XLSX.utils.decode_range(ws['!ref']);const cols=[];for(let C=range.s.c;C<=range.e.c;C++){let w=10;for(let R=range.s.r;R<=range.e.r;R++){const cell=ws[XLSX.utils.encode_cell({r:R,c:C})];if(cell&&cell.v)w=Math.min(Math.max(w,String(cell.v).length+2),40);}cols.push({wch:w});}ws['!cols']=cols;return ws;}
 function saveXL(wb,name){XLSX.writeFile(wb,name);}
 
 function downloadOverviewExcel(){
-  if(!DATA)return;
-  const wb=XLSX.utils.book_new();
-  const dates=getActiveDates();
+  if(!DATA)return;const wb=XLSX.utils.book_new();const dates=getActiveDates();
   const hpd=(DATA.headcount_per_day||[]).filter(h=>dates.includes(h.date));
   const ws1=XLSX.utils.aoa_to_sheet([['Bhati March 2026 Ph2 — Overview'],['Generated',new Date().toLocaleString('en-IN')],[''],['DATE','PRESENT','IN','OUT'],...hpd.map(h=>[h.date,h.total_present,h.total_in,h.total_out])]);
   styleWS(ws1);XLSX.utils.book_append_sheet(wb,ws1,'Headcount');
@@ -1985,242 +1358,94 @@ function downloadOverviewExcel(){
   saveXL(wb,reportName('Overview_Headcount-Gender'));
 }
 
+// ── KEY FIX: Download uses _filteredScanRows (data array), not DOM ────────────
 function downloadScansExcel(){
   if(!DATA)return;
-  const vis=[...document.querySelectorAll('#scan-body tr')].filter(r=>r.style.display!=='none');
+  const rows=_filteredScanRows;
   const wb=XLSX.utils.book_new();
   const ws=XLSX.utils.aoa_to_sheet([
-    [`Bhati Scan Details (${vis.length} records)`],['Generated',new Date().toLocaleString('en-IN')],[''],
+    [`Bhati Scan Details (${rows.length} records)`],['Generated',new Date().toLocaleString('en-IN')],[''],
     ['#','Badge No.','Name','Satsang Point','Centre','Department','Type','Date','Time (IST)','Scanned By Badge','Scanned By Name','Scanned By Centre'],
-    ...vis.map((row,i)=>{
-      const t=row.querySelectorAll('td');
-      return[i+1,t[1]?.textContent?.trim(),t[2]?.querySelector('.name-primary')?.textContent?.trim(),
-        t[2]?.querySelector('.name-sub')?.textContent?.trim(),t[3]?.textContent?.trim(),
-        t[4]?.textContent?.trim(),t[5]?.textContent?.trim(),t[6]?.textContent?.trim(),
-        t[7]?.textContent?.trim(),t[8]?.textContent?.trim(),
-        t[9]?.querySelector('.name-primary')?.textContent?.trim(),t[10]?.textContent?.trim()];
-    })
+    ...rows.map((s,i)=>[i+1,s.badge_no,s.sewadar_name,s.satsang_point,s.sewadar_centre,s.department,s.type,s.date,fmtTime(s.time),s.scanned_by_badge,s.scanned_by_name,s.scanned_by_centre])
   ]);
   styleWS(ws);XLSX.utils.book_append_sheet(wb,ws,'Scans');
   saveXL(wb,reportName('ScanDetails_Filtered'));
 }
 
 function downloadAttendanceExcel(){
-  if(!DATA)return;
-  const dates=getActiveDates();
+  if(!DATA)return;const dates=getActiveDates();
   const vis=[...document.querySelectorAll('#att-body tr')].filter(r=>r.style.display!=='none');
   const wb=XLSX.utils.book_new();
   const ws=XLSX.utils.aoa_to_sheet([
     [`Bhati Attendance Matrix (${vis.length} sewadars)`],['Generated',new Date().toLocaleString('en-IN')],[''],
     ['#','Badge No.','Name','Satsang Point','Centre','Department','Gender',...dates.map(fmtDate)],
-    ...vis.map((row,i)=>{
-      const t=row.querySelectorAll('td');
-      const base=[i+1,t[1]?.textContent?.trim(),t[2]?.querySelector('.name-primary')?.textContent?.trim(),
-        t[2]?.querySelector('.name-sub')?.textContent?.trim(),t[3]?.textContent?.trim(),
-        t[4]?.textContent?.trim(),t[5]?.textContent?.trim()];
-      const dc=dates.map((_,di)=>t[7+di]?.textContent?.trim().replace(/\s+/g,' ')||'ABSENT');
-      return[...base,...dc];
-    })
+    ...vis.map((row,i)=>{const t=row.querySelectorAll('td');const base=[i+1,t[1]?.textContent?.trim(),t[2]?.querySelector('.name-primary')?.textContent?.trim(),t[2]?.querySelector('.name-sub')?.textContent?.trim(),t[3]?.textContent?.trim(),t[4]?.textContent?.trim(),t[5]?.textContent?.trim()];const dc=dates.map((_,di)=>t[7+di]?.textContent?.trim().replace(/\s+/g,' ')||'ABSENT');return[...base,...dc];})
   ]);
   styleWS(ws);XLSX.utils.book_append_sheet(wb,ws,'Attendance');
   saveXL(wb,reportName('AttendanceMatrix'));
 }
 
 function downloadCentreExcel(){
-  if(!DATA)return;
-  const dates=getActiveDates();
+  if(!DATA)return;const dates=getActiveDates();
   const vis=[...document.querySelectorAll('.centre-card')].filter(c=>c.style.display!=='none').map(c=>c.dataset.name.toUpperCase());
   const centres=(DATA.centre_summary||[]).filter(c=>vis.includes(c.centre));
   const wb=XLSX.utils.book_new();
-  const ws=XLSX.utils.aoa_to_sheet([
-    ['Bhati Centre Summary'],['Generated',new Date().toLocaleString('en-IN')],[''],
-    ['Centre','Total Scanned','Expected',...dates.flatMap(dt=>[`${fmtDate(dt)} Present`,`${fmtDate(dt)} IN`,`${fmtDate(dt)} OUT`])],
-    ...centres.map(c=>[c.centre,c.total_sewadars,c.expected||0,...dates.flatMap(dt=>{const i=c.dates[dt]||{present:0,in_count:0,out_count:0};return[i.present,i.in_count,i.out_count];})])
-  ]);
-  styleWS(ws);XLSX.utils.book_append_sheet(wb,ws,'Centres');
-  saveXL(wb,reportName('CentreSummary'));
+  const ws=XLSX.utils.aoa_to_sheet([['Bhati Centre Summary'],['Generated',new Date().toLocaleString('en-IN')],[''],['Centre','Total Scanned','Expected',...dates.flatMap(dt=>[`${fmtDate(dt)} Present`,`${fmtDate(dt)} IN`,`${fmtDate(dt)} OUT`])],...centres.map(c=>[c.centre,c.total_sewadars,c.expected||0,...dates.flatMap(dt=>{const i=c.dates[dt]||{present:0,in_count:0,out_count:0};return[i.present,i.in_count,i.out_count];})])]);
+  styleWS(ws);XLSX.utils.book_append_sheet(wb,ws,'Centres');saveXL(wb,reportName('CentreSummary'));
 }
 
 function downloadAbsentExcel(){
-  if(!DATA)return;
-  const dates=getActiveDates();
-  const groupBy=document.getElementById('absent-group-filter')?.value||'date';
+  if(!DATA)return;const dates=getActiveDates();const groupBy=document.getElementById('absent-group-filter')?.value||'date';
   const wb=XLSX.utils.book_new();
-  if(groupBy==='date'){
-    const rows=[];
-    (DATA.absent_per_day||[]).filter(a=>dates.includes(a.date)).forEach(day=>{(day.absent||[]).forEach(s=>rows.push([day.date,s.badge_no,s.name,s.centre,s.department,s.gender]));});
-    const ws=XLSX.utils.aoa_to_sheet([['Bhati Absent Sewadar List'],['Generated',new Date().toLocaleString('en-IN')],[''],['Date','Badge No.','Name','Centre','Department','Gender'],...rows]);
-    styleWS(ws);XLSX.utils.book_append_sheet(wb,ws,'By Date');
-  }else if(groupBy==='centre'){
-    const centreGroups={};
-    (DATA.absent_per_day||[]).filter(a=>dates.includes(a.date)).forEach(day=>{(day.absent||[]).forEach(a=>{const c=a.centre||'Unknown';if(!centreGroups[c])centreGroups[c]=[];centreGroups[c].push({...a,date:day.date});});});
-    const rows=[];
-    Object.entries(centreGroups).sort((a,b)=>b[1].length-a[1].length).forEach(([centre,items])=>{items.forEach(s=>rows.push([centre,s.badge_no,s.name,s.department,s.date,s.gender]));});
-    const ws=XLSX.utils.aoa_to_sheet([['Bhati Absent List by Centre'],['Generated',new Date().toLocaleString('en-IN')],[''],['Centre','Badge No.','Name','Department','Date','Gender'],...rows]);
-    styleWS(ws);XLSX.utils.book_append_sheet(wb,ws,'By Centre');
-  }else if(groupBy==='dept'){
-    const deptGroups={};
-    (DATA.absent_per_day||[]).filter(a=>dates.includes(a.date)).forEach(day=>{(day.absent||[]).forEach(a=>{const dpt=a.department||'Unknown';if(!deptGroups[dpt])deptGroups[dpt]=[];deptGroups[dpt].push({...a,date:day.date});});});
-    const rows=[];
-    Object.entries(deptGroups).sort((a,b)=>b[1].length-a[1].length).forEach(([dept,items])=>{items.forEach(s=>rows.push([dept,s.badge_no,s.name,s.centre,s.date,s.gender]));});
-    const ws=XLSX.utils.aoa_to_sheet([['Bhati Absent List by Department'],['Generated',new Date().toLocaleString('en-IN')],[''],['Department','Badge No.','Name','Centre','Date','Gender'],...rows]);
-    styleWS(ws);XLSX.utils.book_append_sheet(wb,ws,'By Department');
-  }
+  if(groupBy==='date'){const rows=[];(DATA.absent_per_day||[]).filter(a=>dates.includes(a.date)).forEach(day=>{(day.absent||[]).forEach(s=>rows.push([day.date,s.badge_no,s.name,s.centre,s.department,s.gender]));});const ws=XLSX.utils.aoa_to_sheet([['Bhati Absent Sewadar List'],['Generated',new Date().toLocaleString('en-IN')],[''],['Date','Badge No.','Name','Centre','Department','Gender'],...rows]);styleWS(ws);XLSX.utils.book_append_sheet(wb,ws,'By Date');}
+  else if(groupBy==='centre'){const centreGroups={};(DATA.absent_per_day||[]).filter(a=>dates.includes(a.date)).forEach(day=>{(day.absent||[]).forEach(a=>{const c=a.centre||'Unknown';if(!centreGroups[c])centreGroups[c]=[];centreGroups[c].push({...a,date:day.date});});});const rows=[];Object.entries(centreGroups).sort((a,b)=>b[1].length-a[1].length).forEach(([centre,items])=>{items.forEach(s=>rows.push([centre,s.badge_no,s.name,s.department,s.date,s.gender]));});const ws=XLSX.utils.aoa_to_sheet([['Bhati Absent List by Centre'],['Generated',new Date().toLocaleString('en-IN')],[''],['Centre','Badge No.','Name','Department','Date','Gender'],...rows]);styleWS(ws);XLSX.utils.book_append_sheet(wb,ws,'By Centre');}
+  else if(groupBy==='dept'){const deptGroups={};(DATA.absent_per_day||[]).filter(a=>dates.includes(a.date)).forEach(day=>{(day.absent||[]).forEach(a=>{const dpt=a.department||'Unknown';if(!deptGroups[dpt])deptGroups[dpt]=[];deptGroups[dpt].push({...a,date:day.date});});});const rows=[];Object.entries(deptGroups).sort((a,b)=>b[1].length-a[1].length).forEach(([dept,items])=>{items.forEach(s=>rows.push([dept,s.badge_no,s.name,s.centre,s.date,s.gender]));});const ws=XLSX.utils.aoa_to_sheet([['Bhati Absent List by Department'],['Generated',new Date().toLocaleString('en-IN')],[''],['Department','Badge No.','Name','Centre','Date','Gender'],...rows]);styleWS(ws);XLSX.utils.book_append_sheet(wb,ws,'By Department');}
   saveXL(wb,reportName('AbsentList'));
 }
 
 function downloadAlertsExcel(){
-  if(!DATA)return;
-  const wb=XLSX.utils.book_new();
-  const ws1=XLSX.utils.aoa_to_sheet([['Duplicate IN Scans'],[''],['Badge','Name','Date','IN Count','Times'],...(DATA.duplicate_flags||[]).map(f=>[f.badge_no,f.sewadar_name,f.date,f.in_count,(f.times||[]).join(', ')])]);
-  styleWS(ws1);XLSX.utils.book_append_sheet(wb,ws1,'Dup INs');
-  const ws2=XLSX.utils.aoa_to_sheet([['Missing OUT Scans'],[''],['Badge','Name','Centre','Department','Date','IN Time'],...(DATA.missing_out||[]).map(m=>[m.badge_no,m.sewadar_name,m.centre,m.department,m.date,m.in_time])]);
-  styleWS(ws2);XLSX.utils.book_append_sheet(wb,ws2,'Missing OUT');
-  const ws3=XLSX.utils.aoa_to_sheet([['Missing IN (Orphaned OUTs)'],[''],['Badge','Name','Centre','Department','Date','OUT Time'],...(DATA.orphaned_outs||[]).map(m=>[m.badge_no,m.sewadar_name,m.centre,m.department,m.date,m.out_time])]);
-  styleWS(ws3);XLSX.utils.book_append_sheet(wb,ws3,'Missing IN');
-  const ws4=XLSX.utils.aoa_to_sheet([['Re-entry Scans'],[''],['Badge','Name','Date','First IN','OUT Time','Re-entry IN'],...(DATA.re_entry_flags||[]).map(r=>[r.badge_no,r.sewadar_name,r.date,r.first_in,r.out_time,r.second_in])]);
-  styleWS(ws4);XLSX.utils.book_append_sheet(wb,ws4,'Re-entries');
+  if(!DATA)return;const wb=XLSX.utils.book_new();
+  const ws1=XLSX.utils.aoa_to_sheet([['Duplicate IN Scans'],[''],['Badge','Name','Date','IN Count','Times'],...(DATA.duplicate_flags||[]).map(f=>[f.badge_no,f.sewadar_name,f.date,f.in_count,(f.times||[]).join(', ')])]);styleWS(ws1);XLSX.utils.book_append_sheet(wb,ws1,'Dup INs');
+  const ws2=XLSX.utils.aoa_to_sheet([['Missing OUT Scans'],[''],['Badge','Name','Centre','Department','Date','IN Time'],...(DATA.missing_out||[]).map(m=>[m.badge_no,m.sewadar_name,m.centre,m.department,m.date,m.in_time])]);styleWS(ws2);XLSX.utils.book_append_sheet(wb,ws2,'Missing OUT');
+  const ws3=XLSX.utils.aoa_to_sheet([['Missing IN (Orphaned OUTs)'],[''],['Badge','Name','Centre','Department','Date','OUT Time'],...(DATA.orphaned_outs||[]).map(m=>[m.badge_no,m.sewadar_name,m.centre,m.department,m.date,m.out_time])]);styleWS(ws3);XLSX.utils.book_append_sheet(wb,ws3,'Missing IN');
+  const ws4=XLSX.utils.aoa_to_sheet([['Re-entry Scans'],[''],['Badge','Name','Date','First IN','OUT Time','Re-entry IN'],...(DATA.re_entry_flags||[]).map(r=>[r.badge_no,r.sewadar_name,r.date,r.first_in,r.out_time,r.second_in])]);styleWS(ws4);XLSX.utils.book_append_sheet(wb,ws4,'Re-entries');
   const dupOutData=(DATA.multi_scan_flags||[]).filter(f=>f.type==='OUT');
-  if(dupOutData.length){
-    const ws5=XLSX.utils.aoa_to_sheet([['Duplicate OUT Scans'],[''],['Badge','Name','Date','OUT Count','Times'],...dupOutData.map(f=>[f.badge_no,f.sewadar_name,f.date,f.count,(f.times||[]).join(', ')])]);
-    styleWS(ws5);XLSX.utils.book_append_sheet(wb,ws5,'Dup OUTs');
-  }
+  if(dupOutData.length){const ws5=XLSX.utils.aoa_to_sheet([['Duplicate OUT Scans'],[''],['Badge','Name','Date','OUT Count','Times'],...dupOutData.map(f=>[f.badge_no,f.sewadar_name,f.date,f.count,(f.times||[]).join(', ')])]);styleWS(ws5);XLSX.utils.book_append_sheet(wb,ws5,'Dup OUTs');}
   saveXL(wb,reportName('AlertsReport'));
 }
 
 function populateReportFilters(){
-  if(!DATA)return;
-  const dates=DATA.dates||[];
+  if(!DATA)return;const dates=DATA.dates||[];
   const dateOptions='<option value="all">All Dates</option>'+dates.map(d=>`<option value="${d}">${fmtDate(d)}</option>`).join('');
-  ['overview','scans','attendance','centre','absent','alerts','scanner','gender','pivot'].forEach(id=>{
-    const el=document.getElementById('report-'+id+'-date');
-    if(el)el.innerHTML=dateOptions;
-  });
+  ['overview','scans','attendance','centre','absent','alerts','scanner','gender','pivot'].forEach(id=>{const el=document.getElementById('report-'+id+'-date');if(el)el.innerHTML=dateOptions;});
   const centres=[...new Set((DATA.scans||[]).map(s=>s.sewadar_centre).filter(Boolean))].sort();
   const centreOptions='<option value="">All Centres</option>'+centres.map(c=>`<option value="${c}">${c}</option>`).join('');
-  ['attendance','centre','scanner'].forEach(id=>{
-    const el=document.getElementById('report-'+id+'-centre');
-    if(el)el.innerHTML=centreOptions;
-  });
-  const ac=document.getElementById('report-absent-centre');
-  if(ac)ac.innerHTML=centreOptions;
+  ['attendance','centre','scanner'].forEach(id=>{const el=document.getElementById('report-'+id+'-centre');if(el)el.innerHTML=centreOptions;});
+  const ac=document.getElementById('report-absent-centre');if(ac)ac.innerHTML=centreOptions;
   const depts=[...new Set((DATA.scans||[]).map(s=>s.department).filter(Boolean))].sort();
   const deptOptions='<option value="">All Departments</option>'+depts.map(d=>`<option value="${d}">${d}</option>`).join('');
-  ['attendance','absent'].forEach(id=>{
-    const el=document.getElementById('report-'+id+'-dept');
-    if(el)el.innerHTML=deptOptions;
-  });
+  ['attendance','absent'].forEach(id=>{const el=document.getElementById('report-'+id+'-dept');if(el)el.innerHTML=deptOptions;});
 }
 
-function getReportDates(reportType){
-  const dateSel=document.getElementById('report-'+reportType+'-date');
-  if(!dateSel)return DATA.dates||[];
-  return dateSel.value==='all'?(DATA.dates||[]):[dateSel.value];
-}
+function getReportDates(reportType){const dateSel=document.getElementById('report-'+reportType+'-date');if(!dateSel)return DATA.dates||[];return dateSel.value==='all'?(DATA.dates||[]):[dateSel.value];}
 
 function downloadReport(type){
-  if(!DATA)return;
-  const dates=getReportDates(type);
-  const wb=XLSX.utils.book_new();
-  if(type==='overview'){
-    const hpd=(DATA.headcount_per_day||[]).filter(h=>dates.includes(h.date));
-    const ws1=XLSX.utils.aoa_to_sheet([['Bhati March 2026 Ph2 — Overview Report'],['Generated',new Date().toLocaleString('en-IN')],[''],['DATE','PRESENT','IN','OUT'],...hpd.map(h=>[h.date,h.total_present,h.total_in,h.total_out])]);
-    styleWS(ws1);XLSX.utils.book_append_sheet(wb,ws1,'Headcount');
-    const gs=(DATA.gender_summary||[]).filter(g=>dates.includes(g.date));
-    const ws2=XLSX.utils.aoa_to_sheet([['DATE','MALE','FEMALE'],...gs.map(g=>[g.date,g.male,g.female])]);
-    styleWS(ws2);XLSX.utils.book_append_sheet(wb,ws2,'Gender');
-    const ds=DATA.department_expected||{};
-    const ws3=XLSX.utils.aoa_to_sheet([['DEPARTMENT','REGISTERED'],...Object.entries(ds).map(([d,c])=>[d,c])]);
-    styleWS(ws3);XLSX.utils.book_append_sheet(wb,ws3,'Departments');
-  }else if(type==='scans'){
-    const typeFilter=document.getElementById('report-scans-type')?.value||'';
-    const scans=(DATA.scans||[]).filter(s=>dates.includes(s.date)&&(!typeFilter||s.type===typeFilter));
-    const ws=XLSX.utils.aoa_to_sheet([['Bhati March 2026 Ph2 — Scan Details'],['Generated',new Date().toLocaleString('en-IN')],['Records',scans.length],[''],['Badge No.','Name','Centre','Dept','Gender','Type','Date','Time','Scanned By Badge','Scanned By Name'],...scans.map(s=>[s.badge_no,s.sewadar_name,s.sewadar_centre,s.department,s.gender,s.type,s.date,s.time,s.scanned_by_badge,s.scanned_by_name])]);
-    styleWS(ws);XLSX.utils.book_append_sheet(wb,ws,'Scans');
-  }else if(type==='attendance'){
-    const centreFilter=document.getElementById('report-attendance-centre')?.value||'';
-    const deptFilter=document.getElementById('report-attendance-dept')?.value||'';
-    let rows=DATA.sewadar_attendance||[];
-    if(centreFilter)rows=rows.filter(r=>r.sewadar_centre===centreFilter);
-    if(deptFilter)rows=rows.filter(r=>r.department===deptFilter);
-    const ws=XLSX.utils.aoa_to_sheet([['Bhati March 2026 Ph2 — Attendance Matrix'],['Generated',new Date().toLocaleString('en-IN')],[''],['Badge No.','Name','Centre','Department','Gender',...dates.map(d=>fmtDate(d))],...rows.map(r=>[r.badge_no,r.sewadar_name,r.sewadar_centre,r.department,r.gender,...dates.map(d=>{const info=r[d];if(!info||info.status==='ABSENT')return'ABSENT';return`IN:${info.first_in} OUT:${info.last_out}`;})])]);
-    styleWS(ws);XLSX.utils.book_append_sheet(wb,ws,'Attendance');
-  }else if(type==='centre'){
-    const centreFilter=document.getElementById('report-centre-name')?.value||'';
-    let centres=DATA.centre_summary||[];
-    if(centreFilter)centres=centres.filter(c=>c.centre===centreFilter);
-    const ws=XLSX.utils.aoa_to_sheet([['Bhati March 2026 Ph2 — Centre Summary'],['Generated',new Date().toLocaleString('en-IN')],[''],['Centre','Expected','Scanned',...dates.map(d=>fmtDate(d))],...centres.map(c=>[c.centre,c.expected,c.total_sewadars,...dates.map(d=>c.dates?.[d]?.present||0)])]);
-    styleWS(ws);XLSX.utils.book_append_sheet(wb,ws,'Centres');
-  }else if(type==='absent'){
-    const centreFilter=document.getElementById('report-absent-centre')?.value||'';
-    const deptFilter=document.getElementById('report-absent-dept')?.value||'';
-    const absentData=(DATA.absent_per_day||[]).filter(a=>dates.includes(a.date));
-    let allAbsent=absentData.flatMap(a=>a.absent||[]);
-    if(centreFilter)allAbsent=allAbsent.filter(a=>a.centre===centreFilter);
-    if(deptFilter)allAbsent=allAbsent.filter(a=>a.department===deptFilter);
-    const ws=XLSX.utils.aoa_to_sheet([['Bhati March 2026 Ph2 — Absent List'],['Generated',new Date().toLocaleString('en-IN')],['Total Absent',allAbsent.length],[''],['Badge No.','Name','Centre','Department','Gender'],...allAbsent.map(a=>[a.badge_no,a.name,a.centre,a.department,a.gender])]);
-    styleWS(ws);XLSX.utils.book_append_sheet(wb,ws,'Absent');
-  }else if(type==='alerts'){
-    const alertType=document.getElementById('report-alerts-type')?.value||'';
-    const dups=alertType===''||alertType==='duplicate'?(DATA.duplicate_flags||[]).filter(f=>dates.includes(f.date)):[];
-    const miss=alertType===''||alertType==='missing'?(DATA.missing_out||[]).filter(m=>dates.includes(m.date)):[];
-    const reentry=alertType===''||alertType==='reentry'?(DATA.re_entry_flags||[]).filter(r=>dates.includes(r.date)):[];
-    const multi=alertType===''||alertType==='multi'?(DATA.multi_scan_flags||[]).filter(m=>dates.includes(m.date)):[];
-    if(dups.length){const ws1=XLSX.utils.aoa_to_sheet([['Duplicate IN Scans'],[''],['Badge','Name','Date','Count','Times'],...dups.map(f=>[f.badge_no,f.sewadar_name,f.date,f.in_count,(f.times||[]).join(', ')])]);styleWS(ws1);XLSX.utils.book_append_sheet(wb,ws1,'Dup INs');}
-    if(miss.length){const ws2=XLSX.utils.aoa_to_sheet([['Missing OUT Scans'],[''],['Badge','Name','Centre','Department','Date','IN Time'],...miss.map(m=>[m.badge_no,m.sewadar_name,m.centre,m.department,m.date,m.in_time])]);styleWS(ws2);XLSX.utils.book_append_sheet(wb,ws2,'Missing OUT');}
-    if(reentry.length){const ws3=XLSX.utils.aoa_to_sheet([['Re-entry Scans'],[''],['Badge','Name','Date','First IN','OUT Time','Second IN'],...reentry.map(r=>[r.badge_no,r.sewadar_name,r.date,r.first_in,r.out_time,r.second_in])]);styleWS(ws3);XLSX.utils.book_append_sheet(wb,ws3,'Re-entry');}
-    if(multi.length){const ws4=XLSX.utils.aoa_to_sheet([['Multi Scans'],[''],['Badge','Name','Date','Type','Count','Times'],...multi.map(m=>[m.badge_no,m.sewadar_name,m.date,m.type,m.count,(m.times||[]).join(', ')])]);styleWS(ws4);XLSX.utils.book_append_sheet(wb,ws4,'Multi-scan');}
-  }else if(type==='scanner'){
-    const centreFilter=document.getElementById('report-scanner-centre')?.value||'';
-    const scans=(DATA.scans||[]).filter(s=>dates.includes(s.date)&&(!centreFilter||s.scanned_by_centre===centreFilter));
-    const scannerMap={};
-    scans.forEach(s=>{const sb=s.scanned_by_badge;if(!sb)return;if(!scannerMap[sb])scannerMap[sb]={name:s.scanned_by_name,centre:s.scanned_by_centre,scans:0,badges:new Set()};scannerMap[sb].scans++;scannerMap[sb].badges.add(s.badge_no);});
-    const ws=XLSX.utils.aoa_to_sheet([['Bhati March 2026 Ph2 — Scanner Performance'],['Generated',new Date().toLocaleString('en-IN')],[''],['Scanner Badge','Scanner Name','Centre','Total Scans','Unique Sewadars'],...Object.entries(scannerMap).map(([badge,s])=>[badge,s.name,s.centre,s.scans,s.badges.size])]);
-    styleWS(ws);XLSX.utils.book_append_sheet(wb,ws,'Scanners');
-  }else if(type==='pivot'){
-    // Centre × Department Pivot Matrix — per day
-    const pivotData=DATA.pivot_data||{};
-    const pivotDates=getReportDates('pivot');
-    // Collect all unique departments across all days
-    const allDepts=new Set();
-    Object.values(pivotData).forEach(day=>Object.values(day).forEach(dmap=>Object.keys(dmap).forEach(d=>allDepts.add(d))));
-    const deptCols=[...allDepts].sort();
-    pivotDates.forEach(date=>{
-      if(!pivotData[date])return;
-      const dayPivot=pivotData[date];
-      const centres=Object.keys(dayPivot).sort();
-      const header=['Centre',...deptCols,'TOTAL'];
-      const rows=[header];
-      centres.forEach(c=>{
-        const dmap=dayPivot[c]||{};
-        const vals=deptCols.map(d=>dmap[d]||0);
-        const total=vals.reduce((a,b)=>a+b,0);
-        rows.push([c,...vals,total]);
-      });
-      // Grand total row
-      const totals=['GRAND TOTAL',...deptCols.map(d=>centres.reduce((s,c)=>(dayPivot[c]||{})[d]?s+(dayPivot[c][d]||0):s,0))];
-      totals.push(totals.slice(1).reduce((a,b)=>a+b,0));
-      rows.push(totals);
-      const ws=XLSX.utils.aoa_to_sheet([
-        [`Bhati March 2026 Ph2 — Centre × Department Pivot — ${date}`],
-        ['Generated',new Date().toLocaleString('en-IN')],
-        [''],
-        ...rows
-      ]);
-      styleWS(ws);
-      XLSX.utils.book_append_sheet(wb,ws,`Pivot_${date}`);
-    });
-  }else if(type==='gender'){
-    const gs=(DATA.gender_summary||[]).filter(g=>dates.includes(g.date));
-    const ws=XLSX.utils.aoa_to_sheet([['Bhati March 2026 Ph2 — Gender Report'],['Generated',new Date().toLocaleString('en-IN')],[''],['Date','Male','Female','Total'],...gs.map(g=>[g.date,g.male,g.female,g.male+g.female])]);
-    styleWS(ws);XLSX.utils.book_append_sheet(wb,ws,'Gender');
-  }
+  if(!DATA)return;const dates=getReportDates(type);const wb=XLSX.utils.book_new();
+  if(type==='overview'){const hpd=(DATA.headcount_per_day||[]).filter(h=>dates.includes(h.date));const ws1=XLSX.utils.aoa_to_sheet([['Bhati March 2026 Ph2 — Overview Report'],['Generated',new Date().toLocaleString('en-IN')],[''],['DATE','PRESENT','IN','OUT'],...hpd.map(h=>[h.date,h.total_present,h.total_in,h.total_out])]);styleWS(ws1);XLSX.utils.book_append_sheet(wb,ws1,'Headcount');const gs=(DATA.gender_summary||[]).filter(g=>dates.includes(g.date));const ws2=XLSX.utils.aoa_to_sheet([['DATE','MALE','FEMALE'],...gs.map(g=>[g.date,g.male,g.female])]);styleWS(ws2);XLSX.utils.book_append_sheet(wb,ws2,'Gender');const ds=DATA.department_expected||{};const ws3=XLSX.utils.aoa_to_sheet([['DEPARTMENT','REGISTERED'],...Object.entries(ds).map(([d,c])=>[d,c])]);styleWS(ws3);XLSX.utils.book_append_sheet(wb,ws3,'Departments');}
+  else if(type==='scans'){const typeFilter=document.getElementById('report-scans-type')?.value||'';const scans=(DATA.scans||[]).filter(s=>dates.includes(s.date)&&(!typeFilter||s.type===typeFilter));const ws=XLSX.utils.aoa_to_sheet([['Bhati March 2026 Ph2 — Scan Details'],['Generated',new Date().toLocaleString('en-IN')],['Records',scans.length],[''],['Badge No.','Name','Centre','Dept','Gender','Type','Date','Time','Scanned By Badge','Scanned By Name'],...scans.map(s=>[s.badge_no,s.sewadar_name,s.sewadar_centre,s.department,s.gender,s.type,s.date,s.time,s.scanned_by_badge,s.scanned_by_name])]);styleWS(ws);XLSX.utils.book_append_sheet(wb,ws,'Scans');}
+  else if(type==='attendance'){const centreFilter=document.getElementById('report-attendance-centre')?.value||'';const deptFilter=document.getElementById('report-attendance-dept')?.value||'';let rows=DATA.sewadar_attendance||[];if(centreFilter)rows=rows.filter(r=>r.sewadar_centre===centreFilter);if(deptFilter)rows=rows.filter(r=>r.department===deptFilter);const ws=XLSX.utils.aoa_to_sheet([['Bhati March 2026 Ph2 — Attendance Matrix'],['Generated',new Date().toLocaleString('en-IN')],[''],['Badge No.','Name','Centre','Department','Gender',...dates.map(d=>fmtDate(d))],...rows.map(r=>[r.badge_no,r.sewadar_name,r.sewadar_centre,r.department,r.gender,...dates.map(d=>{const info=r[d];if(!info||info.status==='ABSENT')return'ABSENT';return`IN:${info.first_in} OUT:${info.last_out}`;})]) ]);styleWS(ws);XLSX.utils.book_append_sheet(wb,ws,'Attendance');}
+  else if(type==='centre'){const centreFilter=document.getElementById('report-centre-name')?.value||'';let centres=DATA.centre_summary||[];if(centreFilter)centres=centres.filter(c=>c.centre===centreFilter);const ws=XLSX.utils.aoa_to_sheet([['Bhati March 2026 Ph2 — Centre Summary'],['Generated',new Date().toLocaleString('en-IN')],[''],['Centre','Expected','Scanned',...dates.map(d=>fmtDate(d))],...centres.map(c=>[c.centre,c.expected,c.total_sewadars,...dates.map(d=>c.dates?.[d]?.present||0)])]);styleWS(ws);XLSX.utils.book_append_sheet(wb,ws,'Centres');}
+  else if(type==='absent'){const centreFilter=document.getElementById('report-absent-centre')?.value||'';const deptFilter=document.getElementById('report-absent-dept')?.value||'';const absentData=(DATA.absent_per_day||[]).filter(a=>dates.includes(a.date));let allAbsent=absentData.flatMap(a=>a.absent||[]);if(centreFilter)allAbsent=allAbsent.filter(a=>a.centre===centreFilter);if(deptFilter)allAbsent=allAbsent.filter(a=>a.department===deptFilter);const ws=XLSX.utils.aoa_to_sheet([['Bhati March 2026 Ph2 — Absent List'],['Generated',new Date().toLocaleString('en-IN')],['Total Absent',allAbsent.length],[''],['Badge No.','Name','Centre','Department','Gender'],...allAbsent.map(a=>[a.badge_no,a.name,a.centre,a.department,a.gender])]);styleWS(ws);XLSX.utils.book_append_sheet(wb,ws,'Absent');}
+  else if(type==='alerts'){const alertType=document.getElementById('report-alerts-type')?.value||'';const dups=alertType===''||alertType==='duplicate'?(DATA.duplicate_flags||[]).filter(f=>dates.includes(f.date)):[];const miss=alertType===''||alertType==='missing'?(DATA.missing_out||[]).filter(m=>dates.includes(m.date)):[];const reentry=alertType===''||alertType==='reentry'?(DATA.re_entry_flags||[]).filter(r=>dates.includes(r.date)):[];const multi=alertType===''||alertType==='multi'?(DATA.multi_scan_flags||[]).filter(m=>dates.includes(m.date)):[];if(dups.length){const ws1=XLSX.utils.aoa_to_sheet([['Duplicate IN Scans'],[''],['Badge','Name','Date','Count','Times'],...dups.map(f=>[f.badge_no,f.sewadar_name,f.date,f.in_count,(f.times||[]).join(', ')])]);styleWS(ws1);XLSX.utils.book_append_sheet(wb,ws1,'Dup INs');}if(miss.length){const ws2=XLSX.utils.aoa_to_sheet([['Missing OUT Scans'],[''],['Badge','Name','Centre','Department','Date','IN Time'],...miss.map(m=>[m.badge_no,m.sewadar_name,m.centre,m.department,m.date,m.in_time])]);styleWS(ws2);XLSX.utils.book_append_sheet(wb,ws2,'Missing OUT');}if(reentry.length){const ws3=XLSX.utils.aoa_to_sheet([['Re-entry Scans'],[''],['Badge','Name','Date','First IN','OUT Time','Second IN'],...reentry.map(r=>[r.badge_no,r.sewadar_name,r.date,r.first_in,r.out_time,r.second_in])]);styleWS(ws3);XLSX.utils.book_append_sheet(wb,ws3,'Re-entry');}if(multi.length){const ws4=XLSX.utils.aoa_to_sheet([['Multi Scans'],[''],['Badge','Name','Date','Type','Count','Times'],...multi.map(m=>[m.badge_no,m.sewadar_name,m.date,m.type,m.count,(m.times||[]).join(', ')])]);styleWS(ws4);XLSX.utils.book_append_sheet(wb,ws4,'Multi-scan');}}
+  else if(type==='scanner'){const centreFilter=document.getElementById('report-scanner-centre')?.value||'';const scans=(DATA.scans||[]).filter(s=>dates.includes(s.date)&&(!centreFilter||s.scanned_by_centre===centreFilter));const scannerMap={};scans.forEach(s=>{const sb=s.scanned_by_badge;if(!sb)return;if(!scannerMap[sb])scannerMap[sb]={name:s.scanned_by_name,centre:s.scanned_by_centre,scans:0,badges:new Set()};scannerMap[sb].scans++;scannerMap[sb].badges.add(s.badge_no);});const ws=XLSX.utils.aoa_to_sheet([['Bhati March 2026 Ph2 — Scanner Performance'],['Generated',new Date().toLocaleString('en-IN')],[''],['Scanner Badge','Scanner Name','Centre','Total Scans','Unique Sewadars'],...Object.entries(scannerMap).map(([badge,s])=>[badge,s.name,s.centre,s.scans,s.badges.size])]);styleWS(ws);XLSX.utils.book_append_sheet(wb,ws,'Scanners');}
+  else if(type==='pivot'){const pivotData=DATA.pivot_data||{};const pivotDates=getReportDates('pivot');const allDepts=new Set();Object.values(pivotData).forEach(day=>Object.values(day).forEach(dmap=>Object.keys(dmap).forEach(d=>allDepts.add(d))));const deptCols=[...allDepts].sort();pivotDates.forEach(date=>{if(!pivotData[date])return;const dayPivot=pivotData[date];const centres=Object.keys(dayPivot).sort();const header=['Centre',...deptCols,'TOTAL'];const rows=[header];centres.forEach(c=>{const dmap=dayPivot[c]||{};const vals=deptCols.map(d=>dmap[d]||0);const total=vals.reduce((a,b)=>a+b,0);rows.push([c,...vals,total]);});const totals=['GRAND TOTAL',...deptCols.map(d=>centres.reduce((s,c)=>(dayPivot[c]||{})[d]?s+(dayPivot[c][d]||0):s,0))];totals.push(totals.slice(1).reduce((a,b)=>a+b,0));rows.push(totals);const ws=XLSX.utils.aoa_to_sheet([[`Bhati March 2026 Ph2 — Centre × Department Pivot — ${date}`],['Generated',new Date().toLocaleString('en-IN')],[''],...rows]);styleWS(ws);XLSX.utils.book_append_sheet(wb,ws,`Pivot_${date}`);});}
+  else if(type==='gender'){const gs=(DATA.gender_summary||[]).filter(g=>dates.includes(g.date));const ws=XLSX.utils.aoa_to_sheet([['Bhati March 2026 Ph2 — Gender Report'],['Generated',new Date().toLocaleString('en-IN')],[''],['Date','Male','Female','Total'],...gs.map(g=>[g.date,g.male,g.female,g.male+g.female])]);styleWS(ws);XLSX.utils.book_append_sheet(wb,ws,'Gender');}
   saveXL(wb,reportName('Report_'+type.charAt(0).toUpperCase()+type.slice(1)));
 }
 
 // ── Init ──────────────────────────────────────────────────────────────────────
 loadData();
-setInterval(()=>loadData(true),30*1000); // Phase 2: 30s poll
+setInterval(()=>loadData(true), 30*1000);
 </script>
 </body>
 </html>
